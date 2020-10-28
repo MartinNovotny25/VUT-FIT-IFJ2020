@@ -130,13 +130,13 @@
                    }
                    else if (current_char == '{')
                    {
-                       end_token(t_BRACES_R, &token);
+                       end_token(t_BRACES_L, &token);
                        return token;
                        break;
                    }
                    else if (current_char == '}')
                    {
-                       end_token(t_BRACES_L, &token);
+                       end_token(t_BRACES_R, &token);
                        return token;
                        break;
                    }
