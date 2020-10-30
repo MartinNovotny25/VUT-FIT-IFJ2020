@@ -430,6 +430,11 @@
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
+                   else if (isdigit(current_char))
+                   {
+                       fprintf(stderr , "Lexical error.\n");
+                       exit(1);
+                   }
                    else
                    {
                        unload_c(text);
