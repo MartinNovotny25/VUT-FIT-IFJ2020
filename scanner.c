@@ -425,6 +425,16 @@
                    {
                        state = DOT;
                    }
+                   else if (current_char == '0')
+                   {
+                       fprintf(stderr , "Lexical error.\n");
+                       exit(1);
+                   }
+                   else if (isdigit(current_char))
+                   {
+                       fprintf(stderr , "Lexical error.\n");
+                       exit(1);
+                   }
                    else
                    {
                        unload_c(text);
