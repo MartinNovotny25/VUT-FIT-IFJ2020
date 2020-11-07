@@ -71,6 +71,7 @@
        strcpy(token->lex, current_token);
        token->type = type;
        printf("token %d lex %s\n",token->type, token->lex);
+       //printf("%d\n",token->type);
        delete_string();
    }
 
@@ -165,6 +166,12 @@
                    else if (current_char == '+')
                    {
                        end_token(t_PLUS, &token);
+                       return token;
+                       break;
+                   }
+                   else if (current_char == ';')
+                   {
+                       end_token(T_SEMICOLON, &token);
                        return token;
                        break;
                    }
