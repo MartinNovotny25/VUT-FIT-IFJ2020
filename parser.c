@@ -51,8 +51,6 @@ void rule_for_def();
 
 void rule_for_assign();
 
-void rule_call_func();
-
 void rule_id_n_or_call_func();
 
 int main() {
@@ -140,10 +138,10 @@ void rule_func_retlist_body() {
             if (token.type != t_EOL) { error_call(ERR_SYN); }
             else { token = get_next_token(stdin); }
 
-            printf("tu budem pokracovat do STAT a OPTIONAL RETkokot\n");
+           // printf("tu budem pokracovat do STAT a OPTIONAL RETkokot\n");
 
             rule_stat();
-            printf("SOM PRED RULE_RETURN\n");
+           // printf("SOM PRED RULE_RETURN\n");
             rule_return();
 
             //printf("vysiel som zo stat\n");
@@ -195,29 +193,25 @@ void rule_func_body() {
 
     rule_stat();
 
-    printf("SOM PRED RULE_RETURN\n");
+    //printf("SOM PRED RULE_RETURN\n");
     rule_return();
 }
 
 // funkcia pre neterminal stat
 void rule_stat() {
-    printf("vosiel som do stat s tokenom %d\n", token.type);
+   // printf("vosiel som do stat s tokenom %d\n", token.type);
     //switch podla typu tokenu
     switch (token.type) {
         // <stat> -> id CALL_FUNC/ASSIGN -- ak pride id
         case t_IDENTIFIER:
             token = get_next_token(stdin);
-            rule_id_n();
-            rule_init_def();
+            rule_id_n_or_call_func();
 
-            rule_func_assign();
-
-            rule_stat();
             break;
 
             // <stat> ->
         case t_IF:
-            printf("som v if\n");
+            //printf("som v if\n");
             token = get_next_token(stdin);
 
             //sem pride psa, nacitava znaky vyrazu do zatvorky
@@ -229,7 +223,7 @@ void rule_stat() {
             } else { error_call(ERR_SYN); }
 
             if (token.type != t_BRACES_L) {
-                printf("zle braces_L\n");
+                //printf("zle braces_L\n");
                 error_call(ERR_SYN);
             }
             else {
@@ -239,7 +233,7 @@ void rule_stat() {
 
 
             if (token.type != t_EOL) {
-                printf("NENI EOL\n");
+                //printf("NENI EOL\n");
                 error_call(ERR_SYN);
             }
             else { token = get_next_token(stdin); }
@@ -258,7 +252,7 @@ void rule_stat() {
             }
 
             if (token.type != t_BRACES_R) {
-                printf("zle braces_R\n");
+                //printf("zle braces_R\n");
                 error_call(ERR_SYN);
             }
             else {
@@ -304,7 +298,7 @@ void rule_stat() {
             }
 
             if (token.type != t_EOL) {
-                printf("NENI EOL ZA ELSE--token je %d\n", token.type);
+                //printf("NENI EOL ZA ELSE--token je %d\n", token.type);
                 error_call(ERR_SYN);
             }
             else { token = get_next_token(stdin); }
@@ -322,7 +316,7 @@ void rule_stat() {
 
             rule_for_def();
 
-            printf("som von z rule_def\n");
+           // printf("som von z rule_def\n");
 
             // SEM PRIDE PCA na vyhodnotenie for vyrazu
             if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
@@ -366,14 +360,14 @@ void rule_stat() {
             break;
 
         case t_EOL:
-            printf("vosiel som do stat_eol\n");
+            //printf("vosiel som do stat_eol\n");
             token = get_next_token(stdin);
             rule_stat();
             break;
 
             //ak po stat nebude nič a skonči sa blok
         case t_BRACES_R:
-            printf("SOM V BRACES\n");
+            //printf("SOM V BRACES\n");
             break;
         case t_RETURN:
             //printf("SOM V ELSE\n");
@@ -385,21 +379,47 @@ void rule_stat() {
     }
 }
 
-/*void rule_id_n_or_call_func()
+void rule_id_n_or_call_func()
 {
-    switch (token.)
+    switch (token.type)
+    {
+        case t_COMMA:
+            rule_id_n();
+            rule_init_def();
+            rule_func_assign();
+            rule_stat();
+            break;
+        case t_DEFINITION_2:
+            rule_id_n();
+            rule_init_def();
+            rule_func_assign();
+            rule_stat();
+            break;
+
+        case t_ASSIGN:
+            rule_id_n();
+            rule_init_def();
+            rule_func_assign();
+            rule_stat();
+            break;
+
+        case t_LEFT_BRACKET:
+            token = get_next_token(stdin);
+            rule_func_params();
+            rule_eol();
+            rule_stat();
+            break;
+        default:
+            error_call(ERR_SYN);
+    }
 
 
 }
 
-void rule_call_func()
-{
-
-}*/
 
 // funckia pre neterminal func_assign spolu s neterminalom OPT_ID
 void rule_func_assign() {
-    printf("FUNC_ASSIGN\n");
+    //printf("FUNC_ASSIGN\n");
     //V tomto pripade sa pozriem na token dopredu, ak bude lava zatvorka tak funckia, ak nieco ine, vyraz
     // Just in case do help_token ulozin ID
     if (token.type == t_IDENTIFIER) {
@@ -485,7 +505,7 @@ void rule_params_n() {
 
 //funkcia pre neterminal rule_func_params -- MUSI BYT EXP
 void rule_func_params() {
-    printf("FUNC_PARAMS\n");
+   // printf("FUNC_PARAMS\n");
     if (token.type == t_RIGHT_BRACKET) {
         token = get_next_token(stdin);
         return;
@@ -499,7 +519,7 @@ void rule_func_params() {
 }
 
 void rule_func_params_n() {
-    printf("FUNC_PARAMS_N\n");
+    //printf("FUNC_PARAMS_N\n");
     if (token.type == t_RIGHT_BRACKET) { return; }
 
     else {
@@ -617,7 +637,7 @@ void rule_type() {
 
 // pravidlo pre neterminal optinal return -- VOLAT TOKEN PRED ZAVOLANIM FUNKCIE
 void rule_return() {
-    printf("som v rule_return s tokenom %d\n", token.type);
+   // printf("som v rule_return s tokenom %d\n", token.type);
     switch (token.type) {
         case t_RETURN:
             token = get_next_token(stdin);
@@ -652,7 +672,7 @@ void rule_return() {
 
         case t_BRACES_R:
             if (is_return == true) {
-                printf("CHYBA RETURN\n");
+               // printf("CHYBA RETURN\n");
                 error_call(ERR_SYN);
             }
             token = get_next_token(stdin);
@@ -660,7 +680,7 @@ void rule_return() {
 
         case t_EOL:
             if (is_return == true) {
-                printf("CHYBA RETURN\n");
+               // printf("CHYBA RETURN\n");
                 error_call(ERR_SYN);
             }
             token = get_next_token(stdin);
@@ -694,7 +714,7 @@ void rule_return_type_n() {
 
 //predtym pride ciarka a zavola sa rule_exp_n a nacita sa token
 void rule_exp_n() {
-    printf("EXP_N s tokenom %d\n",token.type);
+   // printf("EXP_N s tokenom %d\n",token.type);
 
     //token = get_next_token(stdin);
 
