@@ -199,6 +199,7 @@ void rule_func_body() {
 
 // funkcia pre neterminal stat
 void rule_stat() {
+    //
    // printf("vosiel som do stat s tokenom %d\n", token.type);
     //switch podla typu tokenu
     switch (token.type) {
