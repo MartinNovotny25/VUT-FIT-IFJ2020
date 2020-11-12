@@ -12,6 +12,7 @@ TOKEN last_token;
 TOKEN help_token;
 bool no_id_in_params_flag = false; //pri id, id nemoze byt return type pri def_func
 bool is_return = false; // flag pre vynutenie return statementu
+bool was_return = false;
 bool return_happened = false; // pomocny bool pre potrebu testovania RETURNOV vymazat az bude stat
 
 int global_brace_count = 0; //pocitadlo mnozinovych zatvoriek
@@ -114,6 +115,13 @@ void def_func() {
         // printf("vysiel som z retlist body\n");
     }
 
+    if (was_return == false && is_return == true) {error_call(ERR_SYN);}
+    else
+        {
+            was_return = false;
+            is_return = false;
+        }
+
 
     //VYPIS NEIMPLEMENTOVANYCH TERMINALOV
     /*while (token.type != t_BRACES_R && token.type != t_EOF) {token = get_next_token(stdin);}*/
@@ -121,13 +129,13 @@ void def_func() {
 
     if (token.type == t_EOL)
     {
-        printf("som v rule eol na konci\n");
+        //printf("som v rule eol na konci\n");
         rule_eol();
     }
 
     if (token.type == t_FUNC)
     {
-        printf("som v druhom def_func\n");
+        //printf("som v druhom def_func\n");
         token = get_next_token(stdin);
         def_func();
     }
@@ -157,7 +165,7 @@ void rule_func_retlist_body() {
 
             rule_stat();
            // printf("SOM PRED RULE_RETURN\n");
-            rule_return();
+            //rule_return();
 
             //printf("vysiel som zo stat\n");
 
@@ -209,7 +217,7 @@ void rule_func_body() {
     rule_stat();
 
     //printf("SOM PRED RULE_RETURN\n");
-    rule_return();
+    //rule_return();
 }
 
 // funkcia pre neterminal stat
@@ -386,8 +394,10 @@ void rule_stat() {
             //printf("SOM V BRACES\n");
             break;
         case t_RETURN:
-            //printf("SOM V ELSE\n");
             //token = get_next_token(stdin);
+            rule_return();
+            printf("Vysiel som z rule return\n");
+            rule_stat();
             break;
 
         default:
@@ -653,12 +663,13 @@ void rule_type() {
 
 // pravidlo pre neterminal optinal return -- VOLAT TOKEN PRED ZAVOLANIM FUNKCIE
 void rule_return() {
-   // printf("som v rule_return s tokenom %d\n", token.type);
+    //printf("som v rule_return s tokenom %d\n", token.type);
     switch (token.type) {
         case t_RETURN:
+            was_return = true;
             token = get_next_token(stdin);
 
-            if (is_return == 1) {
+            if (is_return == true) {
                 if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
                     token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN); }
                 else { token = get_next_token(stdin); }
@@ -672,11 +683,11 @@ void rule_return() {
                     rule_eol();
                 }
 
-                if (token.type != t_BRACES_R) { error_call(ERR_SYN); }
-                else { token = get_next_token(stdin); }
+                /*if (token.type != t_BRACES_R) { error_call(ERR_SYN); }
+                else { token = get_next_token(stdin); }*/
 
 
-            } else if (is_return == 0) {
+            } else if (is_return == false) {
                 if (token.type != t_EOL) { error_call(ERR_SYN); }
                 else { token = get_next_token(stdin); }
 
