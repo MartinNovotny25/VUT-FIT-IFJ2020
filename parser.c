@@ -9,11 +9,11 @@
 
 TOKEN token;
 TOKEN last_token;
-TOKEN help_token;
+TOKEN help;
 bool no_id_in_params_flag = false; //pri id, id nemoze byt return type pri def_func
 bool is_return = false; // flag pre vynutenie return statementu
 bool was_return = false;
-bool return_happened = false; // pomocny bool pre potrebu testovania RETURNOV vymazat az bude stat
+bool is_eol = false;
 
 int global_brace_count = 0; //pocitadlo mnozinovych zatvoriek
 
@@ -54,6 +54,8 @@ void rule_for_def();
 void rule_for_assign();
 
 void rule_id_n_or_call_func();
+
+void safety_eol();
 
 int main() {
 
@@ -115,13 +117,12 @@ void def_func() {
         // printf("vysiel som z retlist body\n");
     }
 
-    if (was_return == false && is_return == true) {error_call(ERR_SYN);}
-    else
-        {
-            was_return = false;
-            is_return = false;
-        }
+    //printf("is_return je %d, was_return je %d\n", is_return, was_return);
 
+    if (was_return == false && is_return == true) {error_call(ERR_SYN);}
+
+    was_return = false;
+    is_return = false;
 
     //VYPIS NEIMPLEMENTOVANYCH TERMINALOV
     /*while (token.type != t_BRACES_R && token.type != t_EOF) {token = get_next_token(stdin);}*/
@@ -132,6 +133,47 @@ void def_func() {
         //printf("som v rule eol na konci\n");
         rule_eol();
     }
+
+    if (token.type != t_BRACES_R) {error_call(ERR_SYN);}
+    else {token = get_next_token(stdin);}
+
+    printf("TOKEN %d\n", token.type);
+
+
+    printf("som pred switchom\n");
+    switch (token.type)
+    {
+        case t_EOL:
+            if (is_eol == false)
+            {
+                is_eol = true;
+            }
+            safety_eol();
+            break;
+        case t_FUNC:
+            if (is_eol == false)
+            {
+                error_call(ERR_SYN);
+            }
+            break;
+
+        case t_EOF:
+            break;
+        default:
+            error_call(ERR_SYN);
+    }
+
+
+    /*if (token.type != t_EOL) {printf("ERROR s tokenom %d\n", token.type);error_call(ERR_SYN);}
+    else {token = get_next_token(stdin);}
+
+    if (token.type == t_EOL)
+    {
+        printf("som v rule eol na konci\n");
+        rule_eol();
+    }*/
+
+    //printf("Tu by som mal ist do druheho def_func, token je %d\n", token.type);
 
     if (token.type == t_FUNC)
     {
@@ -396,7 +438,7 @@ void rule_stat() {
         case t_RETURN:
             //token = get_next_token(stdin);
             rule_return();
-            printf("Vysiel som z rule return\n");
+            //printf("Vysiel som z rule return\n");
             rule_stat();
             break;
 
@@ -779,5 +821,26 @@ void rule_eol() {
 
         default:
             break;
+    }
+}
+
+void safety_eol() {
+
+    //Zaplata pre PRAVE ZATVORKY
+    //if (token.type == t_BRACES_R) { return; }
+
+    //printf("som v rule_EOL s tokenom %d\n", token.type);
+    token = get_next_token(stdin);
+
+    switch (token.type) {
+        case t_EOL:
+            safety_eol();
+            break;
+
+        case t_FUNC:
+            break;
+
+        default:
+            error_call(ERR_SYN);
     }
 }
