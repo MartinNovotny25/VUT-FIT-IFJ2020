@@ -118,6 +118,20 @@ void def_func() {
     //VYPIS NEIMPLEMENTOVANYCH TERMINALOV
     /*while (token.type != t_BRACES_R && token.type != t_EOF) {token = get_next_token(stdin);}*/
     global_brace_count--;
+
+    if (token.type == t_EOL)
+    {
+        printf("som v rule eol na konci\n");
+        rule_eol();
+    }
+
+    if (token.type == t_FUNC)
+    {
+        printf("som v druhom def_func\n");
+        token = get_next_token(stdin);
+        def_func();
+    }
+
 }
 
 void rule_func_retlist_body() {
