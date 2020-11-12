@@ -2,9 +2,6 @@
    **    Part of IFJ Project 2020/2021
    **    Author: Simon Fenko xfenko01
    */
-
-
-   #include "stack.h"
    #include "scanner.h"
 
    bool First_token = false;
