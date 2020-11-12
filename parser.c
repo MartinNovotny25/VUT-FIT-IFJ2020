@@ -3,6 +3,7 @@
 
 #include "scanner.h"
 #include "error.h"
+#include "parser.h"
 
 //V stat je ELSE ako break, dalej to mozno bude robit problemy, v buducnosti sa na to este pozriet!!
 
@@ -268,7 +269,7 @@ void rule_stat() {
             else { token = get_next_token(stdin); }
 
             if (token.type != t_BRACES_L) {
-                printf("zle braces_L\n");
+                //printf("zle braces_L\n");
                 error_call(ERR_SYN);
             }
             else {
@@ -624,7 +625,7 @@ void rule_type() {
         case t_INT_ZERO:
             token = get_next_token(stdin);
             break;
-        case t_STRING:
+        case t_STRING_ID:
             token = get_next_token(stdin);
             break;
         case t_IDENTIFIER:
@@ -723,12 +724,14 @@ void rule_exp_n() {
     {
         return;
 
-    } else if (token.type != t_COMMA) {printf("1\n");error_call(ERR_SYN);}
+    } else if (token.type != t_COMMA) {error_call(ERR_SYN);}
     else {
         token = get_next_token(stdin);
 
+        if (token.type == t_EOL) {error_call(ERR_SYN);}
+
         if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) {printf("2\n");error_call(ERR_SYN); }
+            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) {error_call(ERR_SYN); }
         else {token = get_next_token(stdin);}
 
         rule_exp_n();
