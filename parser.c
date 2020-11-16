@@ -71,9 +71,9 @@ int main() {
     else { token = get_next_token(stdin); }
 
 
-    // Token EOL
-    if (token.type != t_EOL) { error_call(ERR_SYN); }
-    else { token = get_next_token(stdin); }
+    // Token EOL - Evidentne netreba
+    /*if (token.type != t_EOL) { error_call(ERR_SYN); }
+    else { token = get_next_token(stdin); }*/
 
     // Neterminal <eol>
     if (token.type == t_EOL) {
@@ -86,6 +86,11 @@ int main() {
         token = get_next_token(stdin);
         def_func();
     }
+
+    /*if (token.type == t_EOL) {
+        printf("som v poslednom rule eol\n");
+        rule_eol();
+    }*/
 
     //printf("%d\n", global_brace_count);
     if (global_brace_count != 0) { error_call(ERR_SYN); }
@@ -137,44 +142,13 @@ void def_func() {
     if (token.type != t_BRACES_R) {error_call(ERR_SYN);}
     else {token = get_next_token(stdin);}
 
-    printf("TOKEN %d\n", token.type);
-
-
-    printf("som pred switchom\n");
-    switch (token.type)
-    {
-        case t_EOL:
-            if (is_eol == false)
-            {
-                is_eol = true;
-            }
-            safety_eol();
-            break;
-        case t_FUNC:
-            if (is_eol == false)
-            {
-                error_call(ERR_SYN);
-            }
-            break;
-
-        case t_EOF:
-            break;
-        default:
-            error_call(ERR_SYN);
-    }
-
-
-    /*if (token.type != t_EOL) {printf("ERROR s tokenom %d\n", token.type);error_call(ERR_SYN);}
-    else {token = get_next_token(stdin);}
-
+    //
     if (token.type == t_EOL)
     {
-        printf("som v rule eol na konci\n");
         rule_eol();
-    }*/
+    }
 
-    //printf("Tu by som mal ist do druheho def_func, token je %d\n", token.type);
-
+    printf("som von\n");
     if (token.type == t_FUNC)
     {
         //printf("som v druhom def_func\n");
@@ -490,6 +464,9 @@ void rule_func_assign() {
     //printf("FUNC_ASSIGN\n");
     //V tomto pripade sa pozriem na token dopredu, ak bude lava zatvorka tak funckia, ak nieco ine, vyraz
     // Just in case do help_token ulozin ID
+
+    if (token.type == t_EOL) {error_call(ERR_SYN);}
+
     if (token.type == t_IDENTIFIER) {
         token = get_next_token(stdin);
 
