@@ -30,6 +30,12 @@
        }
        return 0;
    }
+void remove_(void)
+{
+    current_token[current_token_position] = 0x00;
+    current_token_position--;
+    current_token[current_token_position] = 0x00;
+}
    void delete_string(void)
    {
        current_token[0] = 0x00;
@@ -422,6 +428,10 @@
                    {
                        state = t_INT_NON_ZERO;
                    }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
                    else
                    {
                        unload_c(text);
@@ -442,6 +452,10 @@
                    else if (current_char == '.')
                    {
                        state = DOT;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
                    }
                    else if (current_char == '0')
                    {
@@ -469,6 +483,10 @@
                        non_zero_int = false;
                        state = t_FLOAT;
                    }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
                    else
                    {
                        fprintf(stderr , "Lexical error.\n");
@@ -486,6 +504,10 @@
                    else if (isdigit(current_char))
                    {
                        state = t_FLOAT;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
                    }
                    else
                    {
