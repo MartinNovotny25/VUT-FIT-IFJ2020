@@ -342,6 +342,7 @@ void remove_(void)
                        }
                    }
                    break;
+                   
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                    
@@ -518,6 +519,7 @@ void remove_(void)
                    }
                    break;
                    
+               //exponent
                case EXPONENT:
                    
                    if ((isdigit(current_char)) && (current_char != '0'))
@@ -557,7 +559,7 @@ void remove_(void)
                    }
                    break;
 
-                   
+               //Exponent so znamienkom plus alebo minus
                case PLUS_MINUS_EXPONENT:
                    if(isdigit(current_char))
                    {
@@ -589,7 +591,8 @@ void remove_(void)
                        }
                    }
                    break;
-                   
+                
+               //pokracovanie exponenta so znamienkom
                case EXPONENT2:
                    if (isdigit(current_char))
                    {
@@ -602,7 +605,8 @@ void remove_(void)
                        return token;
                    }
                    break;
-                   
+                
+               //Exponent zacinajuci nulou
                case ZERO_EXPONENT:
                    if (isdigit(current_char))
                    {
