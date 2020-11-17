@@ -520,9 +520,13 @@ void remove_(void)
                    
                case EXPONENT:
                    
-                   if (isdigit(current_char))
+                   if ((isdigit(current_char)) && (current_char != '0'))
                    {
                        state = EXPONENT2;
+                   }
+                   else if (current_char == '0')
+                   {
+                       state = ZERO_EXPONENT;
                    }
                    else if (current_char == '+' || current_char == '-'  )
                    {
@@ -598,7 +602,21 @@ void remove_(void)
                        return token;
                    }
                    break;
-
+                   
+               case ZERO_EXPONENT:
+                   if (isdigit(current_char))
+                   {
+                       fprintf(stderr , "Lexical error.\n");
+                       exit(1);
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_FLOAT, &token);
+                       return token;
+                   }
+                   break;
+                
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                    

@@ -68,6 +68,7 @@
 #define EXP_END 54
 #define HELP 55
 #define T_SEMICOLON 56
+#define ZERO_EXPONENT 57
 
 typedef struct TOKEN
 {
