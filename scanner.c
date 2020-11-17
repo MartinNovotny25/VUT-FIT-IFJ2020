@@ -598,6 +598,10 @@ void remove_(void)
                    {
                        state = EXPONENT2;
                    }
+                   else if (current_char == '.')
+                   {
+                       state = DOT;
+                   }
                    else
                    {
                        unload_c(text);
@@ -612,6 +616,10 @@ void remove_(void)
                    {
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
+                   }
+                   else if (current_char == '.')
+                   {
+                       state = DOT;
                    }
                    else
                    {
