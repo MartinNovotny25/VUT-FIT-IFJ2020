@@ -454,6 +454,18 @@ void remove_(void)
                    {
                        state = DOT;
                    }
+                   else if ((current_char == 'b') || (current_char == 'B'))
+                   {
+                       state = BINARY;
+                   }
+                   else if ((current_char == 'o') || (current_char == 'O'))
+                   {
+                       state = OCTAL;
+                   }
+                   else if ((current_char == 'x') || (current_char == 'X'))
+                   {
+                       state = HEXADECIMAL;
+                   }
                    else if (current_char == '_')
                    {
                        remove_();
@@ -625,6 +637,61 @@ void remove_(void)
                    {
                        unload_c(text);
                        end_token(t_FLOAT, &token);
+                       return token;
+                   }
+                   break;
+                   
+   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   ///BASE ROZSIRENIE
+                   
+               case BINARY:
+                   if ((current_char == '0') || (current_char == '1'))
+                   {
+                       state = BINARY;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_INT_NON_ZERO, &token);
+                       return token;
+                   }
+                   break;
+                   
+               case OCTAL:
+                   if (isdigit(current_char))
+                   {
+                       state = OCTAL;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_INT_NON_ZERO, &token);
+                       return token;
+                   }
+                   break;
+                   
+               case HEXADECIMAL:
+                   if ((isdigit(current_char)) || (current_char == 'A') || (current_char == 'a') || (current_char == 'B') || (current_char == 'b') || (current_char == 'C') || (current_char == 'c') || (current_char == 'D') || (current_char == 'd') || (current_char == 'E') || (current_char == 'e') || (current_char == 'F') || (current_char == 'f'))
+                   {
+                       state = HEXADECIMAL;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_INT_NON_ZERO, &token);
                        return token;
                    }
                    break;

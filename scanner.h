@@ -69,6 +69,10 @@
 #define HELP 55
 #define T_SEMICOLON 56
 #define ZERO_EXPONENT 57
+#define BINARY 58
+#define OCTAL 59
+#define HEXADECIMAL 60
+
 
 typedef struct TOKEN
 {
