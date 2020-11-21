@@ -5,9 +5,14 @@
    #include "scanner.h"
 
    bool First_token = false;
+   bool non_zero_int = false;
+   bool zero_int = false;
+   bool floating_point = false;
    char current_token[100];
    int current_token_position = 0;
    char current_char;
+   char current_char2;
+   char current_char3;
    /* Vymazavanie current_tokenu (napr. chodia medzery-vtedy ich vyhodime a
    pokracujeme dalej)*/
 
@@ -25,6 +30,12 @@
        }
        return 0;
    }
+void remove_(void)
+{
+    current_token[current_token_position] = 0x00;
+    current_token_position--;
+    current_token[current_token_position] = 0x00;
+}
    void delete_string(void)
    {
        current_token[0] = 0x00;
@@ -331,6 +342,7 @@
                        }
                    }
                    break;
+                   
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                    
@@ -403,35 +415,60 @@
                    
                // okrem nuly
                case t_INT_NON_ZERO:
+                   non_zero_int = true;
                    if (current_char == '.')
                    {
                        state = DOT;
                    }
                    else if ((current_char == 'e') || (current_char == 'E'))
                    {
+                       current_char2 = current_char;
                        state = EXPONENT;
                    }
                    else if (isdigit(current_char))
                    {
                        state = t_INT_NON_ZERO;
                    }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
                    else
                    {
                        unload_c(text);
                        end_token(t_INT_NON_ZERO, &token);
+                       non_zero_int = false;
                        return token;
                    }
                    break;
                
                // zacina nulou
                case t_INT_ZERO:
+                   zero_int = true;
                    if ((current_char == 'e') || (current_char == 'E'))
                    {
+                       current_char2 = current_char;
                        state = EXPONENT;
                    }
                    else if (current_char == '.')
                    {
                        state = DOT;
+                   }
+                   else if ((current_char == 'b') || (current_char == 'B'))
+                   {
+                       state = BINARY;
+                   }
+                   else if ((current_char == 'o') || (current_char == 'O'))
+                   {
+                       state = OCTAL;
+                   }
+                   else if ((current_char == 'x') || (current_char == 'X'))
+                   {
+                       state = HEXADECIMAL;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
                    }
                    else if (current_char == '0')
                    {
@@ -447,6 +484,7 @@
                    {
                        unload_c(text);
                        end_token(t_INT_ZERO, &token);
+                       zero_int = false;
                        return token;
                    }
                    break;
@@ -454,7 +492,13 @@
                case DOT:
                    if (isdigit(current_char))
                    {
+                       zero_int = false;
+                       non_zero_int = false;
                        state = t_FLOAT;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
                    }
                    else
                    {
@@ -464,39 +508,70 @@
                    break;
                    
                case t_FLOAT:
+                   floating_point = true;
                    if (current_char == 'e' || current_char == 'E')
                    {
+                       current_char2 = current_char;
                        state = EXPONENT;
                    }
                    else if (isdigit(current_char))
                    {
                        state = t_FLOAT;
                    }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
                    else
                    {
                        unload_c(text);
                        end_token(t_FLOAT, &token);
+                       floating_point = false;
                        return token;
                    }
                    break;
                    
+               //exponent
                case EXPONENT:
                    
-                   if (isdigit(current_char))
+                   if ((isdigit(current_char)) && (current_char != '0'))
                    {
                        state = EXPONENT2;
                    }
+                   else if (current_char == '0')
+                   {
+                       state = ZERO_EXPONENT;
+                   }
                    else if (current_char == '+' || current_char == '-'  )
                    {
+                       current_char3 = current_char;
                        state = PLUS_MINUS_EXPONENT;
                    }
                    else
                    {
-                       fprintf(stderr , "Lexical error.\n");
-                       exit(1);
+                       unload_c(text);
+                       ungetc(current_char2,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       if(floating_point){
+                           floating_point = false;
+                           end_token(t_FLOAT, &token);
+                           return token;
+                       }
+                       else if(zero_int){
+                           zero_int = false;
+                           end_token(t_INT_ZERO, &token);
+                           return token;
+                       }
+                       else{
+                           non_zero_int = false;
+                           end_token(t_INT_NON_ZERO, &token);
+                           return token;
+                       }
                    }
                    break;
-                   
+
+               //Exponent so znamienkom plus alebo minus
                case PLUS_MINUS_EXPONENT:
                    if(isdigit(current_char))
                    {
@@ -504,15 +579,40 @@
                    }
                    else
                    {
-                       fprintf(stderr , "Lexical error.\n");
-                       exit(1);
+                       unload_c(text);
+                       ungetc(current_char3,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc(current_char2,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       if(floating_point){
+                           floating_point = false;
+                           end_token(t_FLOAT, &token);
+                           return token;
+                       }
+                       else if(zero_int){
+                           zero_int = false;
+                           end_token(t_INT_ZERO, &token);
+                           return token;
+                       }
+                       else{
+                           non_zero_int = false;
+                           end_token(t_INT_NON_ZERO, &token);
+                           return token;
+                       }
                    }
                    break;
-                   
+                
+               //pokracovanie exponenta so znamienkom
                case EXPONENT2:
                    if (isdigit(current_char))
                    {
                        state = EXPONENT2;
+                   }
+                   else if (current_char == '.')
+                   {
+                       state = DOT;
                    }
                    else
                    {
@@ -521,7 +621,81 @@
                        return token;
                    }
                    break;
-
+                
+               //Exponent zacinajuci nulou
+               case ZERO_EXPONENT:
+                   if (isdigit(current_char))
+                   {
+                       fprintf(stderr , "Lexical error.\n");
+                       exit(1);
+                   }
+                   else if (current_char == '.')
+                   {
+                       state = DOT;
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_FLOAT, &token);
+                       return token;
+                   }
+                   break;
+                   
+   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   ///BASE ROZSIRENIE
+                   
+               case BINARY:
+                   if ((current_char == '0') || (current_char == '1'))
+                   {
+                       state = BINARY;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_INT_NON_ZERO, &token);
+                       return token;
+                   }
+                   break;
+                   
+               case OCTAL:
+                   if (isdigit(current_char))
+                   {
+                       state = OCTAL;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_INT_NON_ZERO, &token);
+                       return token;
+                   }
+                   break;
+                   
+               case HEXADECIMAL:
+                   if ((isdigit(current_char)) || (current_char == 'A') || (current_char == 'a') || (current_char == 'B') || (current_char == 'b') || (current_char == 'C') || (current_char == 'c') || (current_char == 'D') || (current_char == 'd') || (current_char == 'E') || (current_char == 'e') || (current_char == 'F') || (current_char == 'f'))
+                   {
+                       state = HEXADECIMAL;
+                   }
+                   else if (current_char == '_')
+                   {
+                       remove_();
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_INT_NON_ZERO, &token);
+                       return token;
+                   }
+                   break;
+                
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                    
