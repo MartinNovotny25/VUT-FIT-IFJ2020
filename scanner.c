@@ -27,20 +27,25 @@
            {
                break;
            }
+           
        }
        return 0;
    }
-void remove_(void)
-{
-    current_token[current_token_position] = 0x00;
-    current_token_position--;
-    current_token[current_token_position] = 0x00;
-}
+
+   //Funkcia na odstranovanie znaku '_'
+   void remove_(void)
+   {
+       current_token[current_token_position] = 0x00;
+       current_token_position--;
+       current_token[current_token_position] = 0x00;
+   }
+
    void delete_string(void)
    {
        current_token[0] = 0x00;
        current_token_position = 0;
    }
+
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    /*najprv vytiahne znak zo suboru a hodi ho do current_char a prilepi ho
     na koniec stringu, do ktoreho sa uklada sučasny načitavany token, zvyši
@@ -93,9 +98,11 @@ void remove_(void)
        
        while (true)
        {
+           //nacitavame znaky a v pripade prázdneho súboru nastane EOF
            load_c(text);
            if (current_char == EOF && strlen(current_token) == 1 )
            {
+               //TOKEN EOF
                token.type = t_EOF;
                return token;
            }
@@ -105,11 +112,13 @@ void remove_(void)
            switch (state)
            {
                case START:
+                   //V pripade whitespace
                    if (current_char == ' ')
                    {
                        state = START;
                        delete_string();
                    }
+                   //V pripade EOL (TAB)
                    else if (current_char == 9)
                    {
                        state = START;
@@ -117,106 +126,127 @@ void remove_(void)
                    }
                    else if (current_char == '<')
                    {
+                       //Posuvame sa do medzistavu, pretoze moze z toho byt token <=
                        state = t_LESS;
                    }
                    else if (current_char == '>')
                    {
+                       //Posuvame sa do medzistavu, pretoze moze z toho byt token >=
                        state = t_GREATER;
                    }
                    else if (current_char == '=')
                    {
+                       //Posume sa do medzistavu, pretoze moze z toho byt token ==
                        state = t_ASSIGN;
                    }
                    else if (current_char == '!')
                    {
+                       //Posuvame sa do medzistavu, pretoze moze z toho byt token !=
                        state = EXLAMATION;
                    }
                    else if (current_char == ',')
                    {
+                       //Koncime tokenom COMMA
                        end_token(t_COMMA, &token);
                        return token;
                        break;
                    }
                    else if (current_char == '{')
                    {
+                       //Koncime tokenom {
                        end_token(t_BRACES_L, &token);
                        return token;
                        break;
                    }
                    else if (current_char == '}')
                    {
+                       //Koncime tokenom }
                        end_token(t_BRACES_R, &token);
                        return token;
                        break;
                    }
                    else if (current_char == '(')
                    {
+                       //Koncime tokenom (
                        end_token(t_LEFT_BRACKET, &token);
                        return token;
                        break;
                    }
                    else if (current_char == ')')
                    {
+                       //koncime tokenom )
                        end_token(t_RIGHT_BRACKET, &token);
                        return token;
                        break;
                    }
                    else if (current_char == '/')
                    {
+                       //Posuvame sa do medzistavu, pretoze moze to byt aj token //one line comment
                        state = ONE_LINE_COMMENT_1;
                    }
                    else if (current_char == '*')
                    {
+                       //Koncime tokenom *
                        end_token(t_MULTIPLY, &token);
                        return token;
                        break;
                    }
                    else if (current_char == '+')
                    {
+                       //Koncime token +
                        end_token(t_PLUS, &token);
                        return token;
                        break;
                    }
                    else if (current_char == ';')
                    {
+                       //Koncime tokenom ;
                        end_token(T_SEMICOLON, &token);
                        return token;
                        break;
                    }
                    else if (current_char == '-')
                    {
+                       //Koncime tokenom -
                        end_token(t_MINUS, &token);
                        return token;
                        break;
                    }
                    else if (current_char == ':')
                    {
+                       //Posuvame sa do medzistavu, pretoze moze nastat token :=
                        state = t_DEFINITION_1;
                    }
                    else if (current_char == '0')
                    {
+                       //Posuvame sa do medzistavu, pretoze po cisle 0 moze prist aj desatinna cast
                        state = t_INT_ZERO;
                    }
                    else if ((isdigit(current_char)) && (current_char != '0'))
                    {
+                       //Posuvame sa do medzistavu, pretoze moze byt viacciferne cislo alebo desatinne
                        state = t_INT_NON_ZERO;
                    }
                    else if (current_char == '"')
                    {
+                       //Posuvame sa do medzistavu zaciatok stringu
                        state = STRING_START;
                    }
                    else if ((isalpha(current_char)) || (current_char == '_'))
                    {
+                       //Posuvame sa do medzistavu identifikator, pretoze moze by viacznakovy identifikator
                        state = t_IDENTIFIER;
                    }
                    else if (current_char == '\n')
                    {
+                       //Koncime tokenom EOL
                        end_token(t_EOL, &token);
                        First_token = true;
                        return token;
                    }
                    else
                    {
+                       //Nepovolene znaky koncia lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
@@ -228,11 +258,13 @@ void remove_(void)
                case t_LESS:
                    if (current_char == '=')
                    {
+                       //Koncime tokenom <=
                        end_token(t_LESSOREQUAL, &token);
                        return token;
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime tokenom <
                        unload_c(text);
                        end_token(t_LESS, &token);
                        return token;
@@ -242,11 +274,13 @@ void remove_(void)
                case t_GREATER:
                    if (current_char == '=')
                    {
+                       //Koncime tokenom >=
                        end_token(t_GREATEROREQUAL, &token);
                        return token;
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime tokenom >
                        unload_c(text);
                        end_token(t_GREATER, &token);
                        return token;
@@ -256,11 +290,13 @@ void remove_(void)
                case t_ASSIGN:
                    if (current_char == '=')
                    {
+                       //Koncime tokenom ==
                        end_token(t_EQUAL, &token);
                        return token;
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime tokenom =
                        unload_c(text);
                        end_token(t_ASSIGN, &token);
                        return token;
@@ -270,11 +306,13 @@ void remove_(void)
                case EXLAMATION:
                    if (current_char == '=')
                    {
+                       //Koncime tokenom !=
                        end_token(t_NOT_EQUAL, &token);
                        return token;
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
@@ -283,11 +321,13 @@ void remove_(void)
                case t_DEFINITION_1:
                    if (current_char == '=')
                {
+                   //Koncime tokenom :=
                    end_token(t_DEFINITION_2, &token);
                    return token;
                }
                else
                {
+                   //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                    fprintf(stderr , "Lexical error.\n");
                    exit(1);
                }
@@ -295,10 +335,12 @@ void remove_(void)
                
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                   
+               
+               //Stav identifikatoru
                case t_IDENTIFIER:
                    if (isalpha(current_char) || isdigit(current_char) || current_char == '_')
                    {
+                       //Ostavame v stave identifikatoru
                        state = t_IDENTIFIER;
                    }
                    else
@@ -350,14 +392,17 @@ void remove_(void)
                case ONE_LINE_COMMENT_1:
                    if (current_char == '/')
                    {
+                       //Presuvame sa do stavu //One line comment
                        state = ONE_LINE_COMMENT_2;
                    }
                    else if (current_char == '*')
                    {
+                       //Presuvame sa do stavu /* multiline comment zaciatok
                        state = MULTILINE_1;
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime tokenom /
                        unload_c(text);
                        end_token(t_DIVIDE, &token);
                        return token;
@@ -367,18 +412,21 @@ void remove_(void)
                case ONE_LINE_COMMENT_2:
                    if (current_char == '\n')
                    {
+                       //Koncime tokenom EOL (ONE LINE COMMENT)
                        end_token(t_EOL, &token);
                        First_token = true;
                        return token;
                    }
                    else if (current_char == EOF)
                    {
+                       //Koncime tokenom EOL
                        unload_c(text);
                        end_token(t_EOL, &token);
                        return token;
                    }
                    else
                    {
+                       //Ostavame v stave //One line comment
                        state = ONE_LINE_COMMENT_2;
                    }
                    break;
@@ -390,22 +438,26 @@ void remove_(void)
                case MULTILINE_1:
                    if (current_char == '*')
                    {
+                       //Ostavame v stave /* multiline comment *
                        state = MULTILINE_2;
                    }
                    else
                    {
+                       //Ostavame v stave multiline1 /*
                        state = MULTILINE_1;
                    }
                    break;
                case MULTILINE_2:
                    if (current_char == '/')
                    {
+                       //Koncime tokenom Multiline Comment /* */
                        end_token(t_EOL, &token);
                        First_token = true;
                        return token;
                    }
                    else
                    {
+                       //Ostavame v stave multiline commentu /* *
                        state = MULTILINE_1;
                    }
                    break;
@@ -418,23 +470,28 @@ void remove_(void)
                    non_zero_int = true;
                    if (current_char == '.')
                    {
+                       //Presuvame sa do medzistavu desatinnej bodky, pretoze za desatinnou bodkou musia nasledovat cisla
                        state = DOT;
                    }
                    else if ((current_char == 'e') || (current_char == 'E'))
                    {
+                       //Presuvame sa do medzistavu exponenta, pretoze za znakom e/E musi nasledovat cislo alebo znak +/-
                        current_char2 = current_char;
                        state = EXPONENT;
                    }
                    else if (isdigit(current_char))
                    {
+                       //Ostavame v stave INT_NON_ZERO, pretoze token moze byt viacciferny
                        state = t_INT_NON_ZERO;
                    }
                    else if (current_char == '_')
                    {
+                       //Odstranime znak '_', pretoze pri cifrach sa ignoruje
                        remove_();
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku koncime tokenom nenuloveho cisla a nepovoleny znak skenujeme dalej
                        unload_c(text);
                        end_token(t_INT_NON_ZERO, &token);
                        non_zero_int = false;
@@ -447,41 +504,50 @@ void remove_(void)
                    zero_int = true;
                    if ((current_char == 'e') || (current_char == 'E'))
                    {
+                       //Presuvame sa do medzistavu exponent, pretoze za znakom e/E musi nasledovat cislo alebo znak +/-
                        current_char2 = current_char;
                        state = EXPONENT;
                    }
                    else if (current_char == '.')
                    {
+                       //Presuvame sa do medzistavu desatinnej bodky, pretoze za nou musi nasledovat cislo
                        state = DOT;
                    }
                    else if ((current_char == 'b') || (current_char == 'B'))
                    {
+                       //Presuvame sa do medzistavu binarnej sustavy, pretoze za znakmi 0b/0B moze nasledovať znak 0 alebo znak 1
                        state = BINARY;
                    }
                    else if ((current_char == 'o') || (current_char == 'O'))
                    {
+                       //Presuvame sa do medzistavu osmickovej sustavy, pretoze za znakmi 0o/0O mozu nasledovat len cifry
                        state = OCTAL;
                    }
                    else if ((current_char == 'x') || (current_char == 'X'))
                    {
+                       //Presuvame sa do medzistavu sestnastkovej sustavy, pretoze po znakoch 0x/0X mozu nasledovat len cifry 0-1 alebo pismena A-F,a-f
                        state = HEXADECIMAL;
                    }
                    else if (current_char == '_')
                    {
+                       //Odstranime znak '_', pretoze pri cislach znak podtrzitka ignorujeme
                        remove_();
                    }
                    else if (current_char == '0')
                    {
+                       //V pripade nepovoleneho znaku (cislom), koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
                    else if (isdigit(current_char))
                    {
+                       //V pripade nepovoleneho znaku (cislom), koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku koncime tokenom INT_ZERO a skenujeme nepovoleny znak
                        unload_c(text);
                        end_token(t_INT_ZERO, &token);
                        zero_int = false;
@@ -492,16 +558,19 @@ void remove_(void)
                case DOT:
                    if (isdigit(current_char))
                    {
+                       //Presuvame sa do medzistavu FLOAT, pretoze desatinna cast moze byt viacciferna
                        zero_int = false;
                        non_zero_int = false;
                        state = t_FLOAT;
                    }
                    else if (current_char == '_')
                    {
+                       //Odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
                        remove_();
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
@@ -511,19 +580,23 @@ void remove_(void)
                    floating_point = true;
                    if (current_char == 'e' || current_char == 'E')
                    {
+                       //presuvame sa do medzistavu exponent, pretoze za znakmi e/E musi nasledovat cislo alebo znak +/-
                        current_char2 = current_char;
                        state = EXPONENT;
                    }
                    else if (isdigit(current_char))
                    {
+                       //ostavame v stave FLOAT, pretoze desatinna cast cisla moze byt viacciferna
                        state = t_FLOAT;
                    }
                    else if (current_char == '_')
                    {
+                       //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
                        remove_();
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku koncime tokenom FLOAT a skenujeme nepovoleny znak
                        unload_c(text);
                        end_token(t_FLOAT, &token);
                        floating_point = false;
@@ -536,19 +609,23 @@ void remove_(void)
                    
                    if ((isdigit(current_char)) && (current_char != '0'))
                    {
+                       //Ostavame v stave exponent, pretoze za znakom e/E moze byt viac cifier
                        state = EXPONENT2;
                    }
                    else if (current_char == '0')
                    {
+                       //Presuvame sa do stavu ZERO_EXPONENT, pretoze za 0 nesmie nasledovat uz iny znak
                        state = ZERO_EXPONENT;
                    }
                    else if (current_char == '+' || current_char == '-'  )
                    {
+                       //Presuvame sa do medzistavu PLUS_MINUS_EXPONENT, pretoze za znakmi +/- musi nasledovat cislo
                        current_char3 = current_char;
                        state = PLUS_MINUS_EXPONENT;
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku vypiseme token FLOAT a znak e/E berieme ako identifikator a nepovoleny znak skenujeme dalej
                        unload_c(text);
                        ungetc(current_char2,text);
                        current_token_position--;
@@ -575,10 +652,12 @@ void remove_(void)
                case PLUS_MINUS_EXPONENT:
                    if(isdigit(current_char))
                    {
+                       //Presuvame sa do medzistavu exponent2, pretoze za znakom +/- moze byt viac cifier
                        state = EXPONENT2;
                    }
                    else
                    {
+                       //Koncime tokenom FLOAT a skenujeme dalej nepovoleny znak
                        unload_c(text);
                        ungetc(current_char3,text);
                        current_token_position--;
@@ -608,14 +687,17 @@ void remove_(void)
                case EXPONENT2:
                    if (isdigit(current_char))
                    {
+                       //Ostavame v stave exponent2, pretoze za znakom +/- moze byt viac cifier
                        state = EXPONENT2;
                    }
                    else if (current_char == '.')
                    {
+                       //presuvame sa do medzistavu desatinnej bodky, pretoze za nou musi nasledovat cislo
                        state = DOT;
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime tokenom FLOAT a skenujeme dalej nepovoleny znak
                        unload_c(text);
                        end_token(t_FLOAT, &token);
                        return token;
@@ -626,15 +708,18 @@ void remove_(void)
                case ZERO_EXPONENT:
                    if (isdigit(current_char))
                    {
+                       //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
                    else if (current_char == '.')
                    {
+                       //presuvame sa do medzistavu desatinnej bodky, pretoze za nou musi nasledovat cislo
                        state = DOT;
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime tokenom FLOAT a skenujeme dalej nepovoleny znak
                        unload_c(text);
                        end_token(t_FLOAT, &token);
                        return token;
@@ -648,14 +733,17 @@ void remove_(void)
                case BINARY:
                    if ((current_char == '0') || (current_char == '1'))
                    {
+                       //Ostavame v stave BINARY, pretoze moze byt viac ciferne binarne cislo
                        state = BINARY;
                    }
                    else if (current_char == '_')
                    {
+                       //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
                        remove_();
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                        unload_c(text);
                        end_token(t_INT_NON_ZERO, &token);
                        return token;
@@ -665,14 +753,17 @@ void remove_(void)
                case OCTAL:
                    if (isdigit(current_char))
                    {
+                       //Ostavame v stave OCTAL, pretoze moze byt viac ciferne osmickove cislo
                        state = OCTAL;
                    }
                    else if (current_char == '_')
                    {
+                       //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
                        remove_();
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                        unload_c(text);
                        end_token(t_INT_NON_ZERO, &token);
                        return token;
@@ -682,14 +773,17 @@ void remove_(void)
                case HEXADECIMAL:
                    if ((isdigit(current_char)) || (current_char == 'A') || (current_char == 'a') || (current_char == 'B') || (current_char == 'b') || (current_char == 'C') || (current_char == 'c') || (current_char == 'D') || (current_char == 'd') || (current_char == 'E') || (current_char == 'e') || (current_char == 'F') || (current_char == 'f'))
                    {
+                       //Ostavame v stave HEXADECIMAL, pretoze moze byt viac ciferne sestnastkove cislo
                        state = HEXADECIMAL;
                    }
                    else if (current_char == '_')
                    {
+                       //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
                        remove_();
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                        unload_c(text);
                        end_token(t_INT_NON_ZERO, &token);
                        return token;
@@ -702,21 +796,25 @@ void remove_(void)
                case STRING_START:
                    if (current_char == '"' )
                    {
+                       //Koncime tokenom STRING ""
                        end_token(t_STRING, &token);
                        return token;
                    }
                    else if (current_char == 92)
                    {
+                       //Presuvame sa do medzistavu ES_STRING, pretoze mozu nasledovat vyhradene znaky, potrebne na ES
                        state = ES_STRING;
                    }
                    else if (current_char == EOF)
                    {
+                       //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
                        
                    else if (current_char > 31 && current_char != 39 && current_char != 92)
                    {
+                       //Ostavame v stave STRING_START, pretoze string moze byt viacznakovy
                        state = STRING_START;
                    }
                    break;
@@ -732,6 +830,7 @@ void remove_(void)
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
@@ -744,6 +843,7 @@ void remove_(void)
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
@@ -756,6 +856,7 @@ void remove_(void)
                    }
                    else
                    {
+                       //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                        fprintf(stderr , "Lexical error.\n");
                        exit(1);
                    }
@@ -763,3 +864,4 @@ void remove_(void)
            }
        }
    }
+   //rewind(FILE *file);
