@@ -1,14 +1,7 @@
-/* 
-**	Part of IFJ Project 2019/2020
-**	Author: Samuel Stuchly xstuch06
-*/
-
 #include "symtable.h"
 
 
-// TODO : fix documentation
-
-tBSTNodePtr GlobalBody ;
+tBSTNodePtr GlobalFunctions;
 tBSTNodePtrLocal LocalVariables;
 tBSTNodePtrLocal  GFDefinedVarsTree;
 tBSTNodePtrLocal  LFDefinedVarsTree;
