@@ -9,6 +9,7 @@
 //V stat je ELSE ako break, dalej to mozno bude robit problemy, v buducnosti sa na to este pozriet!!
 
 TDLList tokens;
+TDLList psa_list;
 TOKEN token;
 TOKEN last_token;
 TOKEN help;
@@ -110,7 +111,9 @@ int main() {
     printf("Parser: USPESNY KONIEC\n");
     
     printf("Parser: Printujem cely zoznam tokenov\n");
-    TDLLPrintAllTokens(&tokens);
+    //TDLLPrintAllTokens(&tokens);
+
+    TDLLDisposeList(&psa_list);
     
     return 0;
 }
@@ -299,14 +302,48 @@ void rule_stat() {
             token = get_next_token(stdin);
             TDLLInsertLast(&tokens, token);
 
+            //Nacitavanie tokenov vyrazu do listu -- PSA
+            TDLLInitList(&psa_list);
+
+             while (token.type != t_BRACES_L)
+            {
+                if ((token.type == t_PLUS)
+                    || (token.type == t_MINUS)
+                    || (token.type == t_DIVIDE)
+                    || (token.type == t_MULTIPLY)
+                    || (token.type == t_RIGHT_BRACKET)
+                    || (token.type == t_LEFT_BRACKET)
+                    || (token.type == t_LESS)
+                    || (token.type == t_LESSOREQUAL)
+                    || (token.type == t_GREATER)
+                    || (token.type == t_GREATEROREQUAL)
+                    || (token.type == t_EQUAL)
+                    || (token.type == t_NOT_EQUAL)
+                    || (token.type == t_IDENTIFIER)
+                    || (token.type == t_FLOAT)
+                    || (token.type == t_INT_NON_ZERO)
+                    || (token.type == t_INT_ZERO)) {
+
+                    TDLLInsertLast(&psa_list, token);
+                    token = get_next_token(stdin);
+
+                } else {error_call(ERR_SYN, &tokens);}
+
+
+            }
+            // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
+
+
+             TDLLDisposeList(&psa_list);
+
             //sem pride psa, nacitava znaky vyrazu do zatvorky
-            if (token.type == t_IDENTIFIER
+            /*if (token.type == t_IDENTIFIER
                 || token.type == t_INT_ZERO
                 || token.type == t_INT_NON_ZERO
-                || token.type == t_FLOAT64) {
+                || token.type == t_FLOAT) {
                 token = get_next_token(stdin);
                 TDLLInsertLast(&tokens, token);
-            } else { error_call(ERR_SYN, &tokens); }
+            } else { error_call(ERR_SYN, &tokens); }*/
 
             // Otváracia množinová zátvorka pre telo IFu
             if (token.type != t_BRACES_L) {
@@ -424,13 +461,49 @@ void rule_stat() {
 
             // Výraz for cyklu
             // SEM PRIDE PCA na vyhodnotenie for vyrazu
-            if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
+            /*if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
                 token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
             else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // bodkociarka pre oddelenie vyrazov v hlavicke for
             if (token.type != T_SEMICOLON) { error_call(ERR_SYN, &tokens); }
-            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }*/
+
+            TDLLInitList(&psa_list);
+
+            while (token.type != T_SEMICOLON)
+            {
+                if ((token.type == t_PLUS)
+                    || (token.type == t_MINUS)
+                    || (token.type == t_DIVIDE)
+                    || (token.type == t_MULTIPLY)
+                    || (token.type == t_RIGHT_BRACKET)
+                    || (token.type == t_LEFT_BRACKET)
+                    || (token.type == t_LESS)
+                    || (token.type == t_LESSOREQUAL)
+                    || (token.type == t_GREATER)
+                    || (token.type == t_GREATEROREQUAL)
+                    || (token.type == t_EQUAL)
+                    || (token.type == t_NOT_EQUAL)
+                    || (token.type == t_IDENTIFIER)
+                    || (token.type == t_FLOAT)
+                    || (token.type == t_INT_NON_ZERO)
+                    || (token.type == t_INT_ZERO)) {
+
+                    TDLLInsertLast(&psa_list, token);
+                    token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
+
+                } else {error_call(ERR_SYN, &tokens);}
+
+
+            }
+            // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
+
+            //TDLLPrintAllTokens(&psa_list);
+            TDLLDisposeList(&psa_list);
+            token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
+
+
 
             // Pravidlo for_assign pre priradenie hodnoty premennej po vykonaní FOR cyklu
             //bodkociarka sa kontroluje v pravidle
@@ -567,10 +640,13 @@ void rule_id_n_or_call_func()
 void rule_func_assign() {
     //V tomto pripade sa pozriem na token dopredu, ak bude lava zatvorka tak funckia, ak nieco ine, vyraz
     //Nesmie byt odriadkovanie
-    if (token.type == t_EOL) {error_call(ERR_SYN, &tokens);}
+    if (token.type == t_EOL) { error_call(ERR_SYN, &tokens); }
 
     // Ak príde identifikátor, neviem si to je výraz alebo volanie funckie, volam dalsi token
     if (token.type == t_IDENTIFIER) {
+        //PARSER -- tu si ulozim token cisto pre vkladanie do psa_listu
+        help = token;
+
         token = get_next_token(stdin);
         TDLLInsertLast(&tokens, token);
 
@@ -593,10 +669,55 @@ void rule_func_assign() {
             TDLLInsertLast(&tokens, token);
             // Ci za jednym vyrazom pokracuje dalsi -- exp_NEXT
             rule_exp_n();
+
+            rule_eol();
+            rule_stat();
         }
 
-        // TODO
-        // Sem pojde precedencna ak za identifikatorom pojde aritmeticke znamienko
+
+            // Sem pojde precedencna ak za identifikatorom pojde aritmeticke znamienko
+        else if ((token.type == t_PLUS)
+                 || (token.type == t_MINUS)
+                 || (token.type == t_DIVIDE)
+                 || (token.type == t_MULTIPLY)) {
+            TDLLInitList(&psa_list);
+            // v help mam ulozeny identifikator, kedze je sucastou vyrazu a v token uz je nacitane znamienko
+            TDLLInsertLast(&psa_list, help);
+            TDLLInsertLast(&psa_list, token);
+            token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
+
+            //Nacitanie dalsich znakov, koncim ked mi pride ciarka alebo EOL
+
+            while (token.type != t_COMMA && token.type != t_EOL) {
+                if ((token.type == t_PLUS)
+                    || (token.type == t_MINUS)
+                    || (token.type == t_DIVIDE)
+                    || (token.type == t_MULTIPLY)
+                    || (token.type == t_RIGHT_BRACKET)
+                    || (token.type == t_LEFT_BRACKET)
+                    || (token.type == t_IDENTIFIER)
+                    || (token.type == t_FLOAT)
+                    || (token.type == t_INT_NON_ZERO)
+                    || (token.type == t_INT_ZERO)) {
+
+                    TDLLInsertLast(&psa_list, token);
+                    token = get_next_token(stdin);
+                    TDLLInsertLast(&tokens, token);
+
+                } else { error_call(ERR_SYN, &tokens); }
+
+            }
+
+            TDLLPrintAllTokens(&psa_list);
+            TDLLDisposeList(&psa_list);
+
+            // Pride mi ciarka alebo eol, musim zavolat exp_n ci za tym nieco ide
+            rule_exp_n();
+            rule_eol();
+            rule_stat();
+
+        }
     }
 
         // ak mi nepride id -- nemusis riesit, ide vyraz, ale nejde lebo ho este netreba
@@ -605,16 +726,41 @@ void rule_func_assign() {
 
     else if (token.type == t_FLOAT || token.type == t_INT_NON_ZERO || token.type == t_INT_ZERO ||
              token.type == t_STRING) {
-        token = get_next_token(stdin);
-        TDLLInsertLast(&tokens, token);
 
-        // Ci za jednym vyrazom pokracuje dalsi
-        rule_exp_n();
+        TDLLInitList(&psa_list);
+        TDLLInsertLast(&psa_list, token);
 
-        rule_eol();
-        rule_stat();
+        //nacitavam, kym nepride ciarka alebo eol -- koneic vyrazu
+        while (token.type != t_COMMA && token.type != t_EOL) {
+            if ((token.type == t_PLUS)
+                || (token.type == t_MINUS)
+                || (token.type == t_DIVIDE)
+                || (token.type == t_MULTIPLY)
+                || (token.type == t_RIGHT_BRACKET)
+                || (token.type == t_LEFT_BRACKET)
+                || (token.type == t_IDENTIFIER)
+                || (token.type == t_FLOAT)
+                || (token.type == t_INT_NON_ZERO)
+                || (token.type == t_INT_ZERO)) {
+
+                TDLLInsertLast(&psa_list, token);
+                token = get_next_token(stdin);
+                TDLLInsertLast(&tokens, token);
+
+            } else { error_call(ERR_SYN, &tokens); }
+
+
+            /*token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);*/
+
+            // Ci za jednym vyrazom pokracuje dalsi
+            rule_exp_n();
+            rule_eol();
+            rule_stat();
+        }
     }
 }
+
 
 // funkcia pre neterminal params
 void rule_params() {
@@ -681,7 +827,7 @@ void rule_func_params() {
     }
     else {
         // Možné typy vo vstupnych parametroch funckie
-        if (token.type != t_IDENTIFIER && token.type != t_FLOAT64 && token.type != t_STRING &&
+        if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
             token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
         token = get_next_token(stdin);
         TDLLInsertLast(&tokens, token);
@@ -747,12 +893,30 @@ void rule_for_def() {
             //kontrola, ci pride inicializacia alebo definicia -- Neviem ci je IBA priradenie hodnoty možné, ak áno, iteračná premenná musí byť definovaná dopredu
             rule_init_def();
 
-            //TU PRIDE PSA
-            if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
-            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
-            if (token.type != T_SEMICOLON) { error_call(ERR_SYN, &tokens); }
-            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
+            TDLLInitList(&psa_list);
+
+            while (token.type != T_SEMICOLON) {
+                if ((token.type == t_PLUS)
+                    || (token.type == t_MINUS)
+                    || (token.type == t_DIVIDE)
+                    || (token.type == t_MULTIPLY)
+                    || (token.type == t_RIGHT_BRACKET)
+                    || (token.type == t_LEFT_BRACKET)
+                    || (token.type == t_IDENTIFIER)
+                    || (token.type == t_FLOAT)
+                    || (token.type == t_INT_NON_ZERO)
+                    || (token.type == t_INT_ZERO)) {
+
+                    TDLLInsertLast(&psa_list, token);
+                    token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
+
+                } else { error_call(ERR_SYN, &tokens); }
+            }
+            // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
+
+            //TDLLPrintAllTokens(&psa_list);
+            TDLLDisposeList(&psa_list);
+            token = get_next_token(stdin);
 
             break;
             // Definicia je vynechaná
@@ -777,10 +941,36 @@ void rule_for_assign() {
             if (token.type != t_ASSIGN) { error_call(ERR_SYN, &tokens); }
             else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
-            //sem pride  
-            if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
+            TDLLInitList(&psa_list);
+
+            while (token.type != t_BRACES_L)
+            {
+                if ((token.type == t_PLUS)
+                    || (token.type == t_MINUS)
+                    || (token.type == t_DIVIDE)
+                    || (token.type == t_MULTIPLY)
+                    || (token.type == t_RIGHT_BRACKET)
+                    || (token.type == t_LEFT_BRACKET)
+                    || (token.type == t_IDENTIFIER)
+                    || (token.type == t_FLOAT)
+                    || (token.type == t_INT_NON_ZERO)
+                    || (token.type == t_INT_ZERO)) {
+
+                    TDLLInsertLast(&psa_list, token);
+                    token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
+
+                } else {error_call(ERR_SYN, &tokens);}
+
+
+            }
+            //TDLLPrintAllTokens(&psa_list);
+            TDLLDisposeList(&psa_list);
+            //token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
+
+            //sem pride psa
+            /*if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
                 token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
-            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }*/
 
             break;
 
@@ -951,13 +1141,41 @@ void rule_exp_n() {
         token = get_next_token(stdin);
         TDLLInsertLast(&tokens, token);
 
+        TDLLInitList(&psa_list);
+
         if (token.type == t_EOL) {error_call(ERR_SYN, &tokens);}
+        else {
 
-        if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) {error_call(ERR_SYN, &tokens); }
-        else {token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
+            while (token.type != t_COMMA && token.type != t_EOL) {
+                if ((token.type == t_PLUS)
+                    || (token.type == t_MINUS)
+                    || (token.type == t_DIVIDE)
+                    || (token.type == t_MULTIPLY)
+                    || (token.type == t_RIGHT_BRACKET)
+                    || (token.type == t_LEFT_BRACKET)
+                    || (token.type == t_IDENTIFIER)
+                    || (token.type == t_FLOAT)
+                    || (token.type == t_INT_NON_ZERO)
+                    || (token.type == t_INT_ZERO)) {
 
-        rule_exp_n();
+                    TDLLInsertLast(&psa_list, token);
+                    token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
+
+                } else { error_call(ERR_SYN, &tokens); }
+            }
+
+            //TDLLPrintAllTokens(&psa_list);
+            TDLLDisposeList(&psa_list);
+
+            /*if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
+                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
+            else {
+                token = get_next_token(stdin);
+                TDLLInsertLast(&tokens, token);
+            }*/
+
+            rule_exp_n();
+        }
     }
 }
 
