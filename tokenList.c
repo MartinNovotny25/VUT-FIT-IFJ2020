@@ -116,7 +116,7 @@ void TDLLDisposeList (TDLList *L) {
 ** se nacházel po inicializaci. Rušené prvky seznamu budou korektně
 ** uvolněny voláním operace free.
 **/
-    printf("tokenList: An Error occured: Disposing all Elements\n...");
+    printf("tokenList: Disposing all Elements...\n");
     TDLLElemPtr tmp = L->First;              //tmp ukazuje na prvy prvok
     while (L->First != NULL) {              //zoznam nie je prazdny
         L->First = L->First->rptr;          //cyklus posuva ukazatel First do prava a uvolnuje pamat prvku pred nim
