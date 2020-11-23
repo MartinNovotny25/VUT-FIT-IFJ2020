@@ -73,6 +73,8 @@
 #define OCTAL 59
 #define HEXADECIMAL 60
 
+#define t_DOLLAR 100
+
 
 typedef struct TOKEN
 {

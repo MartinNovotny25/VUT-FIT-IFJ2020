@@ -5,6 +5,7 @@
 #include "scanner.h"
 #include "error.h"
 #include "parser.h"
+#include "precanalysis.h"
 
 //V stat je ELSE ako break, dalej to mozno bude robit problemy, v buducnosti sa na to este pozriet!!
 
@@ -113,7 +114,6 @@ int main() {
     printf("Parser: Printujem cely zoznam tokenov\n");
     //TDLLPrintAllTokens(&tokens);
 
-    TDLLDisposeList(&psa_list);
     
     return 0;
 }
@@ -182,6 +182,7 @@ void def_func() {
         def_func();
     }
 
+
 }
 
 // Čo môže nastať
@@ -209,6 +210,7 @@ void rule_func_retlist_body() {
 
             //OPTIONAL_RETURN
         case t_BRACES_L:
+            printf("SOM V BRACES_L\n");
             global_brace_count++;
             token = get_next_token(stdin);
             TDLLInsertLast(&tokens, token);
@@ -216,7 +218,9 @@ void rule_func_retlist_body() {
             else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Neterminál stat (STATEMENT) -- Vyjadruje možné príkazy v tele funkcie
+            printf("IDEM DO STAT\n");
             rule_stat();
+            printf("KONIEC RULE STAT\n");
 
     }
 }
@@ -332,7 +336,7 @@ void rule_stat() {
 
             }
             // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
-
+            //evaluation(&psa_list);
 
              TDLLDisposeList(&psa_list);
 
@@ -558,7 +562,7 @@ void rule_stat() {
 
             //ak po stat nebude nič a skonči sa blok
         case t_BRACES_R:
-            //printf("SOM V BRACES\n");
+            printf("SOM V BRACES\n");
             break;
 
         // Ak príde return -- pokracujeme do rule_return a za tym rule_stat
@@ -605,6 +609,7 @@ void rule_id_n_or_call_func()
             // či s bude priradzovan pomocou výrazu alebo volaním funckie
             rule_func_assign();
             rule_stat();
+            printf("VYSIEL Z DALSIEH\n");
             break;
 
         case t_ASSIGN:
@@ -727,6 +732,8 @@ void rule_func_assign() {
     else if (token.type == t_FLOAT || token.type == t_INT_NON_ZERO || token.type == t_INT_ZERO ||
              token.type == t_STRING) {
 
+        printf("VOSIEL SOM SPRAVNE\n");
+
         TDLLInitList(&psa_list);
         TDLLInsertLast(&psa_list, token);
 
@@ -747,7 +754,11 @@ void rule_func_assign() {
                 token = get_next_token(stdin);
                 TDLLInsertLast(&tokens, token);
 
-            } else { error_call(ERR_SYN, &tokens); }
+            } else {
+                printf("TU SOM SKAPAL\n");
+                error_call(ERR_SYN, &tokens);
+            }
+        }
 
 
             /*token = get_next_token(stdin);
@@ -756,8 +767,8 @@ void rule_func_assign() {
             // Ci za jednym vyrazom pokracuje dalsi
             rule_exp_n();
             rule_eol();
-            rule_stat();
-        }
+            //rule_stat();
+            printf("VYSIEL SOM ZO STAT PO VYRAZE\n");
     }
 }
 
