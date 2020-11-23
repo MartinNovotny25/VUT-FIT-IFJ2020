@@ -336,7 +336,8 @@ void rule_stat() {
 
             }
             // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
-            //evaluation(&psa_list);
+            evaluation(&psa_list);
+             printf("VYSIEL SOM Z PSA\n");
 
              TDLLDisposeList(&psa_list);
 
@@ -504,6 +505,7 @@ void rule_stat() {
             // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
 
             //TDLLPrintAllTokens(&psa_list);
+            evaluation(&psa_list);
             TDLLDisposeList(&psa_list);
             token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
 
@@ -714,7 +716,8 @@ void rule_func_assign() {
 
             }
 
-            TDLLPrintAllTokens(&psa_list);
+            //TDLLPrintAllTokens(&psa_list);
+            evaluation(&psa_list);
             TDLLDisposeList(&psa_list);
 
             // Pride mi ciarka alebo eol, musim zavolat exp_n ci za tym nieco ide
@@ -732,10 +735,12 @@ void rule_func_assign() {
     else if (token.type == t_FLOAT || token.type == t_INT_NON_ZERO || token.type == t_INT_ZERO ||
              token.type == t_STRING) {
 
-        printf("VOSIEL SOM SPRAVNE\n");
-
         TDLLInitList(&psa_list);
         TDLLInsertLast(&psa_list, token);
+
+        token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
+
 
         //nacitavam, kym nepride ciarka alebo eol -- koneic vyrazu
         while (token.type != t_COMMA && token.type != t_EOL) {
@@ -755,11 +760,12 @@ void rule_func_assign() {
                 TDLLInsertLast(&tokens, token);
 
             } else {
-                printf("TU SOM SKAPAL\n");
                 error_call(ERR_SYN, &tokens);
             }
         }
 
+        evaluation(&psa_list);
+        TDLLDisposeList(&psa_list);
 
             /*token = get_next_token(stdin);
             TDLLInsertLast(&tokens, token);*/
@@ -767,8 +773,7 @@ void rule_func_assign() {
             // Ci za jednym vyrazom pokracuje dalsi
             rule_exp_n();
             rule_eol();
-            //rule_stat();
-            printf("VYSIEL SOM ZO STAT PO VYRAZE\n");
+            rule_stat();
     }
 }
 
@@ -925,6 +930,7 @@ void rule_for_def() {
             }
             // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
 
+            evaluation(&psa_list);
             //TDLLPrintAllTokens(&psa_list);
             TDLLDisposeList(&psa_list);
             token = get_next_token(stdin);
@@ -975,6 +981,7 @@ void rule_for_assign() {
 
             }
             //TDLLPrintAllTokens(&psa_list);
+            evaluation(&psa_list);
             TDLLDisposeList(&psa_list);
             //token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
 
@@ -1175,6 +1182,7 @@ void rule_exp_n() {
                 } else { error_call(ERR_SYN, &tokens); }
             }
 
+            evaluation(&psa_list);
             //TDLLPrintAllTokens(&psa_list);
             TDLLDisposeList(&psa_list);
 
