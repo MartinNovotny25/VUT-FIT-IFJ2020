@@ -31,6 +31,7 @@ typedef struct {                           /* dvousměrně vázaný seznam token
 
 /* ---------------------PROTOTYPY FUNKCII NAD DL ZOZNAMOM TOKENOV--------------------- */
 
+void TDLLPrintAllTokens(TDLList *);    //vytlaci vsetky tokeny v liste
 void TDLLInitList (TDLList *);          //inicializacia zoznamu
 void TDLLDisposeList (TDLList *);       //zrusenie vsetkych prvkov
 void TDLLInsertFirst (TDLList *, TOKEN);  //vlozenie prvku na zaciatok zoznmu

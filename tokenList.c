@@ -34,6 +34,7 @@
  int TDLLActive (TDLList *);             //zistuje aktivitu zoznamu
  */
 
+/*
 int main()                          //tmp main - iba na testiky
 {
     printf("entered main\n");
@@ -53,29 +54,45 @@ int main()                          //tmp main - iba na testiky
         TDLLInsertLast(&tmpL, tmpTOKEN[i]);
         TDLLFirst(&tmpL);
     }
-    printf("for ^\n     while \\/\n");
-    while (tmpL.Act != NULL) {
-        printf("entered while\n");
-        printf("%d  %s\n", tmpL.Act->tdata.type,  tmpL.Act->tdata.lex);
-        TDLLSucc(&tmpL);
+    printf("for ^\n     Print all tokens \\/\n");
+    //while (tmpL.Act != NULL) {
+    //    printf("entered while\n");
+     //   printf("%d  %s\n", tmpL.Act->tdata.type,  tmpL.Act->tdata.lex);
+      //  TDLLSucc(&tmpL);
     }
+    TDLLPrintAllTokens(&tmpL);
     TDLLDisposeList(&tmpL);
     printf("return iminent\n");
     return 0;
 }
-
-//TODO
-//treba zemnit datovy segment elementov z integru na TOKEN a patricne upravit fcie...
-
+*/
 
 void DLError() {
+//nema prakticke vyuzite v projekte
+//TODO overit ci vymazanie nic nerozbije a vymazat
 /*
 ** Vytiskne upozornění na to, že došlo k chybě.
 ** Tato funkce bude volána z některých dále implementovaných operací.
 **/
-    printf ("*ERROR* The program has performed an illegal operation.\n");
+    printf ("tokenList: *ERROR* The program has performed an illegal operation.\n");
     //errflg = TRUE;             /* globální proměnná -- příznak ošetření chyby */
     return;
+}
+
+
+
+
+void TDLLPrintAllTokens(TDLList *L) {
+    printf("tokenList: Printing all tokens from DL list...\n\n");
+    TDLLFirst(L);
+    
+    while (L->Act != NULL) {                          //while prechadza listom
+        printf("token %d\n", L->Act->tdata.type);
+        printf("lexem %s\n\n", L->Act->tdata.lex);
+        TDLLSucc(L);                                //presun aktivity na nasledujuci token
+    }
+    printf("tokenList: Printing Ended Succesfully...\n");
+    TDLLFirst(L);                                      //aktivita sa vrati na zaciatok
 }
 
 void TDLLInitList (TDLList *L) {
@@ -86,9 +103,11 @@ void TDLLInitList (TDLList *L) {
 ** seznamem, a proto tuto možnost neošetřujte. Vždy předpokládejte,
 ** že neinicializované proměnné mají nedefinovanou hodnotu.
 **/
+    //printf("som v InitList\n");
     L->First = NULL;        //vsetky ukazetele zoznamu nastavi na NULL
     L->Last = NULL;
     L->Act = NULL;
+    //printf("koncim InitList\n");
 }
 
 void TDLLDisposeList (TDLList *L) {
@@ -97,6 +116,7 @@ void TDLLDisposeList (TDLList *L) {
 ** se nacházel po inicializaci. Rušené prvky seznamu budou korektně
 ** uvolněny voláním operace free.
 **/
+    printf("tokenList: An Error occured: Disposing all Elements\n...");
     TDLLElemPtr tmp = L->First;              //tmp ukazuje na prvy prvok
     while (L->First != NULL) {              //zoznam nie je prazdny
         L->First = L->First->rptr;          //cyklus posuva ukazatel First do prava a uvolnuje pamat prvku pred nim
@@ -137,11 +157,14 @@ void TDLLInsertLast(TDLList *L, TOKEN token) {
 ** V případě, že není dostatek paměti pro nový prvek při operaci malloc,
 ** volá funkci DLError().
 **/
+    
+    //printf("som v InsertLast a idem alokovat\n");
     TDLLElemPtr tmp = (TDLLElemPtr) malloc(sizeof(struct TDLLElem));       //alokacia pamate
     if (tmp == NULL) {
         DLError();
         return;
     }
+    //printf("som v InsertLast a po alokovani\n\n");
     tmp->tdata = token;                                    //nakopirovanie dat
     tmp->rptr = NULL;                                   //pravy ukazatel noveho prvku musi byt NULL
     tmp->lptr = L->Last;                                //lavy ukazatl noveho ukazuje na Last

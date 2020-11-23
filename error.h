@@ -5,6 +5,7 @@
 #ifndef IFJ2020_ERROR_H
 #define IFJ2020_ERROR_H
 
+#include "tokenList.h"
 
 #define ERR_LEX 1
 #define ERR_SYN 2
@@ -16,6 +17,6 @@
 #define ERR_SEM_ZERODIV 9
 #define ERR_INTERN 99
 
-void error_call(int err);
+void error_call(int err, TDLList *L);
 
 #endif //IFJ2020_ERROR_H

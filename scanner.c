@@ -15,7 +15,7 @@
    char current_char3;
    /* Vymazavanie current_tokenu (napr. chodia medzery-vtedy ich vyhodime a
    pokracujeme dalej)*/
-
+    /*
    int main()
    {
        while (1)
@@ -31,7 +31,7 @@
        }
        return 0;
    }
-
+*/
    //Funkcia na odstranovanie znaku '_'
    void remove_(void)
    {
@@ -83,13 +83,14 @@
        alloc(current_token_position+1, token);
        strcpy(token->lex, current_token);
        token->type = type;
-       printf("token %d lex %s\n",token->type, token->lex);
+       printf("Scanner: token %d lex %s\n",token->type, token->lex);
        //printf("%d\n",token->type);
        delete_string();
    }
 
    TOKEN get_next_token(FILE* text)
    {
+       printf("Scanner: Dodavam novy TOKEN\n");
        TOKEN token;
        static int state;
        if(state != IND_DED){

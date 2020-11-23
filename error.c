@@ -7,9 +7,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "symtable.h"
+#include "tokenList.h"
 
-void error_call(int err)
+void error_call(int err, TDLList *L)
 {
+    
+    TDLLDisposeList(L);        //v pripade chyby je potrebne uvolnit DLlist
+    
     int exit_err;
     switch (err)
     {

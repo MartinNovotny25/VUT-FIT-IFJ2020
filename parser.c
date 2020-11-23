@@ -1,12 +1,14 @@
 #include <stdio.h>
-#include <stdio.h>
+//#include <stdio.h>
 
+#include "tokenList.h"
 #include "scanner.h"
 #include "error.h"
 #include "parser.h"
 
 //V stat je ELSE ako break, dalej to mozno bude robit problemy, v buducnosti sa na to este pozriet!!
 
+TDLList tokens;
 TOKEN token;
 TOKEN last_token;
 TOKEN help;
@@ -61,22 +63,27 @@ void rule_id_n_or_call_func();
 // Zaciatok vykonavania syntaktickej a lexikalnej analýzy
 int main() {
 
+    //inicilizacia zoznamu tokenov
+    TDLLInitList(&tokens);
+    //printf("som za InitListom\n");
+    
     //načitanie prvého tokenu
     token = get_next_token(stdin);
-
+    //nacitanie tokenu do zoznamu tokenov, bude sa volast s kazdym get_next_token
+    TDLLInsertLast(&tokens, token);
     // eol(y) na zaciatku -- nepovinne
     if (token.type == t_EOL) {
         rule_eol();
     }
 
     // Test package main
-    if (token.type != t_PACKAGE_MAIN) { error_call(ERR_SYN); }
-    else { token = get_next_token(stdin); }
+    if (token.type != t_PACKAGE_MAIN) { error_call(ERR_SYN, &tokens); }
+    else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
 
     // Token EOL - Evidentne netreba
-    /*if (token.type != t_EOL) { error_call(ERR_SYN); }
-    else { token = get_next_token(stdin); }*/
+    /*if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+    else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }*/
 
     // Neterminal <eol> -- nepovinny eol
     if (token.type == t_EOL) {
@@ -84,9 +91,10 @@ int main() {
     }
 
     // Neterminal <def_func> -- Zacne definicia funkcie
-    if (token.type != t_FUNC) { error_call(ERR_SYN); }
+    if (token.type != t_FUNC) { error_call(ERR_SYN, &tokens); }
     else {
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
         def_func();
     }
 
@@ -97,32 +105,37 @@ int main() {
     }*/
 
     //printf("%d\n", global_brace_count);
-    //if (global_brace_count != 0) { error_call(ERR_SYN); }
+    //if (global_brace_count != 0) { error_call(ERR_SYN, &tokens); }
 
-    printf("USPESNY KONIEC\n");
+    printf("Parser: USPESNY KONIEC\n");
+    
+    printf("Parser: Printujem cely zoznam tokenov\n");
+    TDLLPrintAllTokens(&tokens);
+    
     return 0;
 }
 
 // funkcia pre neterminal <def_func> -- Pravidlo pre správne definovanie funkcie
 void def_func() {
     // terminal ID
-    if (token.type != t_IDENTIFIER) { error_call(ERR_SYN); }
-    else { token = get_next_token(stdin); }
+    if (token.type != t_IDENTIFIER) { error_call(ERR_SYN, &tokens); }
+    else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
     // token (
-    if (token.type != t_LEFT_BRACKET) { error_call(ERR_SYN); }
-    else { token = get_next_token(stdin); }
+    if (token.type != t_LEFT_BRACKET) { error_call(ERR_SYN, &tokens); }
+    else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
     // neterminal <params> -- Vstupne parametre funkcie
     // Zoznam parametrov moze byt prazdny, preto može ist za lavou zatvorkou hned pravá
-    if (token.type != t_IDENTIFIER && token.type != t_RIGHT_BRACKET) { error_call(ERR_SYN); }
+    if (token.type != t_IDENTIFIER && token.type != t_RIGHT_BRACKET) { error_call(ERR_SYN, &tokens); }
     else {
         //token = get_next_token(stdin);
+        //TDLLInsertLast(&tokens, token);
         rule_params();
     }
 
     // Nasleduje typy návratového listu a za ním telo -- preto RETLIST_BODY
-    if (token.type != t_LEFT_BRACKET && token.type != t_BRACES_L) { error_call(ERR_SYN); }
+    if (token.type != t_LEFT_BRACKET && token.type != t_BRACES_L) { error_call(ERR_SYN, &tokens); }
     else {
         rule_func_retlist_body();
         // printf("vysiel som z retlist body\n");
@@ -131,7 +144,7 @@ void def_func() {
     //printf("is_return je %d, was_return je %d\n", is_return, was_return);
 
     // Ak funckia mala mat return, ale v kode sa nenachadza -- ERROR
-    if (was_return == false && is_return == true) {error_call(ERR_SYN);}
+    if (was_return == false && is_return == true) {error_call(ERR_SYN, &tokens);}
 
     // nastavime flagy na povodnu hodnotu pre dalsie mozne def_func
     was_return = false;
@@ -147,8 +160,8 @@ void def_func() {
     }
 
     // Ak sa za def func nenachaza ukoncovacia mnozinova zatvorka
-    if (token.type != t_BRACES_R) {error_call(ERR_SYN);}
-    else {token = get_next_token(stdin);}
+    if (token.type != t_BRACES_R) {error_call(ERR_SYN, &tokens);}
+    else {token = get_next_token(stdin); TDLLInsertLast(&tokens, token);}
 
     //Nepovinne eoly medzi blokmi
     if (token.type == t_EOL)
@@ -156,12 +169,13 @@ void def_func() {
         rule_eol();
     }
 
-    printf("som von\n");
+    printf("Parser: som von\n");
     //Ak dôjde k dalsej definicii, znova def_func
     if (token.type == t_FUNC)
     {
         //printf("som v druhom def_func\n");
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
         def_func();
     }
 
@@ -184,6 +198,7 @@ void rule_func_retlist_body() {
         case t_LEFT_BRACKET:
             //printf("Tu pojdem do FUNC_BODY\n");
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
 
             rule_func_body();
 
@@ -193,8 +208,9 @@ void rule_func_retlist_body() {
         case t_BRACES_L:
             global_brace_count++;
             token = get_next_token(stdin);
-            if (token.type != t_EOL) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            TDLLInsertLast(&tokens, token);
+            if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Neterminál stat (STATEMENT) -- Vyjadruje možné príkazy v tele funkcie
             rule_stat();
@@ -211,21 +227,25 @@ void rule_func_body() {
     switch (token.type) {
         case t_RIGHT_BRACKET:
             //token = get_next_token(stdin);
+            //TDLLInsertLast(&tokens, token);
             break;
 
         case t_INT_ID:
             is_return = true;
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             rule_return_type_n();
             break;
         case t_FLOAT64:
             is_return = true;
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             rule_return_type_n();
             break;
         case t_STRING_ID:
             is_return = true;
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             rule_return_type_n();
             break;
 
@@ -233,20 +253,21 @@ void rule_func_body() {
 
     //V prípade, že nám nepríde ukončovacia zátvorka zoznamu návratových typov, ERROR.
 
-    if (token.type != t_RIGHT_BRACKET) { error_call(ERR_SYN); }
-    else { token = get_next_token(stdin); }
+    if (token.type != t_RIGHT_BRACKET) { error_call(ERR_SYN, &tokens); }
+    else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
     // Token otváracej množinovej zátvorky pre začiatok tela funckie
 
-    if (token.type != t_BRACES_L) { error_call(ERR_SYN); }
+    if (token.type != t_BRACES_L) { error_call(ERR_SYN, &tokens); }
     else {
         global_brace_count++;
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
     }
 
     // Nutný EOL po otváracej množinovej zátvorke
-    if (token.type != t_EOL) { error_call(ERR_SYN); }
-    else { token = get_next_token(stdin); }
+    if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+    else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
     //printf("tu pojde do STAT a OPT RET\n");
 
@@ -267,6 +288,7 @@ void rule_stat() {
         // voláme rule_id_n_or_call_func na rozhonutie
         case t_IDENTIFIER:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             rule_id_n_or_call_func();
 
             break;
@@ -275,6 +297,7 @@ void rule_stat() {
         case t_IF:
             //printf("som v if\n");
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
 
             //sem pride psa, nacitava znaky vyrazu do zatvorky
             if (token.type == t_IDENTIFIER
@@ -282,24 +305,26 @@ void rule_stat() {
                 || token.type == t_INT_NON_ZERO
                 || token.type == t_FLOAT64) {
                 token = get_next_token(stdin);
-            } else { error_call(ERR_SYN); }
+                TDLLInsertLast(&tokens, token);
+            } else { error_call(ERR_SYN, &tokens); }
 
             // Otváracia množinová zátvorka pre telo IFu
             if (token.type != t_BRACES_L) {
                 //printf("zle braces_L\n");
-                error_call(ERR_SYN);
+                error_call(ERR_SYN, &tokens);
             }
             else {
                 global_brace_count++;
                 token = get_next_token(stdin);
+                TDLLInsertLast(&tokens, token);
             }
 
             //Vynútenie eolu po otváracej množinovej zátvorke
             if (token.type != t_EOL) {
                 //printf("NENI EOL\n");
-                error_call(ERR_SYN);
+                error_call(ERR_SYN, &tokens);
             }
-            else { token = get_next_token(stdin); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Dalsie optional EOLy
             if (token.type == t_EOL) {
@@ -318,33 +343,35 @@ void rule_stat() {
             // Ukoncovacia množinová zátvorka tela IFu
             if (token.type != t_BRACES_R) {
                 //printf("zle braces_R\n");
-                error_call(ERR_SYN);
+                error_call(ERR_SYN, &tokens);
             }
             else {
                 global_brace_count--;
                 token = get_next_token(stdin);
+                TDLLInsertLast(&tokens, token);
             }
 
             //ELSE statement
 
             // token ELSE
-            if (token.type != t_ELSE) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != t_ELSE) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
 
             //Otváracia množinová zátvorka tela bloku ELSE
             if (token.type != t_BRACES_L) {
                 //printf("zle braces_L\n");
-                error_call(ERR_SYN);
+                error_call(ERR_SYN, &tokens);
             }
             else {
                 global_brace_count++;
                 token = get_next_token(stdin);
+                TDLLInsertLast(&tokens, token);
             }
 
             //Vynútenie EOlu po otváracej zátvorke
-            if (token.type != t_EOL) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Dalsie optional EOLy
             if (token.type == t_EOL) {
@@ -360,18 +387,19 @@ void rule_stat() {
             }
 
             // ukoncovacia mnozinová zátvorka na konci tela bloku ELSE
-            if (token.type != t_BRACES_R) { error_call(ERR_SYN); }
+            if (token.type != t_BRACES_R) { error_call(ERR_SYN, &tokens); }
             else {
                 global_brace_count--;
                 token = get_next_token(stdin);
+                TDLLInsertLast(&tokens, token);
             }
 
             // Vynútenie EOLu za zatvorkou
             if (token.type != t_EOL) {
                 //printf("NENI EOL ZA ELSE--token je %d\n", token.type);
-                error_call(ERR_SYN);
+                error_call(ERR_SYN, &tokens);
             }
-            else { token = get_next_token(stdin); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Dalsie optional EOLy
             if (token.type == t_EOL) {
@@ -385,6 +413,7 @@ void rule_stat() {
          // token FOR
         case t_FOR:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
 
 
             //rule for_def, ktoré skontroluje definíciu LOKALNEJ ITERACNEJ PREMENNEJ
@@ -396,24 +425,24 @@ void rule_stat() {
             // Výraz for cyklu
             // SEM PRIDE PCA na vyhodnotenie for vyrazu
             if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // bodkociarka pre oddelenie vyrazov v hlavicke for
-            if (token.type != T_SEMICOLON) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != T_SEMICOLON) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Pravidlo for_assign pre priradenie hodnoty premennej po vykonaní FOR cyklu
             //bodkociarka sa kontroluje v pravidle
             rule_for_assign();
 
             // token otváracej množinovej zátvorky tela for cyklu
-            if (token.type != t_BRACES_L) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != t_BRACES_L) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Vynútenie eolu po zatvorke
-            if (token.type != t_EOL) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Dalsie optional EOLy
             if (token.type == t_EOL) {
@@ -430,12 +459,12 @@ void rule_stat() {
             }
 
             // token ukončovacej zátvorky tela for cyklu
-            if (token.type != t_BRACES_R) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != t_BRACES_R) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Vynútenie EOLu po ukončovacej zátvorke
-            if (token.type != t_EOL) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Dalsie optional EOLy
             if (token.type == t_EOL) {
@@ -450,6 +479,7 @@ void rule_stat() {
         case t_EOL:
             //printf("vosiel som do stat_eol\n");
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             rule_stat();
             break;
 
@@ -463,13 +493,14 @@ void rule_stat() {
         // Generator by ASI mal vediet jak s tym naložiť
         case t_RETURN:
             //token = get_next_token(stdin);
+            //TDLLInsertLast(&tokens, token);
             rule_return();
             //printf("Vysiel som z rule return\n");
             rule_stat();
             break;
          // Pride hocico ine - ERROR
         default:
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
     }
 }
 //Neterminal ID_N/CALL_FUNC
@@ -515,6 +546,7 @@ void rule_id_n_or_call_func()
 
         case t_LEFT_BRACKET:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             // Testovanie parametrov funkcie
             rule_func_params();
             // Nepovinné eoly
@@ -523,7 +555,7 @@ void rule_id_n_or_call_func()
             rule_stat();
             break;
         default:
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
     }
 
 
@@ -535,15 +567,17 @@ void rule_id_n_or_call_func()
 void rule_func_assign() {
     //V tomto pripade sa pozriem na token dopredu, ak bude lava zatvorka tak funckia, ak nieco ine, vyraz
     //Nesmie byt odriadkovanie
-    if (token.type == t_EOL) {error_call(ERR_SYN);}
+    if (token.type == t_EOL) {error_call(ERR_SYN, &tokens);}
 
     // Ak príde identifikátor, neviem si to je výraz alebo volanie funckie, volam dalsi token
     if (token.type == t_IDENTIFIER) {
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
 
         // Lava zatvorka -- volanie funckie
         if (token.type == t_LEFT_BRACKET) {
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
 
             // po vyjdeni budem mat nacitany dalsi token
             rule_func_params();
@@ -556,6 +590,7 @@ void rule_func_assign() {
             // ciarka - dalsi vyraz
         else if (token.type == t_COMMA) {
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             // Ci za jednym vyrazom pokracuje dalsi -- exp_NEXT
             rule_exp_n();
         }
@@ -571,6 +606,7 @@ void rule_func_assign() {
     else if (token.type == t_FLOAT || token.type == t_INT_NON_ZERO || token.type == t_INT_ZERO ||
              token.type == t_STRING) {
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
 
         // Ci za jednym vyrazom pokracuje dalsi
         rule_exp_n();
@@ -587,6 +623,7 @@ void rule_params() {
     switch (token.type) {
         case t_IDENTIFIER:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             //kontrola, ci je správny typ
             rule_type();
             //Ak nasleduju dalsie parametre
@@ -596,12 +633,14 @@ void rule_params() {
         // koniec zoznamu ukoncovacou zatvorkou
         case t_RIGHT_BRACKET:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
     }
     no_id_in_params_flag = false;
 
     //naviac
     //token = get_next_token(stdin);
+    //TDLLInsertLast(&tokens, token);
 }
 
 // funckia pre netemrinal params_n
@@ -609,18 +648,20 @@ void rule_params_n() {
     //ak pride zatvorka -- koniec
     if (token.type == t_RIGHT_BRACKET) {
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
         return;
     }
 
     // prva musi prist ciarka ako oddelovac dalsieho parametra
-    if (token.type != t_COMMA /*&& token.type != t_RIGHT_BRACKET*/) { error_call(ERR_SYN); }
-    else { token = get_next_token(stdin); }
+    if (token.type != t_COMMA /*&& token.type != t_RIGHT_BRACKET*/) { error_call(ERR_SYN, &tokens); }
+    else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
     // kontrola, ci po ciarke pride id
-    if (token.type != t_IDENTIFIER) { error_call(ERR_SYN); }
+    if (token.type != t_IDENTIFIER) { error_call(ERR_SYN, &tokens); }
         // ak pride id, pokracujeme typom a nasledne volame params_n znova
     else {
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
         //kontrola, ci je typ premennej správny
         rule_type();
         // rekurzivne volanie params_n
@@ -635,13 +676,15 @@ void rule_func_params() {
    //Token pravá zátvorka, koniec
     if (token.type == t_RIGHT_BRACKET) {
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
         return;
     }
     else {
         // Možné typy vo vstupnych parametroch funckie
         if (token.type != t_IDENTIFIER && token.type != t_FLOAT64 && token.type != t_STRING &&
-            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN); }
+            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
         //rekurzivne func_params_NEXT, bud budu dalsie typy alebo koniec
         rule_func_params_n();
     }
@@ -653,12 +696,14 @@ void rule_func_params_n() {
 
     else {
         // Za prechádzajúcim typom musí prísť čiarka napr. (10 , ...)
-        if (token.type != t_COMMA) { error_call(ERR_SYN); }
+        if (token.type != t_COMMA) { error_call(ERR_SYN, &tokens); }
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
 
         if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN); }
+            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
         //rekurzivne volanie, bud dalsie typy alebo koniec
         rule_func_params_n();
 
@@ -672,9 +717,11 @@ void rule_id_n() {
         // za predchádzajúcim identifikátorom musí prísť čiarka
         case t_COMMA:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             //token ID
-            if (token.type != t_IDENTIFIER) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != t_IDENTIFIER) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
+            
 
             //rekurzivne volanie pre dalsie mozne IDs, ak nepridu, koniec
             rule_id_n();
@@ -687,7 +734,7 @@ void rule_id_n() {
             break;
             // hocico ine, ERROR
         default:
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
     }
 }
 
@@ -696,24 +743,26 @@ void rule_for_def() {
     switch (token.type) {
         case t_IDENTIFIER:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             //kontrola, ci pride inicializacia alebo definicia -- Neviem ci je IBA priradenie hodnoty možné, ak áno, iteračná premenná musí byť definovaná dopredu
             rule_init_def();
 
             //TU PRIDE PSA
             if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
-            if (token.type != T_SEMICOLON) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
+            if (token.type != T_SEMICOLON) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             break;
             // Definicia je vynechaná
         case T_SEMICOLON:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
         default:
             //hocico ine -- ERROR
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
     }
 
 }
@@ -722,15 +771,16 @@ void rule_for_assign() {
     switch (token.type) {
         case t_IDENTIFIER:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
 
             //môže príst iba token assign =
-            if (token.type != t_ASSIGN) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+            if (token.type != t_ASSIGN) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
-            //sem pride psa
+            //sem pride  
             if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN); }
-            else { token = get_next_token(stdin); }
+                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
+            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             break;
 
@@ -739,7 +789,7 @@ void rule_for_assign() {
             break;
         // hocico ine - break
         default:
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
     }
 }
 
@@ -748,12 +798,14 @@ void rule_init_def() {
     switch (token.type) {
         case t_ASSIGN:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
         case t_DEFINITION_2:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
         default:
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
     }
 }
 
@@ -764,22 +816,27 @@ void rule_type() {
     switch (token.type) {
         case t_FLOAT64:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
         case t_INT_ID:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
         case t_INT_ZERO:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
         case t_STRING_ID:
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
         case t_IDENTIFIER:
-            if (no_id_in_params_flag == true) { error_call(ERR_SYN); }
+            if (no_id_in_params_flag == true) { error_call(ERR_SYN, &tokens); }
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;
         default:
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
     }
 }
 
@@ -791,34 +848,35 @@ void rule_return() {
         case t_RETURN:
             was_return = true; // nastavíme premennú výskytu RETURN na true
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
 
             // Ak je prítomnost RETURN nutná -- definicia obsahuje návratové typy
             if (is_return == true) {
                 //pokial za returnom nenasledujú návratové hodnoty -- ERROR -- kontrolovat ci sú správne robí GENERATOR
                 if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-                    token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN); }
-                else { token = get_next_token(stdin); }
+                    token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
+                else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
                 // Ak za returnom nasledujú dalsie return výrazy
                 rule_exp_n();
 
-                /*if (token.type != t_EOL) { error_call(ERR_SYN); }
-                else { token = get_next_token(stdin); }*/
+                /*if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+                else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }*/
 
                 //mozné EOLy sa returnom
                 if (token.type == t_EOL) {
                     rule_eol();
                 }
 
-                /*if (token.type != t_BRACES_R) { error_call(ERR_SYN); }
-                else { token = get_next_token(stdin); }*/
+                /*if (token.type != t_BRACES_R) { error_call(ERR_SYN, &tokens); }
+                else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }*/
 
 
                 // Ak je prítomnosť RETURN nepovinná
             } else if (is_return == false) {
                 // Nic nevraciame, cize za RETURNOM musí ísť eol
-                if (token.type != t_EOL) { error_call(ERR_SYN); }
-                else { token = get_next_token(stdin); }
+                if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+                else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
                 // Možné eoly na konci
                 if (token.type == t_EOL) {
@@ -832,21 +890,23 @@ void rule_return() {
             // ak treba RETURN toto nemože prisť
             if (is_return == true) {
                // printf("CHYBA RETURN\n");
-                error_call(ERR_SYN);
+                error_call(ERR_SYN, &tokens);
             }
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;*/
 
         /*case t_EOL: -- ANI TOTO TU ASI NEMUSI BYT, S TAKYM SA SEM ANI NEDOSTANEM
             if (is_return == true) {
                // printf("CHYBA RETURN\n");
-                error_call(ERR_SYN);
+                error_call(ERR_SYN, &tokens);
             }
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             break;*/
 
         default:
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
 
     }
 }
@@ -858,6 +918,7 @@ void rule_return_type_n() {
         case t_COMMA:
             // Musí prís čiarka za predchadzajúcim návratovým typom
             token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);
             rule_type();
             rule_return_type_n();
             break;
@@ -865,10 +926,11 @@ void rule_return_type_n() {
             //prava zatvorka, koniec
         case t_RIGHT_BRACKET:
             //token = get_next_token(stdin);
+            //TDLLInsertLast(&tokens, token);
             break;
 
         default:
-            error_call(ERR_SYN);
+            error_call(ERR_SYN, &tokens);
     }
     no_id_in_params_flag = false;
 }
@@ -878,20 +940,22 @@ void rule_exp_n() {
    // printf("EXP_N s tokenom %d\n",token.type);
 
     //token = get_next_token(stdin);
+    //TDLLInsertLast(&tokens, token);
 
     if (token.type == t_EOL)
     {
         return;
 
-    } else if (token.type != t_COMMA) {error_call(ERR_SYN);}
+    } else if (token.type != t_COMMA) {error_call(ERR_SYN, &tokens);}
     else {
         token = get_next_token(stdin);
+        TDLLInsertLast(&tokens, token);
 
-        if (token.type == t_EOL) {error_call(ERR_SYN);}
+        if (token.type == t_EOL) {error_call(ERR_SYN, &tokens);}
 
         if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) {error_call(ERR_SYN); }
-        else {token = get_next_token(stdin);}
+            token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) {error_call(ERR_SYN, &tokens); }
+        else {token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
         rule_exp_n();
     }
@@ -905,6 +969,7 @@ void rule_eol() {
 
     //printf("som v rule_EOL s tokenom %d\n", token.type);
     token = get_next_token(stdin);
+    TDLLInsertLast(&tokens, token);
 
     switch (token.type) {
         case t_EOL:
