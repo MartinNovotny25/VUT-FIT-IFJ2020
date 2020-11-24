@@ -12,9 +12,10 @@
 TDLList tokens;
 TDLList psa_list;
 TOKEN token;
+int psa_result;
 TOKEN help;
 bool no_id_in_params_flag = false; //pri id, id nemoze byt return type pri def_func -- ID je možnost v RULE_TYPE, ak by nebol tento case,
-                                    // prítomnost identifikátor medzi NÁVRATOVÝMI TYPMI funckie by bola akceptovaná xd
+                                    // prítomnost identifikátor medzi NÁVRATOVÝMI TYPMI funckie by bola akceptovaná
                                     // Ak je flag == true, tak ak príde identifikator medzi návratovými typmi, ERROR
 bool is_return = false; // flag pre vynutenie return statementu
 bool was_return = false; // flag pre zaznacenie ci funkcia obsahovala return
@@ -67,7 +68,7 @@ int main() {
     //inicilizacia zoznamu tokenov
     TDLLInitList(&tokens);
     //printf("som za InitListom\n");
-    
+
     //načitanie prvého tokenu
     token = get_next_token(stdin);
     //nacitanie tokenu do zoznamu tokenov, bude sa volast s kazdym get_next_token
@@ -109,11 +110,11 @@ int main() {
     //if (global_brace_count != 0) { error_call(ERR_SYN, &tokens); }
 
     printf("Parser: USPESNY KONIEC\n");
-    
+
     printf("Parser: Printujem cely zoznam tokenov\n");
     //TDLLPrintAllTokens(&tokens);
 
-    
+
     return 0;
 }
 
@@ -209,7 +210,6 @@ void rule_func_retlist_body() {
 
             //OPTIONAL_RETURN
         case t_BRACES_L:
-            printf("SOM V BRACES_L\n");
             global_brace_count++;
             token = get_next_token(stdin);
             TDLLInsertLast(&tokens, token);
@@ -217,9 +217,7 @@ void rule_func_retlist_body() {
             else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             // Neterminál stat (STATEMENT) -- Vyjadruje možné príkazy v tele funkcie
-            printf("IDEM DO STAT\n");
             rule_stat();
-            printf("KONIEC RULE STAT\n");
 
     }
 }
@@ -335,8 +333,7 @@ void rule_stat() {
 
             }
             // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
-            evaluation(&psa_list);
-             printf("VYSIEL SOM Z PSA\n");
+            evaluation(&psa_list, &tokens);
 
              TDLLDisposeList(&psa_list);
 
@@ -504,7 +501,7 @@ void rule_stat() {
             // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
 
             //TDLLPrintAllTokens(&psa_list);
-            evaluation(&psa_list);
+            evaluation(&psa_list, &tokens);
             TDLLDisposeList(&psa_list);
             token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
 
@@ -563,7 +560,6 @@ void rule_stat() {
 
             //ak po stat nebude nič a skonči sa blok
         case t_BRACES_R:
-            printf("SOM V BRACES\n");
             break;
 
         // Ak príde return -- pokracujeme do rule_return a za tym rule_stat
@@ -610,7 +606,6 @@ void rule_id_n_or_call_func()
             // či s bude priradzovan pomocou výrazu alebo volaním funckie
             rule_func_assign();
             rule_stat();
-            printf("VYSIEL Z DALSIEH\n");
             break;
 
         case t_ASSIGN:
@@ -716,7 +711,9 @@ void rule_func_assign() {
             }
 
             //TDLLPrintAllTokens(&psa_list);
-            evaluation(&psa_list);
+
+            //Ak precedencna analyza vrati 1 -- ERROR
+            evaluation(&psa_list, &tokens);
             TDLLDisposeList(&psa_list);
 
             // Pride mi ciarka alebo eol, musim zavolat exp_n ci za tym nieco ide
@@ -727,19 +724,15 @@ void rule_func_assign() {
         }
     }
 
-        // ak mi nepride id -- nemusis riesit, ide vyraz, ale nejde lebo ho este netreba
-        //TODO
-        //tiez dorobit volanie precedencnej
-
+        // ak mi nepride id -- nemusis riesit, ide vyraz
     else if (token.type == t_FLOAT || token.type == t_INT_NON_ZERO || token.type == t_INT_ZERO ||
-             token.type == t_STRING) {
+             token.type == t_STRING || token.type == t_LEFT_BRACKET) {
 
         TDLLInitList(&psa_list);
         TDLLInsertLast(&psa_list, token);
 
         token = get_next_token(stdin);
         TDLLInsertLast(&tokens, token);
-
 
         //nacitavam, kym nepride ciarka alebo eol -- koneic vyrazu
         while (token.type != t_COMMA && token.type != t_EOL) {
@@ -763,7 +756,7 @@ void rule_func_assign() {
             }
         }
 
-        evaluation(&psa_list);
+        evaluation(&psa_list, &tokens);
         TDLLDisposeList(&psa_list);
 
             /*token = get_next_token(stdin);
@@ -882,7 +875,7 @@ void rule_id_n() {
             //token ID
             if (token.type != t_IDENTIFIER) { error_call(ERR_SYN, &tokens); }
             else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
-            
+
 
             //rekurzivne volanie pre dalsie mozne IDs, ak nepridu, koniec
             rule_id_n();
@@ -929,7 +922,7 @@ void rule_for_def() {
             }
             // TU SA ZAVOLA PRECEDENCNA S NAPLNENYM LISTOM
 
-            evaluation(&psa_list);
+            evaluation(&psa_list, &tokens);
             //TDLLPrintAllTokens(&psa_list);
             TDLLDisposeList(&psa_list);
             token = get_next_token(stdin);
@@ -980,7 +973,7 @@ void rule_for_assign() {
 
             }
             //TDLLPrintAllTokens(&psa_list);
-            evaluation(&psa_list);
+            evaluation(&psa_list, &tokens);
             TDLLDisposeList(&psa_list);
             //token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
 
@@ -1181,16 +1174,10 @@ void rule_exp_n() {
                 } else { error_call(ERR_SYN, &tokens); }
             }
 
-            evaluation(&psa_list);
+            evaluation(&psa_list, &tokens);
             //TDLLPrintAllTokens(&psa_list);
             TDLLDisposeList(&psa_list);
 
-            /*if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
-            else {
-                token = get_next_token(stdin);
-                TDLLInsertLast(&tokens, token);
-            }*/
 
             rule_exp_n();
         }

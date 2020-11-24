@@ -2,26 +2,20 @@
 #include "psa_lib.h"
 #include "precanalysis_stack.h"
 #include <string.h>
-#include "tokenList.h"
+#include "error.h"
 
 
 #define PTABLE_ROWS 14
 #define PTABLE_COLUMNS 14
-//extern int rule_array[120][40];
 
-int SYM1, SYM2, SYM3;
+//tsym_stack_symbol *KONTROLA;
+tsym_stack syms_Stack; // Zásobník tokenov (symbolov)
+int count; //pocet symbolov v REDUKCII
+bool red_found; // symbol redukcie bol najdeny
+psa_rules rule; //hodnota pravidla
 
-tsym_stack_symbol *KONTROLA;
-tsym_stack syms_Stack;
-tsym_stack_symbol* checked_symbol;
-TOKEN exp_start, exp_end;
-TOKEN help_tmp;
-int count;
-bool red_found;
-psa_rules rule;
 
-//int rule_array[120][40];
-
+// Precedencna tabulka, rozhoduje o výbere operácie podla tokenu na vstupe a tokenu na zásobníku
 int psa_prec_table[PTABLE_ROWS][PTABLE_COLUMNS] = {
         /*           0   1   2   3   4   5     6   7    8    9   10  11  12  13
         /*           |+| |-| |*| |/| |(| |)| |==| |!=| |>=| |<=| |<| |>| |i| |$| */
@@ -41,8 +35,8 @@ int psa_prec_table[PTABLE_ROWS][PTABLE_COLUMNS] = {
         /* 13 $  */{  1 , 1 , 1 , 1 , 1 , 4 , 1 ,  1 ,  1 ,  1 ,  1 , 1 , 1 , 4  }
 };
 
+// Prevedie tokeny na symboly, s ktorym pracuje precedencna
 psa_symbols psa_tokenToSymbol(TOKEN* token) {
-
     if (token->type == t_PLUS)
         return T_PLUS;
     else if (token->type == t_MINUS)
@@ -82,30 +76,25 @@ psa_symbols psa_tokenToSymbol(TOKEN* token) {
     }
 }
 
+// Funckia aplikuje pravidlo pre redukciu, viz psa_lib.h
 psa_rules psa_rule_application(int pocet, tsym_stack_symbol* sym1, tsym_stack_symbol* sym2, tsym_stack_symbol* sym3) {
-
     if (pocet == 1) {
-
         if (sym1->symbol == T_ID) {
-
             return R_OP;
         } else {
-
             return R_NOTDEFINED;
         }
     }
-
         // NON_TERM sa bude pushovat pocas reduce pravidla namiesto popnutych symbolov
     else if (pocet == 3) {
         if (sym1->symbol == T_LEFT_PARENTHESIS && sym2->symbol == T_NON_TERM && sym3->symbol == T_RIGHT_PARENTHESIS) {
             return R_EBRACES;
         }
-
+        // napr E+E -> 1. a 3. symbol je NON_TERM
         if (sym1->symbol == T_NON_TERM && sym3->symbol == T_NON_TERM) {
 
-            if(sym2->symbol == T_PLUS) {
+            if(sym2->symbol == T_PLUS)
                 return R_PLUS;
-            }
 
             else if (sym2->symbol == T_MINUS)
                 return R_MINUS;
@@ -144,95 +133,81 @@ psa_rules psa_rule_application(int pocet, tsym_stack_symbol* sym1, tsym_stack_sy
     return R_NOTDEFINED;
 }
 
-void evaluation(TDLList* psa_list) {
+//Samotna riadiaca funckia
+void evaluation(TDLList* psa_list, TDLList* global_tokens) {
+    // TOKEN dollar, zaradim na koniec vyrazu a posledny znak
     TOKEN dollar;
-
     alloc(3, &dollar);
     strcpy(dollar.lex, "$");
     dollar.type = t_DOLLAR;
 
-
-
-// int rule_counter = 0;
-//static int id_counter = 0;
-
-    extern psa_rules rule;
-
-//TOKENY zaciatok a start
-/* exp_start.lex = id_counter;
- exp_end.lex = NULL;
-
- exp_start.type = EXP_START;
- exp_end.type = EXP_END;*/
-
-//TDLLDeleteFirst(psa_list);
     TDLLFirst(psa_list);
-//TDLLInsertFirst(psa_list, exp_start);
     TDLLInsertLast(psa_list, dollar);
+
+    //Inicializacia stacku
     symstack_init(&syms_Stack);
 
+    //Pushnutie dolara na spodok stacku ako koniec stacku
     symstack_push(&syms_Stack, T_DOLLAR); //DOLLAR NA SPODKU STACKU
 
-    psa_symbols input_sym;
-    tsym_stack_symbol* top_terminal;
+    psa_symbols input_sym; //Symbol na vstupe -- VYRAZ
+    tsym_stack_symbol* top_terminal; //Symbol na vrchole terminalu
 
-
-    bool koniec = false;
+    bool koniec = false; // PREMENNA pre koniec vyhodnocovania vyrazu
 
     do {
 
-        input_sym = psa_tokenToSymbol(&psa_list->Act->tdata);
-        top_terminal = symstack_top_t(&syms_Stack);
+        input_sym = psa_tokenToSymbol(&psa_list->Act->tdata); //do input sym sa umiestni aktualny znak DLL
+        top_terminal = symstack_top_t(&syms_Stack); //top terminal je vrchol stacku
 
         int terminal = top_terminal->symbol;
         int vstup = input_sym;
 
-//int test = psa_prec_table[1][1];
+        //int test = psa_prec_table[1][1];
+        //printf("Na terminale je %d, na vstupe je %d\n", terminal, vstup);
 
-//printf("Na terminale je %d, na vstupe je %d\n", terminal, vstup);
+        //SPLIT premenna symbolizuje vyber pravidla
+        // 1 = SHIFT
+        // 2 = REDUKCIA
+        // 3 = EQUAL
+        // 4 = X, NEMOZNE // V PRIPADE  $ a $ USPESNY KONIEC
 
-        int SPLIT = psa_prec_table[terminal/*top_terminal->symbol*/][vstup/*input_sym*/];
-        printf("SPLIT %d\n", SPLIT);
+        int SPLIT = psa_prec_table[terminal][vstup];
+        //printf("SPLIT %d\n", SPLIT);
 
-/* SHIFT */
+        /* SHIFT */
         if (SPLIT == 1) {
-//printf("som v <\n");
 
+            // Ak pride shift, pred najvrchnejsi termnal sa pushne znak pre redukciu
             symstack_push_red(&syms_Stack, T_RED);
-            KONTROLA = syms_Stack.top;
-            printf("PUSH %d\n", KONTROLA->symbol);
-
+            //Na vrch sa pusne aktualny znak na vstupe
             symstack_push(&syms_Stack, input_sym);
 
-            KONTROLA = syms_Stack.top;
-            printf("PUSH %d\n", KONTROLA->symbol);
-
-
+            //aktivita sa nastaví na dalsi znak
             psa_list->Act = psa_list->Act->rptr;
-
-            printf("\n\nKONIEC\n\n");
 
         }
 
-/* REDUKCIA */
+        /* REDUKCIA */
         else if (SPLIT == 2) {
-//printf("som v >\n");
+
+            //Premenna pre cyklenie cez znaky, ktore s budu nasledne popovať zo stacku po redukcii
             tsym_stack_symbol* checked_symbol;
-///////////////////////////////////////////////////////////////////
-
-///////////////// TU POZOR /////////////////////////
+        ///////////////// TU POZOR /////////////////////////
+            //nastavenie na vrchol zasobniku
             checked_symbol = syms_Stack.top;
-/////////////////////////////////////////////////
+        /////////////////////////////////////////////////
 
-
+        //cyklus
             while (checked_symbol != NULL)
             {
-// printf("Na vrchu je %d\n", checked_symbol->symbol);
+                // pokial sa nenajde symbol redukcie, zvysi sa count
                 if (checked_symbol->symbol != T_RED)
                 {
                     red_found = false;
                     count++;
                 }
+                // ak sa najde, cyklus sa breakne
                 else if (checked_symbol->symbol == T_RED)
                 {
                     red_found = true;
@@ -243,57 +218,35 @@ void evaluation(TDLList* psa_list) {
             }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+            // Moze sa redukovat iba ak su 3 alebo 1 znak
+            // napr E+E -> E, (E) -> E, i -> E
             if (count != 3 && count != 1) {
-
-                /*KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
-                symstack_pop(&syms_Stack);
-
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
-                symstack_pop(&syms_Stack);
-
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
-                symstack_pop(&syms_Stack);
-
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
-                symstack_pop(&syms_Stack);*/
-
-                fprintf(stderr, "Syntax Error, zly pocet symbolov\n");
-                exit(2);
+                symstack_free(&syms_Stack);
+                //fprintf(stderr, "PSA - Syntax error\n");
+                error_call(ERR_SYN, *(&global_tokens));
             }
 
+            // Jeden znak
             if (count == 1 && red_found) {
 
-                //1 symbolx potrebne pre redukciu
+                //1 symbol potrebny pre redukciu
                 tsym_stack_symbol* red1;
-
                 red1 = syms_Stack.top;
 
-
+                //Aplikacia pravidla
                 rule = psa_rule_application(count, red1, NULL, NULL);
 
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
+                // popnutie vrchneho symbolu
                 symstack_pop(&syms_Stack);
-
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
                 symstack_pop(&syms_Stack); //popuje sa RED symbol
 
 
+                //Pushnutie nontermu -> E
                 symstack_push(&syms_Stack, T_NON_TERM);
-
-                KONTROLA = syms_Stack.top;
-                printf("PUSH %d\n", KONTROLA->symbol);
-
-
 
             }   else if (count == 3 && red_found) {
 
-                //3 symbolx potrebne pre redukciu
+                //3 symboly potrebne pre redukciu
                 tsym_stack_symbol* red1;
                 tsym_stack_symbol* red2;
                 tsym_stack_symbol* red3;
@@ -302,71 +255,57 @@ void evaluation(TDLList* psa_list) {
                 red2 = red3->next;
                 red1 = red3->next->next;
 
+                // Apliakcia pravidla
                 rule = psa_rule_application(count, red1, red2, red3);
 
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
+                //Popnutie 3 symbolob, ktore sa redukovali
                 symstack_pop(&syms_Stack);
-
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
                 symstack_pop(&syms_Stack);
-
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
                 symstack_pop(&syms_Stack);
-
-                KONTROLA = syms_Stack.top;
-                printf("POP %d\n", KONTROLA->symbol);
                 symstack_pop(&syms_Stack); //popuje sa RED symbol
 
+                // push nonterm
                 symstack_push(&syms_Stack, T_NON_TERM);
-                KONTROLA = syms_Stack.top;
-                printf("PUSH %d\n", KONTROLA->symbol);
+
             }
 
+            // Ak nebolo uplatnene ziadne pravidlo -- Error
             if (rule == R_NOTDEFINED) {
-                fprintf(stderr, "PSA - Syntax error\n");
-                exit(2);
+                symstack_free(&syms_Stack);
+                //fprintf(stderr, "PSA - Syntax error\n");
+                error_call(ERR_SYN, *(&global_tokens));
+                // Ak chill , nastavi sa count spat na 0
             } else {
                 count = 0;
             }
 
-            printf("\n\nKONIEC\n\n");
-        }
 
+        }
         /* EQUAL */
         else if (SPLIT == 3) {
         // printf("som v =\n");
 
+            // Aktualny symbol sa pushne na stack, aktivita sa posunie
             symstack_push(&syms_Stack, input_sym);
-            KONTROLA = syms_Stack.top;
-            printf("PUSH %d\n", KONTROLA->symbol);
-
             psa_list->Act = psa_list->Act->rptr;
-
-            printf("\n\nKONIEC\n\n");
         }
 
         else if (SPLIT == 4) {
         //printf("som v x\n");
 
+            // Ak je na vstupe Dollar a na zasobniku Dollar, VYRAZ JE VALIDNY
             if((input_sym == T_DOLLAR && top_terminal->symbol == T_DOLLAR) != true) {
-
-                fprintf(stderr, "PSA SYNTAX ERROR, EXIT (2)\n");
-
-                exit(2); //situacia nemoze nastat
+                symstack_free(&syms_Stack);
+                //fprintf(stderr, "PSA SYNTAX ERROR, EXIT (2)\n");
+                error_call(ERR_SYN, *(&global_tokens));
             } else
                 koniec = true;
         }
 
     } while (koniec != true);
 
-    TDLLDeleteLast(psa_list); //removnem dollar na konci listu
-
-        //TDLLInsertLast(psa_list, exp_end);
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //  TDLLDeleteLast(psa_list); //removnem dollar na konci listu
+  // Uvolnenie stacku
     symstack_free(&syms_Stack);
 
 }

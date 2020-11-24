@@ -54,7 +54,7 @@ void symstack_push_red(tsym_stack* sym_stack, psa_symbols symbol)
 
     while (stack_sym != NULL)
     {
-        if (stack_sym->symbol < T_RED /*&& stack_sym->symbol != T_NON_TERM*/){
+        if (stack_sym->symbol != T_RED && stack_sym->symbol != T_NON_TERM){
 
             tsym_stack_symbol* pushed_sym = (tsym_stack_symbol*)malloc(sizeof(tsym_stack_symbol));
             pushed_sym->symbol = symbol;
