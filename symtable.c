@@ -8,13 +8,13 @@
 
 // TODO : fix documentation
 
-tBSTNodePtr GlobalBody ;
+tBSTNodePtrGlobal GlobalBody ;
 tBSTNodePtrLocal LocalVariables;
 tBSTNodePtrLocal  GFDefinedVarsTree;
 tBSTNodePtrLocal  LFDefinedVarsTree;
 
 
-void BSTInit (tBSTNodePtr *RootPtr) {
+void BSTInitGlobal (tBSTNodePtrGlobal *RootPtr) {
 /*   -------
 ** Function inicializes tree before its first use.
 **/
@@ -22,7 +22,7 @@ void BSTInit (tBSTNodePtr *RootPtr) {
 
 }	
 
-bool BSTSearch (tBSTNodePtr RootPtr, char* name, global_t *Content)	{
+bool BSTSearchGlobal (tBSTNodePtrGlobal RootPtr, char* name, global_t *Content)	{
 /*  ---------
 ** Function searches for a node with key == name.
 **
@@ -37,12 +37,12 @@ bool BSTSearch (tBSTNodePtr RootPtr, char* name, global_t *Content)	{
 	{
 		if ((strcmp(name, RootPtr->Name) < 0))
 		{
-			return BSTSearch(RootPtr->LPtr,name,Content);
+			return BSTSearchGlobal(RootPtr->LPtr,name,Content);
 				
 		}
 		else if (strcmp(name, RootPtr->Name) > 0)
 		{
-			return BSTSearch(RootPtr->RPtr,name,Content);
+			return BSTSearchGlobal(RootPtr->RPtr,name,Content);
 		}
 		else
 		{
@@ -57,30 +57,12 @@ bool BSTSearch (tBSTNodePtr RootPtr, char* name, global_t *Content)	{
 	}
 } 
 
-
-void BSTInsert (tBSTNodePtr* RootPtr, char* name, global_t Content)	{	
-/*   ---------
-** Vloží do stromu RootPtr hodnotu Content s klíčem K.
-**
-** Pokud již uzel se zadaným klíčem ve stromu existuje, bude obsah uzlu
-** s klíčem K nahrazen novou hodnotou. Pokud bude do stromu vložen nový
-** uzel, bude vložen vždy jako list stromu.
-**
-** Funkci implementujte rekurzivně. Nedeklarujte žádnou pomocnou funkci.
-**
-** Rekurzivní implementace je méně efektivní, protože se při každém
-** rekurzivním zanoření ukládá na zásobník obsah uzlu (zde integer).
-** Nerekurzivní varianta by v tomto případě byla efektivnější jak z hlediska
-** rychlosti, tak z hlediska paměťových nároků. Zde jde ale o školní
-** příklad, na kterém si chceme ukázat eleganci rekurzivního zápisu.
-**/
-	
-				
-
+/*
+void BSTInsertGLobal (tBSTNodePtrGlobal* RootPtr, char* name, global_t Content)	{	
 
 	if (*RootPtr == NULL)
 	{
-		*RootPtr = malloc(sizeof (struct tBSTNode));	
+		*RootPtr = malloc(sizeof (struct tBSTNodeGlobal));	
 		(*RootPtr)->Name = name;
 		(*RootPtr)->content = Content;
 		(*RootPtr)->LPtr = NULL;
@@ -94,18 +76,18 @@ void BSTInsert (tBSTNodePtr* RootPtr, char* name, global_t Content)	{
 	}
 	else if (strcmp(name, (*RootPtr)->Name) < 0)     	
 	{
-		BSTInsert(&(*RootPtr)->LPtr,name,Content);
+		BSTInsertGlobal(&(*RootPtr)->LPtr,name,Content);
 	}
 	else if (strcmp(name, (*RootPtr)->Name) > 0)
 	{
-		BSTInsert(&(*RootPtr)->RPtr,name,Content);
+		BSTInsertGlobal(&(*RootPtr)->RPtr,name,Content);
 	}
 	
 	
 }
+*/
 
-
-void BSTDispose (tBSTNodePtr *RootPtr) {	
+void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {	
 /*   
 ** Deletes entire binary tree and correctly frees allocated memory.
 **/	
@@ -113,8 +95,8 @@ void BSTDispose (tBSTNodePtr *RootPtr) {
 
 	if (*RootPtr != NULL)					
 	{
-		BSTDispose(&(*RootPtr)->LPtr);
-		BSTDispose(&(*RootPtr)->RPtr);
+		BSTDisposeGlobal(&(*RootPtr)->LPtr);
+		BSTDisposeGlobal(&(*RootPtr)->RPtr);
 		free(*RootPtr);
 		*RootPtr = NULL;
 	}
@@ -160,19 +142,21 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name)	{
  
 
 
-void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * name)	{	
+void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, char *Type, char *Data)	{	
 
 				
 
 	if (*RootPtr == NULL)
 	{
 		*RootPtr = malloc(sizeof (struct tBSTNodeLocal));	
-		(*RootPtr)->Name = name;
+		(*RootPtr)->Name = Name;
 		(*RootPtr)->LPtr = NULL;
 		(*RootPtr)->RPtr = NULL;	
+		(*RootPtr)->Type = Type;
+		(*RootPtr)->Data = Data;
 	}
 
-	else if (strcmp(name, (*RootPtr)->Name) == 0)
+	else if (strcmp(Name, (*RootPtr)->Name) == 0)
 	{		
 		// this state should never be called since parser should check if local var is in tree
 		// before trying to insert it again.
@@ -180,13 +164,13 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * name)	{
 		printf("THIS CODE SHOULD NEVER BE REACHED!\n"); 
 		
 	}
-	else if (strcmp(name, (*RootPtr)->Name) < 0)     	
+	else if (strcmp(Name, (*RootPtr)->Name) < 0)     	
 	{
-		BSTInsertLocal(&(*RootPtr)->LPtr,name);
+		BSTInsertLocal(&(*RootPtr)->LPtr,Name, Type, Data);
 	}
-	else if (strcmp(name, (*RootPtr)->Name) > 0)
+	else if (strcmp(Name, (*RootPtr)->Name) > 0)
 	{
-		BSTInsertLocal(&(*RootPtr)->RPtr,name);
+		BSTInsertLocal(&(*RootPtr)->RPtr,Name, Type, Data);
 	}
 	
 	

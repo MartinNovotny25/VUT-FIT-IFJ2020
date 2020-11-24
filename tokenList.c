@@ -88,7 +88,11 @@ void TDLLPrintAllTokens(TDLList *L) {
     
     while (L->Act != NULL) {                          //while prechadza listom
         printf("token %d\n", L->Act->tdata.type);
+        if (L->Act->tdata.type == 29) {
+            printf("lexem EOF\n\n");
+        } else {
         printf("lexem %s\n\n", L->Act->tdata.lex);
+        }
         TDLLSucc(L);                                //presun aktivity na nasledujuci token
     }
     printf("tokenList: Printing Ended Succesfully...\n");
