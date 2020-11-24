@@ -13,9 +13,11 @@
    char current_char;
    char current_char2;
    char current_char3;
+   char current_char4;
    /* Vymazavanie current_tokenu (napr. chodia medzery-vtedy ich vyhodime a
    pokracujeme dalej)*/
-    /*
+   
+   /*
    int main()
    {
        while (1)
@@ -31,7 +33,8 @@
        }
        return 0;
    }
-*/
+   */
+
    //Funkcia na odstranovanie znaku '_'
    void remove_(void)
    {
@@ -346,8 +349,8 @@
                    }
                    else
                    {
-                       if(!strcmp(current_token, "package ") || !strcmp(current_token, "package   ")){
-                           state = t_IDENTIFIER;
+                       if(!strcmp(current_token, "package ")){
+                           state = t_PACKAGE_CONTROLL;
                        }
                        else{
                            unload_c(text);
@@ -372,8 +375,8 @@
                            else if(!strcmp(current_token, "int")){
                                end_token(t_INT_ID, &token);
                            }
-                           else if(!strcmp(current_token, "package main")){
-                               end_token(t_PACKAGE_MAIN, &token);
+                           else if(!strcmp(current_token, "package")){
+                               end_token(t_PACKAGE, &token);
                            }
                            else if(!strcmp(current_token, "func")){
                                end_token(t_FUNC, &token);
@@ -383,6 +386,80 @@
                            }
                            return token;
                        }
+                   }
+                   break;
+                
+               case t_PACKAGE_CONTROLL:
+                   if (current_char == 'm')
+                   {
+                       state = t_PACKAGE_CONTROLL1;
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       end_token(t_PACKAGE, &token);
+                       return token;
+                   }
+                   break;
+               
+               case t_PACKAGE_CONTROLL1:
+                   if (current_char == 'a')
+                   {
+                       current_char2 = current_char;
+                       state = t_PACKAGE_CONTROLL2;
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       ungetc(current_char2,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       end_token(t_PACKAGE, &token);
+                       return token;
+                   }
+                   break;
+                   
+               case t_PACKAGE_CONTROLL2:
+                   if (current_char == 'i')
+                   {
+                       current_char3 = current_char;
+                       state = t_PACKAGE_CONTROLL3;
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       ungetc(current_char3,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc(current_char2,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       end_token(t_PACKAGE, &token);
+                       return token;
+                   }
+                   break;
+                   
+               case t_PACKAGE_CONTROLL3:
+                   if (current_char == 'n')
+                   {
+                       current_char4 = current_char;
+                       end_token(t_PACKAGE_MAIN, &token);
+                       return token;
+                   }
+                   else
+                   {
+                       unload_c(text);
+                       ungetc(current_char4,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc(current_char3,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc(current_char2,text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       end_token(t_PACKAGE, &token);
+                       return token;
                    }
                    break;
                    
@@ -865,4 +942,3 @@
            }
        }
    }
-   //rewind(FILE *file);

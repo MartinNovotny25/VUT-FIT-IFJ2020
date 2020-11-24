@@ -72,7 +72,11 @@
 #define BINARY 58
 #define OCTAL 59
 #define HEXADECIMAL 60
-
+#define t_PACKAGE_CONTROLL 61
+#define t_PACKAGE_CONTROLL1 62
+#define t_PACKAGE_CONTROLL2 63
+#define t_PACKAGE_CONTROLL3 64
+#define t_PACKAGE 65
 #define t_DOLLAR 100
 
 
