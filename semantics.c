@@ -19,6 +19,64 @@ int globalBraceCount = 0;
 //globalna symtable funkcii
 tBSTNodePtrGlobal functions;
 
+//TODO pri kontrole parametrov funkcii treba este overit, ci nemaju parametre rovnake identifikatory...
+
+
+/*
+ kontrolna funkcia pre potreby debuggingu
+ vytlaci parametre funkcie vkladanej do symtable
+ */
+void printFunction(char *id, functionData data) {
+    printf("Function id: %s\n", id);
+    printf("Number of params: %d\n", data.numOfParams);
+    printf("Number of return vals: %d\n", data.numOfReturns);
+    printf("Params: \n");
+    for (int i = 0; i < data.numOfParams; i++) {
+        //printf("we even here?\n");
+        switch (data.paramsType[i]) {
+            case t_INT_ID:
+                printf("int ");
+                break;
+            case t_STRING_ID:
+                printf("string ");
+                break;
+            case t_FLOAT64:
+                printf("float64 ");
+                break;
+                
+            default:
+                break;
+        }
+        printf("%s\n", data.params[i]);
+    }
+    printf("Return types:\n");
+    for (int i = 0; i < data.numOfReturns; i++) {
+        //printf("or here?\n");
+        switch (data.returns[i]) {
+            case t_INT_ID:
+                printf("int ");
+                break;
+            case t_STRING_ID:
+                printf("string ");
+                break;
+            case t_FLOAT64:
+                printf("float64 ");
+                break;
+                
+            default:
+                break;
+        }
+    }
+    printf("\n\n\n");
+}
+
+
+
+
+
+
+
+
 /*
 tato funkcia bude prechadzet telom funkcie, a kontrolovat statements, deklaracie a priradenia
 spusta sa ked sa najde funkcia ina ako main(), semantika deklaracie by mala byt spravna, iba ukladame udaje o tejto fcii
@@ -100,7 +158,7 @@ void checkFunctionParams(TDLList *L, char *id) {
         TDLLSucc(L);
     }
     BSTInsertGlobal(&functions, id, data);
-    printf("Semantika: cFp: kontrolny vypis parametrov (viacriadkovy)\nid: %s\nparametrov: %d\nnavratovych typov: %d\n\n", id, paramsCt, retCt);
+    printFunction(id, data);
 }
 
 
@@ -172,8 +230,8 @@ void goThroughList(TDLList *L) {
     while (L->Act != NULL) {
         if (!strcmp(L->Act->tdata.lex, "func")) {
             j++;
-            printf("Semantika: %d. function found...\n", j);
-            printf("Semantika: Function id - %s\n", L->Act->rptr->tdata.lex);
+            //printf("Semantika: %d. function found...\n", j);
+            //printf("Semantika: Function id - %s\n", L->Act->rptr->tdata.lex);
             checkFunction(L);
             
         }

@@ -27,6 +27,10 @@ void goThroughList(TDLList *L);
  #define ERR_SEM_ZERODIV 9
  #define ERR_INTERN 99
  
+ t_INT_ID 24
+ t_FLOAT64 23
+ t_STRING_ID 20
+ 
  #define START 0
  #define t_LESS 1
  #define t_GREATER 2
