@@ -12,10 +12,9 @@
 TDLList tokens;
 TDLList psa_list;
 TOKEN token;
-TOKEN last_token;
 TOKEN help;
 bool no_id_in_params_flag = false; //pri id, id nemoze byt return type pri def_func -- ID je možnost v RULE_TYPE, ak by nebol tento case,
-                                    // prítomnost identifikátor medzi NÁVRATOVÝMI TYPMI funckie by bola akceptovaná
+                                    // prítomnost identifikátor medzi NÁVRATOVÝMI TYPMI funckie by bola akceptovaná xd
                                     // Ak je flag == true, tak ak príde identifikator medzi návratovými typmi, ERROR
 bool is_return = false; // flag pre vynutenie return statementu
 bool was_return = false; // flag pre zaznacenie ci funkcia obsahovala return

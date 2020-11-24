@@ -1,6 +1,6 @@
 #include "scanner.h"
 #include "psa_lib.h"
-#include "symstack.h"
+#include "precanalysis_stack.h"
 #include <string.h>
 #include "tokenList.h"
 
