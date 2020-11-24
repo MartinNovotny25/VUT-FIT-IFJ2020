@@ -397,6 +397,9 @@
                    else
                    {
                        unload_c(text);
+                       ungetc(' ',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
                        end_token(t_PACKAGE, &token);
                        return token;
                    }
@@ -411,7 +414,10 @@
                    else
                    {
                        unload_c(text);
-                       ungetc(current_char2,text);
+                       ungetc('m',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc(' ',text);
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
                        end_token(t_PACKAGE, &token);
@@ -428,10 +434,13 @@
                    else
                    {
                        unload_c(text);
-                       ungetc(current_char3,text);
+                       ungetc('a',text);
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
-                       ungetc(current_char2,text);
+                       ungetc('m',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc(' ',text);
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
                        end_token(t_PACKAGE, &token);
@@ -449,13 +458,16 @@
                    else
                    {
                        unload_c(text);
-                       ungetc(current_char4,text);
+                       ungetc('i',text);
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
-                       ungetc(current_char3,text);
+                       ungetc('a',text);
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
-                       ungetc(current_char2,text);
+                       ungetc('m',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc(' ',text);
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
                        end_token(t_PACKAGE, &token);
