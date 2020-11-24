@@ -7,15 +7,28 @@
 #include<stdbool.h>
 
 #define MAXSTACK 1000
+#define MAXPARAMS 256
 
+/*
+#define INT 1
+#define FLOAT64 2
+#define STRING 3
+*/
+ 
 // Datova struktura pre ukladanie informacii o funkcii (glob. premenne nie su sucastou ifj20)
 typedef struct global{
-    bool defined;
-    bool is_function;
-    int num_of_params;
-    int num_of_return_vars;
+    //bool defined;
+    //bool is_function;
+    int numOfParams;
+    int numOfReturns;
+    //pole parametrov
+    char *params[MAXPARAMS];
+    //pole typov parametrov
+    int paramsType[MAXPARAMS];
+    //pole navratovych typov
+    int returns[MAXPARAMS];
     //struct tBSTNodeLocal * LocalVarTree;   // pointer to the tree of local variables of the function, if is_funtion == False then LocalVarTree is NULL;
-}global_t ;
+}functionData ;
 
 
 
@@ -33,7 +46,7 @@ typedef struct tBSTNodeLocal {
 // Strom pre funkcie resp. Globalny strom
 typedef struct tBSTNodeGlobal {
     char * Name;                    /* key */
-    global_t content;               /* data */
+    functionData content;               /* data */
 	struct tBSTNodeGlobal * LPtr;         /* left subtree */
 	struct tBSTNodeGlobal * RPtr;         /* right subtree */
 } *tBSTNodePtrGlobal;
@@ -58,11 +71,17 @@ typedef struct {
 // Initialize tree for global variables or func
 void BSTInitGlobal   (tBSTNodePtrGlobal *);
 // Find out if the func/var is already in tree + get data
-bool BSTSearchGlobal  (tBSTNodePtrGlobal, char *, global_t *);
+bool BSTSearchGlobal  (tBSTNodePtrGlobal, char *, functionData *);
 // Insert func/var into tree + data
-//void BSTInsertGlobal (tBSTNodePtrGlobal *, char *, global_t);
+void BSTInsertGlobal (tBSTNodePtrGlobal *, char *, functionData);
 // Delete entire tree
 void BSTDisposeGlobal (tBSTNodePtrGlobal *);
+
+
+
+
+
+
 
 
 void BSTInitLocal   (tBSTNodePtrLocal *);

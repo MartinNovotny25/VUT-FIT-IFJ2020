@@ -13,7 +13,34 @@
 #include "scanner.h"
 
 bool mainFound = false;
+//zatial nic nerobi
 int globalBraceCount = 0;
+
+//globalna symtable funkcii
+tBSTNodePtrGlobal functions;
+
+/*
+tato funkcia bude prechadzet telom funkcie, a kontrolovat statements, deklaracie a priradenia
+spusta sa ked sa najde funkcia ina ako main(), semantika deklaracie by mala byt spravna, iba ukladame udaje o tejto fcii
+@param L ukazatel na list tokenov, ukazatel Act je na zaciatku tela funkcie, teda '{'
+@param id identifikator funkcie, not sure if needed
+*/
+void enterFunctionBody(TDLList *L, char *id) {
+    int localBraceCount = 1;
+    //budeme prechadzat telom funckie kym z neho nevyjdeme
+    while (localBraceCount != 0) {
+        //TODO - tu sa budu hladat statements, deklaracie, priradenia a volania funkcii, a budu sa nalezite volat ich respektivne funkcie
+    }
+}
+
+
+
+
+
+
+
+
+
 
 
 /*
@@ -28,24 +55,24 @@ void checkFunctionParams(TDLList *L, char *id) {
     //pocitadla parametrov a navratovych typov
     int paramsCt = 0;
     int retCt = 0;
+    //sem sa ulozia udaje o funkcii
+    functionData data;
     //posun aktivity na prvu zatvorku ( z klucoveho slova "func"
-    
-    //printf("cFp first print: lexem: %s\n\n", L->Act->tdata.lex);
     TDLLSucc(L);
     TDLLSucc(L);
-    //printf("cFp: lexem: %s\n\n", L->Act->tdata.lex);
     //cita tokeny kym nenajde ")" / citame parametre
     while (strcmp(L->Act->tdata.lex, ")")) {
-        //printf("cFp 1st while: lexem %s\n\n", L->Act->tdata.lex);
         //nasleduje identifikator
         if (L->Act->tdata.type == 19) {
+            //ulozime potrebne udaje(nazvy, typy a pocet parametrov)(cyklicky ich pridavam)
+            data.params[paramsCt] = L->Act->tdata.lex;
+            data.paramsType[paramsCt] = L->Act->tdata.type;
             paramsCt++;
-            //TODO insert() - vloz do strom tento id aj jeho typ
-            
+            data.numOfParams = paramsCt;
             //posun aktivny prvok na id->typ->','
             TDLLSucc(L);
             TDLLSucc(L);
-            //keby tu nebolo continue, hrozi preskocenie zatovrky, teda by sa while zastavil nespravne
+            //keby tu nebolo continue, hrozi preskocenie zatvorky, teda by sa while zastavil nespravne
             continue;
             
         }
@@ -54,7 +81,6 @@ void checkFunctionParams(TDLList *L, char *id) {
     }
     //posun ')' -> '(' alebo ')' -> '{'
     TDLLSucc(L);
-    //printf("cFp interwhile: lexem %s\n\n", L->Act->tdata.lex);
     
     //cita tokeny kym nenajde ")" / citame navratove typy
     while (strcmp(L->Act->tdata.lex, ")")) {
@@ -62,32 +88,45 @@ void checkFunctionParams(TDLList *L, char *id) {
         if (!strcmp(L->Act->tdata.lex, "{")) {
             break;
         }
-        //printf("cFp 2nd while: lexem %s\n\n", L->Act->tdata.lex);
         //ak najdeme navratove typy, vlozime do symtable
         if ((L->Act->rptr->tdata.type == t_INT_ID) ||
             (L->Act->rptr->tdata.type == t_STRING_ID) ||
-            (L->Act->rptr->tdata.type == t_FLOAT64))
-            {
-            //TODO navratove typy a ich pocet sa musi ulozit do symtable
+            (L->Act->rptr->tdata.type == t_FLOAT64)) {
+            //ulozim potrebne udaje(typy a pocet navratovych hodnot)
+            data.returns[retCt] = L->Act->rptr->tdata.type;
             retCt++;
+            data.numOfReturns = retCt;
         }
         TDLLSucc(L);
     }
+    BSTInsertGlobal(&functions, id, data);
     printf("Semantika: cFp: kontrolny vypis parametrov (viacriadkovy)\nid: %s\nparametrov: %d\nnavratovych typov: %d\n\n", id, paramsCt, retCt);
 }
+
+
+
+
+
+
+
+
+
+
 /*
  funkcia sa spusta pri kazdom najdeni klucoveho slova "func"
  v podstate sa sklada z velkeho ifu, ktory vysetruje identifikator "main", ak je iny identifikator, spusta sa analyza danej funkcie
  @param L ukazatel na list tokenov
  */
 void checkFunction(TDLList *L) {
+    //pomocna premenna, BSTSearchGobal() sem vravcia data
+    functionData data;
     //pomocny string, ulozime sem identifikator fcie
     char *id = L->Act->rptr->tdata.lex;
     //identifikator funkcie je "main"
     if (!strcmp(id, "main")) {
         //ak uz main bol raz najdeny, volaj error
         if (mainFound) {
-            error_call(3, L);
+            error_call(ERR_SEM_UNDEF, L);
             return;
         }
         //pomocny pointer, mal by ukazovat vpravo od lexemu main, teda (
@@ -98,30 +137,35 @@ void checkFunction(TDLList *L) {
         }
         else {
             //main nema spravne parametre, volaj error
-            error_call(3, L);
+            error_call(ERR_SEM_UNDEF, L);
             return;
         }
         printf("Semantika: Main checked succesfully\n");
         
-            //identifikator funkcie != main \/
+    //identifikator funkcie != main \/
     } else {
-        //printf("Semantika: Printing id: %s \n", L->Act->rptr->tdata.lex);
         //skontroluj ci identifikator uz neni v symtable
-        //if (isInSymtable(id)) {                                   +
-            //pokus o redefiniciu, volaj error                      +
-        //   error_call(3, L);                                      +
-        //    return;                                               +
-        //}
+        if (BSTSearchGlobal(functions, id, &data)) {
+            printf("Semantika: pokus o redefiniciu, volam error\n");
+            error_call(ERR_SEM_UNDEF, L);
+        }
         checkFunctionParams(L, id);
-        
-        //InsertInGlobalSymtable(id, tu asi este budu ine parametre?);  +pseudoF
     }
     //checkFuncBody();                                              +pseudoF
 }
 
-
-//prechadza DL zoznamom tokenov
+/*
+ TATA FUNKCIA SPUSTA SEMANTICKU ANALYZU
+ rozumej ju ako main semntickej analyzy
+ prechadza zoznamom tokenov - klucove slovo "func" spusta seriu funkcii zameranych na semanticku kontrolu danej funkcie
+ kedze sa cely kod sklada s funkcii, pokryje cely kod
+ @param L kompletny zoznam tokenov
+ */
 void goThroughList(TDLList *L) {
+    
+    //inicializacia tabulky funkcii
+    BSTInitGlobal(&functions);
+    
     TDLLFirst(L);
     printf("Semantika: Prechadzam zoznamom tokenov...\n\n");
     int i = 0, j = 0;      //pre potreby vypiskov
@@ -133,14 +177,19 @@ void goThroughList(TDLList *L) {
             checkFunction(L);
             
         }
-        //printf("Sematika: Loop number %d\n", i);
+         
         i++;
+        //printf("Sematika: Loop number %d\n", i);
         TDLLSucc(L);
     }
     if (!mainFound) {
-        error_call(3, L);
+        error_call(ERR_SEM_UNDEF, L);
         return;
+        
     }
-    
-    
+    //uvolnime pouzivane struktury
+    TDLLDisposeList(L);
+    BSTDisposeGlobal(&functions);
+
+    printf("Semantika: USPESNY KONIEC\n");
 } // koniec goThroughList

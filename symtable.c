@@ -22,7 +22,7 @@ void BSTInitGlobal (tBSTNodePtrGlobal *RootPtr) {
 
 }	
 
-bool BSTSearchGlobal (tBSTNodePtrGlobal RootPtr, char* name, global_t *Content)	{
+bool BSTSearchGlobal (tBSTNodePtrGlobal RootPtr, char* name,functionData *Content)	{
 /*  ---------
 ** Function searches for a node with key == name.
 **
@@ -57,9 +57,10 @@ bool BSTSearchGlobal (tBSTNodePtrGlobal RootPtr, char* name, global_t *Content)	
 	}
 } 
 
-/*
-void BSTInsertGLobal (tBSTNodePtrGlobal* RootPtr, char* name, global_t Content)	{	
 
+void BSTInsertGlobal (tBSTNodePtrGlobal* RootPtr, char* name, functionData Content)	{
+
+    //printf("Symtable: Inserting function\n");
 	if (*RootPtr == NULL)
 	{
 		*RootPtr = malloc(sizeof (struct tBSTNodeGlobal));	
@@ -83,16 +84,16 @@ void BSTInsertGLobal (tBSTNodePtrGlobal* RootPtr, char* name, global_t Content)	
 		BSTInsertGlobal(&(*RootPtr)->RPtr,name,Content);
 	}
 	
-	
+	//printf("Symtable: Function inserted succesfully\n");
 }
-*/
+
 
 void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {	
 /*   
 ** Deletes entire binary tree and correctly frees allocated memory.
 **/	
 
-
+    printf("Symtable: Disposing all nodes...\n");
 	if (*RootPtr != NULL)					
 	{
 		BSTDisposeGlobal(&(*RootPtr)->LPtr);
