@@ -6,6 +6,7 @@
 #include "error.h"
 #include "parser.h"
 #include "precanalysis.h"
+#include "semantics.h"
 
 //V stat je ELSE ako break, dalej to mozno bude robit problemy, v buducnosti sa na to este pozriet!!
 
@@ -113,7 +114,8 @@ int main() {
 
     printf("Parser: Printujem cely zoznam tokenov\n");
     //TDLLPrintAllTokens(&tokens);
-
+    printf("Parser: Spustam semantiku\n");
+    goThroughList(&tokens);
 
     return 0;
 }
