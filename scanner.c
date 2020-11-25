@@ -97,7 +97,8 @@
        printf("Scanner: Dodavam novy TOKEN\n");
        TOKEN token;
        static int state;
-       if(state != IND_DED){
+       if(state != IND_DED)
+       {
            state = START;
        }
        
@@ -350,36 +351,46 @@
                    }
                    else
                    {
-                       if(!strcmp(current_token, "package ")){
+                       if(!strcmp(current_token, "package "))
+                       {
                            state = t_PACKAGE_CONTROLL;
                        }
                        else{
                            unload_c(text);
-                           if(!strcmp(current_token, "if")){
+                           if(!strcmp(current_token, "if"))
+                           {
                                end_token(t_IF, &token);
                            }
-                           else if(!strcmp(current_token, "for")){
+                           else if(!strcmp(current_token, "for"))
+                           {
                                end_token(t_FOR, &token);
                            }
-                           else if(!strcmp(current_token, "string")){
+                           else if(!strcmp(current_token, "string"))
+                           {
                                end_token(t_STRING_ID, &token);
                            }
-                           else if(!strcmp(current_token, "else")){
+                           else if(!strcmp(current_token, "else"))
+                           {
                                end_token(t_ELSE, &token);
                            }
-                           else if(!strcmp(current_token, "return")){
+                           else if(!strcmp(current_token, "return"))
+                           {
                                end_token(t_RETURN, &token);
                            }
-                           else if(!strcmp(current_token, "float64")){
+                           else if(!strcmp(current_token, "float64"))
+                           {
                                end_token(t_FLOAT64, &token);
                            }
-                           else if(!strcmp(current_token, "int")){
+                           else if(!strcmp(current_token, "int"))
+                           {
                                end_token(t_INT_ID, &token);
                            }
-                           else if(!strcmp(current_token, "package")){
+                           else if(!strcmp(current_token, "package"))
+                           {
                                end_token(t_PACKAGE, &token);
                            }
-                           else if(!strcmp(current_token, "func")){
+                           else if(!strcmp(current_token, "func"))
+                           {
                                end_token(t_FUNC, &token);
                            }
                            else{
@@ -763,12 +774,14 @@
                        ungetc(current_char2,text);
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
-                       if(floating_point){
+                       if(floating_point)
+                       {
                            floating_point = false;
                            end_token(t_FLOAT, &token);
                            return token;
                        }
-                       else if(zero_int){
+                       else if(zero_int)
+                       {
                            zero_int = false;
                            end_token(t_INT_ZERO, &token);
                            return token;
@@ -798,12 +811,14 @@
                        ungetc(current_char2,text);
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
-                       if(floating_point){
+                       if(floating_point)
+                       {
                            floating_point = false;
                            end_token(t_FLOAT, &token);
                            return token;
                        }
-                       else if(zero_int){
+                       else if(zero_int)
+                       {
                            zero_int = false;
                            end_token(t_INT_ZERO, &token);
                            return token;
