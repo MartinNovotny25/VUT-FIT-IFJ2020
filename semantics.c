@@ -18,7 +18,8 @@ int globalBraceCount = 0;
 
 //globalna symtable funkcii
 tBSTNodePtrGlobal functions;
-
+//tato localna symtable je iba pre potreby testovania
+tBSTNodePtrLocal local;
 //TODO pri kazdom volani erroru uvolnit symtables
 //TODO vlozit so symtable vstavane funkcie
 
@@ -71,6 +72,44 @@ void printFunction(char *id, functionData data) {
 }
 
 
+
+/*
+ tato funkcia bude prechadzet telom funkcie, a kontrolovat statements, deklaracie a priradenia
+ bude potrebne okamzite vytvorit lokalny strom, ulozit donho parametre danej fciee z globalneho stromu
+ a taktiez uz bude treba inicializovat zasobniky stromov
+ @param L ukazatel na list tokenov, ukazatel Act je na zaciatku tela funkcie, teda '{'
+ @param id identifikator funkcie, not sure if needed
+ */
+void enterFunctionBody(TDLList *L, char *id) {
+    int localBraceCount = 1;
+    //budeme prechadzat telom funckie kym z neho nevyjdeme
+    while (localBraceCount != 0) {
+        //TODO - tu sa budu hladat statements, deklaracie, priradenia a volania funkcii, a budu sa nalezite volat ich respektivne funkcie
+        printf("som v enter function body pre %s\n", id);
+        localBraceCount--;
+    }
+}
+
+
+
+
+/*
+ tato funkcia bude druhy krat prechadzat cez zoznam tokenov, pricom vsetky deklracie funkcii
+ su uz syntakticky okontrolovane a vlozene do globalneho stromu funkcii
+ opat teda najde klucove slovo func, a zavola funkciu enterFunctionBody ktorej preda id funkcie, aby vedela v ktorej sa nachadza
+ #param L zoznam tokenov
+ */
+void sencondRun(TDLList *L) {
+    //aktivita musi ist na zaciatok
+    TDLLFirst(L);
+    //prehladavaj kym nenajdes funkciu
+    while (L->Act != NULL) {
+        if (!strcmp(L->Act->tdata.lex, "func")) {
+            enterFunctionBody(L, L->Act->rptr->tdata.lex);
+        }
+        TDLLSucc(L);
+    }
+}
 
 
 
@@ -180,8 +219,8 @@ void insertBuiltInFunction() {
  @param L ukazatel na zoznam tokenov, potrebny pre potreby uvolnenia
  */
 void paramsRedefinitionCheck(functionData data, TDLList *L) {
-    printf("pocet parametrov ktore kontrolujem: %d\n", data.numOfParams);
-    printf("sem: som v paramsRedefinitionCheck\n");
+    //printf("pocet parametrov ktore kontrolujem: %d\n", data.numOfParams);
+    //printf("sem: som v paramsRedefinitionCheck\n");
     if (data.numOfParams == 0) {
         return;
     }
@@ -202,28 +241,6 @@ void paramsRedefinitionCheck(functionData data, TDLList *L) {
         }
     }
 }
-
-
-
-
-/*
-tato funkcia bude prechadzet telom funkcie, a kontrolovat statements, deklaracie a priradenia
-spusta sa ked sa najde funkcia ina ako main(), semantika deklaracie by mala byt spravna, iba ukladame udaje o tejto fcii
-@param L ukazatel na list tokenov, ukazatel Act je na zaciatku tela funkcie, teda '{'
-@param id identifikator funkcie, not sure if needed
-*/
-void enterFunctionBody(TDLList *L, char *id) {
-    int localBraceCount = 1;
-    //budeme prechadzat telom funckie kym z neho nevyjdeme
-    while (localBraceCount != 0) {
-        //TODO - tu sa budu hladat statements, deklaracie, priradenia a volania funkcii, a budu sa nalezite volat ich respektivne funkcie
-    }
-}
-
-
-
-
-
 
 
 
@@ -292,14 +309,8 @@ void checkFunctionParams(TDLList *L, char *id) {
     paramsRedefinitionCheck(data, L);
     //vlozenie funkcie do symtable
     BSTInsertGlobal(&functions, id, data);
-    printFunction(id, data);
+    //printFunction(id, data);
 }
-
-
-
-
-
-
 
 
 
@@ -351,8 +362,8 @@ void checkFunction(TDLList *L) {
 /*
  TATA FUNKCIA SPUSTA SEMANTICKU ANALYZU
  rozumej ju ako main semantickej analyzy
- prechadza zoznamom tokenov - klucove slovo "func" spusta seriu funkcii zameranych na semanticku kontrolu danej funkcie
- kedze sa cely kod sklada z funkcii, pokryje cely kod
+ v prvej faze prechadza zoznamom tokenov, hlada keyword func, a analyzuje deklaracie funkcii, pricom ich insertuje do stromu
+ v druhej faze opat hlada keyword func, pricom uz funkciam vstupuje do tela a vykonava tam semanticku kontrolu
  @param L kompletny zoznam tokenov
  */
 void goThroughList(TDLList *L) {
@@ -383,6 +394,28 @@ void goThroughList(TDLList *L) {
         return;
         
     }
+    
+    sencondRun(L);
+    
+    /* TEST BSTSearch - nechat tak
+    //tu som inicializoval
+    BSTInitLocal(&local);
+    //tieto testovacie data vlozim do stromu
+    char *id = "xy";
+    int typ = 10;
+    char *data = "88";
+    //vlozim data
+    BSTInsertLocal(&local,id ,&typ, data);
+
+    //tieto premenne si musim vytvorit, aby mal BSTSearch kam vracat data
+    int datovytyp;
+    char *content = NULL;
+    
+    //searching
+    if (BSTSearchLocal(local, id, &datovytyp, content)) {
+        printf("datovy typ: %d\n", datovytyp);
+    }
+    */
     //uvolnime pouzivane struktury
     TDLLDisposeList(L);
     BSTDisposeGlobal(&functions);
