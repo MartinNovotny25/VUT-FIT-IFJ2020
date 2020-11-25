@@ -1,120 +1,121 @@
-    /*
-   **    Part of IFJ Project 2020/2021
-   **    Author: Simon Fenko xfenko01
-   */
-   #include "scanner.h"
+/*
+**    Part of IFJ Project 2020/2021
+**    Author: Simon Fenko xfenko01
+*/
+#include "scanner.h"
 
-   bool First_token = false;
-   bool non_zero_int = false;
-   bool zero_int = false;
-   bool floating_point = false;
-   char current_token[100];
-   int current_token_position = 0;
-   char current_char;
-   char current_char2;
-   char current_char3;
-   char current_char4;
-   char current_char5;
-   /* Vymazavanie current_tokenu (napr. chodia medzery-vtedy ich vyhodime a
-   pokracujeme dalej)*/
-   
-   /*
-   int main()
-   {
-       while (1)
-       {
-           TOKEN a;
-           a = get_next_token(stdin);
-           //printf("%d\n", a.type );
-           if (a.type == t_EOF)
-           {
-               break;
-           }
+bool First_token = false;
+bool non_zero_int = false;
+bool zero_int = false;
+bool floating_point = false;
+char current_token[100];
+int current_token_position = 0;
+char current_char;
+char current_char2;
+char current_char3;
+char current_char4;
+char current_char5;
+
+/* Vymazavanie current_tokenu (napr. chodia medzery-vtedy ich vyhodime a
+pokracujeme dalej)*/
+
+/*
+int main()
+{
+    while (1)
+    {
+        TOKEN a;
+        a = get_next_token(stdin);
+        //printf("%d\n", a.type );
+        if (a.type == t_EOF)
+        {
+            break;
+        }
            
-       }
-       return 0;
-   }
-   */
+    }
+    return 0;
+}
+*/
 
-   //Funkcia na odstranovanie znaku '_'
-   void remove_(void)
-   {
-       current_token[current_token_position] = 0x00;
-       current_token_position--;
-       current_token[current_token_position] = 0x00;
-   }
+//Funkcia na odstranovanie znaku '_'
+void remove_(void)
+{
+    current_token[current_token_position] = 0x00;
+    current_token_position--;
+    current_token[current_token_position] = 0x00;
+}
 
-   void delete_string(void)
-   {
-       current_token[0] = 0x00;
-       current_token_position = 0;
-   }
+void delete_string(void)
+{
+    current_token[0] = 0x00;
+    current_token_position = 0;
+}
 
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   /*najprv vytiahne znak zo suboru a hodi ho do current_char a prilepi ho
-    na koniec stringu, do ktoreho sa uklada sučasny načitavany token, zvyši
-    poziciu stringu (dlžku stringu a zakonči ho 0)
-   */
-   void load_c(FILE* text)
-   {
-       current_char = getc(text);
-       current_token[current_token_position] = current_char;
-       current_token_position++;
-       current_token[current_token_position] = 0x00;
-   }
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   /* zavola sa unload a zaroven spravi ungetc - hladačik sa posunie o jedno
-    dozadu a odreze posledny character zo stringu c current_token */
-   void unload_c(FILE *text)
-   {
-       ungetc(current_char,text);
-       current_token_position--;
-       current_token[current_token_position] = 0x00;
-   }
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   /* alokovanie miesta pre string v tokene */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*najprv vytiahne znak zo suboru a hodi ho do current_char a prilepi ho
+na koniec stringu, do ktoreho sa uklada sučasny načitavany token, zvyši
+poziciu stringu (dlžku stringu a zakonči ho 0)
+*/
+void load_c(FILE* text)
+{
+    current_char = getc(text);
+    current_token[current_token_position] = current_char;
+    current_token_position++;
+    current_token[current_token_position] = 0x00;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* zavola sa unload a zaroven spravi ungetc - hladačik sa posunie o jedno
+dozadu a odreze posledny character zo stringu c current_token */
+void unload_c(FILE *text)
+{
+    ungetc(current_char,text);
+    current_token_position--;
+    current_token[current_token_position] = 0x00;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* alokovanie miesta pre string v tokene */
 
-   void alloc(int length, TOKEN* token)
-   {
-       token->lex = (char*) malloc(length * sizeof(char));
-   }
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   /* najprv alokujeme miesto pre textoy obsah tokenu, potom ho tam skopirujeme
-    z current_token, potom skopirujeme type a vymazeme current_token*/
+void alloc(int length, TOKEN* token)
+{
+    token->lex = (char*) malloc(length * sizeof(char));
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* najprv alokujeme miesto pre textoy obsah tokenu, potom ho tam skopirujeme
+z current_token, potom skopirujeme type a vymazeme current_token*/
 
-   void end_token(int type, TOKEN* token)
-   {
-       alloc(current_token_position+1, token);
-       strcpy(token->lex, current_token);
-       token->type = type;
-       printf("Scanner: token %d lex %s\n",token->type, token->lex);
-       //printf("%d\n",token->type);
-       delete_string();
-   }
+void end_token(int type, TOKEN* token)
+{
+    alloc(current_token_position+1, token);
+    strcpy(token->lex, current_token);
+    token->type = type;
+    printf("Scanner: token %d lex %s\n",token->type, token->lex);
+    //printf("%d\n",token->type);
+    delete_string();
+}
 
-   TOKEN get_next_token(FILE* text)
-   {
-       printf("Scanner: Dodavam novy TOKEN\n");
-       TOKEN token;
-       static int state;
-       if(state != IND_DED)
-       {
-           state = START;
-       }
-       
-       while (true)
-       {
-           //nacitavame znaky a v pripade prázdneho súboru nastane EOF
-           load_c(text);
-           if (current_char == EOF && strlen(current_token) == 1 )
-           {
-               //TOKEN EOF
-               token.type = t_EOF;
-               return token;
-           }
-           
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TOKEN get_next_token(FILE* text)
+{
+    printf("Scanner: Dodavam novy TOKEN\n");
+    TOKEN token;
+    static int state;
+    if(state != IND_DED)
+    {
+        state = START;
+    }
+    
+    while (true)
+    {
+        //nacitavame znaky a v pripade prázdneho súboru nastane EOF
+        load_c(text);
+        if (current_char == EOF && strlen(current_token) == 1 )
+        {
+            //TOKEN EOF
+            token.type = t_EOF;
+            return token;
+        }
+        
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
            switch (state)
            {
                case START:
