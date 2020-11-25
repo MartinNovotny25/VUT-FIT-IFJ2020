@@ -20,7 +20,8 @@ int globalBraceCount = 0;
 tBSTNodePtrGlobal functions;
 
 //TODO pri kontrole parametrov funkcii treba este overit, ci nemaju parametre rovnake identifikatory...
-
+//TODO pri kazdom volani erroru uvolnit symtables
+//TODO vlozit so symtable vstavane funkcie
 
 /*
  kontrolna funkcia pre potreby debuggingu
@@ -72,7 +73,31 @@ void printFunction(char *id, functionData data) {
 
 
 
-
+void paramsRedefinitionCheck(functionData data, TDLList *L) {
+    printf("pocet parametrov ktore kontrolujem: %d\n", data.numOfParams);
+    printf("sem: som v paramsRedefinitionCheck\n");
+    if (data.numOfParams == 0) {
+        return;
+    }
+    
+    for (int i = 0; i < data.numOfParams; i++) {
+        //printf("1st int, %d\n", i);
+        for (int j = 0; j < data.numOfParams; j++) {
+            //printf("2st int, %d\n", j);
+            //porovname parameter sameho so sebou, tento krok treba preskocit
+            if (i == j) {
+                continue;
+            }
+            //id parametrov sa rovnaju, volaj error
+            if (!strcmp(data.params[i], data.params[j])) {
+                BSTDisposeGlobal(&functions);
+                printf("Semantika: redefinicia parametrov v deklaracii funkcie, error\n");
+                error_call(ERR_SEM_UNDEF, L);
+                return;
+            }
+        }
+    }
+}
 
 
 
@@ -113,8 +138,10 @@ void checkFunctionParams(TDLList *L, char *id) {
     //pocitadla parametrov a navratovych typov
     int paramsCt = 0;
     int retCt = 0;
-    //sem sa ulozia udaje o funkcii
+    //sem sa ulozia udaje o funkcii, numOfParams a Returns treba nastavit na nulu, inak robi problemy
     functionData data;
+    data.numOfParams = paramsCt;
+    data.numOfReturns = retCt;
     //posun aktivity na prvu zatvorku ( z klucoveho slova "func"
     TDLLSucc(L);
     TDLLSucc(L);
@@ -132,7 +159,6 @@ void checkFunctionParams(TDLList *L, char *id) {
             TDLLSucc(L);
             //keby tu nebolo continue, hrozi preskocenie zatvorky, teda by sa while zastavil nespravne
             continue;
-            
         }
         //posun '(' -> id alebo ',' -> id
         TDLLSucc(L);
@@ -157,6 +183,10 @@ void checkFunctionParams(TDLList *L, char *id) {
         }
         TDLLSucc(L);
     }
+   
+    //overime ci sa parametre funkcie navzajom neredifinuju
+    paramsRedefinitionCheck(data, L);
+    //vlozenie funkcie do symtable
     BSTInsertGlobal(&functions, id, data);
     printFunction(id, data);
 }
@@ -176,7 +206,7 @@ void checkFunctionParams(TDLList *L, char *id) {
  @param L ukazatel na list tokenov
  */
 void checkFunction(TDLList *L) {
-    //pomocna premenna, BSTSearchGobal() sem vravcia data
+    //pomocna premenna, BSTSearchGlobal() sem vravcia data
     functionData data;
     //pomocny string, ulozime sem identifikator fcie
     char *id = L->Act->rptr->tdata.lex;
@@ -184,6 +214,7 @@ void checkFunction(TDLList *L) {
     if (!strcmp(id, "main")) {
         //ak uz main bol raz najdeny, volaj error
         if (mainFound) {
+            printf("Semantika: pokus o redefiniciu mainu, volam error\n");
             error_call(ERR_SEM_UNDEF, L);
             return;
         }
@@ -195,10 +226,11 @@ void checkFunction(TDLList *L) {
         }
         else {
             //main nema spravne parametre, volaj error
+            printf("chybny main function, volam error\n");
             error_call(ERR_SEM_UNDEF, L);
             return;
         }
-        printf("Semantika: Main checked succesfully\n");
+        //printf("Semantika: Main checked succesfully\n");
         
     //identifikator funkcie != main \/
     } else {
@@ -214,9 +246,9 @@ void checkFunction(TDLList *L) {
 
 /*
  TATA FUNKCIA SPUSTA SEMANTICKU ANALYZU
- rozumej ju ako main semntickej analyzy
+ rozumej ju ako main semantickej analyzy
  prechadza zoznamom tokenov - klucove slovo "func" spusta seriu funkcii zameranych na semanticku kontrolu danej funkcie
- kedze sa cely kod sklada s funkcii, pokryje cely kod
+ kedze sa cely kod sklada z funkcii, pokryje cely kod
  @param L kompletny zoznam tokenov
  */
 void goThroughList(TDLList *L) {
@@ -240,7 +272,9 @@ void goThroughList(TDLList *L) {
         //printf("Sematika: Loop number %d\n", i);
         TDLLSucc(L);
     }
+    //main nebol najdeny, volaj error
     if (!mainFound) {
+        printf("Semantika:main not found, volam error\n");
         error_call(ERR_SEM_UNDEF, L);
         return;
         

@@ -76,6 +76,8 @@ bool BSTSearchGlobal  (tBSTNodePtrGlobal, char *, functionData *);
 void BSTInsertGlobal (tBSTNodePtrGlobal *, char *, functionData);
 // Delete entire tree
 void BSTDisposeGlobal (tBSTNodePtrGlobal *);
+// Inicializacia functionData
+//void BSTFunctionDataInit (functionData *);
 
 
 

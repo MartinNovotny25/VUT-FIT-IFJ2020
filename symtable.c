@@ -101,11 +101,16 @@ void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {
 		free(*RootPtr);
 		*RootPtr = NULL;
 	}
-	
-
-
 }
 
+
+/*void BSTFunctionDataInit(functionData *data) {
+    data->numOfParams = 0;
+    data->numOfReturns = 0;
+    data->params[MAXPARAMS] = {NULL};
+    data->returns[MAXPARAMS] = {0};
+    data->paramsType[MAXPARAMS] = {0};
+}*/
 
 // ========================================= LOCAL TREE ==================================================== //
 
