@@ -4,7 +4,7 @@
 
 #ifndef PARSER_C_PSA_LIB_H
 #define PARSER_C_PSA_LIB_H
-typedef enum PSA_RULES {
+/*typedef enum PSA_RULES {
     R_PLUS, // E -> E + E 0
     R_MINUS, // E -> E - E 1
     R_MUL, // E -> E * E 2
@@ -18,7 +18,7 @@ typedef enum PSA_RULES {
     R_EBRACES, // E -> (E) 11
     R_OP, // E -> i  12
     R_NOTDEFINED // Nedefinovane pravidlo 13
-} psa_rules;
+} psa_rules;*/
 
 
 typedef enum PSA_SYMBOLS {

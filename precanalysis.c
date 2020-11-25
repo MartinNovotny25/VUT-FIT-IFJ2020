@@ -12,7 +12,7 @@
 tsym_stack syms_Stack; // Zásobník tokenov (symbolov)
 int count; //pocet symbolov v REDUKCII
 bool red_found; // symbol redukcie bol najdeny
-psa_rules rule; //hodnota pravidla
+bool reduction_succ; // Ci bola redukcia vykonana uspesne alebo neuspesne
 
 
 // Precedencna tabulka, rozhoduje o výbere operácie podla tokenu na vstupe a tokenu na zásobníku
@@ -77,60 +77,60 @@ psa_symbols psa_tokenToSymbol(TOKEN* token) {
 }
 
 // Funckia aplikuje pravidlo pre redukciu, viz psa_lib.h
-psa_rules psa_rule_application(int pocet, tsym_stack_symbol* sym1, tsym_stack_symbol* sym2, tsym_stack_symbol* sym3) {
+bool psa_rule_application(int pocet, tsym_stack_symbol* sym1, tsym_stack_symbol* sym2, tsym_stack_symbol* sym3) {
+    //Redukcia ID -> E -> id
     if (pocet == 1) {
         if (sym1->symbol == T_ID) {
-            return R_OP;
+            return true;
         } else {
-            return R_NOTDEFINED;
+            return false;
         }
     }
         // NON_TERM sa bude pushovat pocas reduce pravidla namiesto popnutych symbolov
     else if (pocet == 3) {
+        // E -> (E) Odstranenie zatvoriek
         if (sym1->symbol == T_LEFT_PARENTHESIS && sym2->symbol == T_NON_TERM && sym3->symbol == T_RIGHT_PARENTHESIS) {
-            return R_EBRACES;
+            return true;
         }
         // napr E+E -> 1. a 3. symbol je NON_TERM
         if (sym1->symbol == T_NON_TERM && sym3->symbol == T_NON_TERM) {
 
             if(sym2->symbol == T_PLUS)
-                return R_PLUS;
+                return true;
 
             else if (sym2->symbol == T_MINUS)
-                return R_MINUS;
+                return true;
 
             else if (sym2->symbol == T_MUL)
-                return R_MUL ;
+                return true ;
 
             else if (sym2->symbol == T_DIV)
-                return R_DIV;
+                return true;
 
             else if (sym2->symbol == T_EQUAL )
-                return R_EQUAL;
+                return true;
 
             else if (sym2->symbol == T_NEQUAL )
-                return R_NEQUAL;
+                return true;
 
             else if (sym2->symbol == T_MOE)
-                return R_MOE;
+                return true;
 
             else if (sym2->symbol == T_LOE )
-                return R_LOE;
+                return true;
 
             else if (sym2->symbol == T_MORE ) {
-                return R_MORE;
+                return true;
             }
             else if (sym2->symbol == T_LESS )
-                return R_LESS;
+                return true;
 
         } else {
-            return R_NOTDEFINED;
+            return false;
         }
-        return R_NOTDEFINED;
-
+        return false;
     }
-
-    return R_NOTDEFINED;
+    return false;
 }
 
 //Samotna riadiaca funckia
@@ -234,7 +234,7 @@ void evaluation(TDLList* psa_list, TDLList* global_tokens) {
                 red1 = syms_Stack.top;
 
                 //Aplikacia pravidla
-                rule = psa_rule_application(count, red1, NULL, NULL);
+                reduction_succ  = psa_rule_application(count, red1, NULL, NULL);
 
                 // popnutie vrchneho symbolu
                 symstack_pop(&syms_Stack);
@@ -256,7 +256,7 @@ void evaluation(TDLList* psa_list, TDLList* global_tokens) {
                 red1 = red3->next->next;
 
                 // Apliakcia pravidla
-                rule = psa_rule_application(count, red1, red2, red3);
+                reduction_succ  = psa_rule_application(count, red1, red2, red3);
 
                 //Popnutie 3 symbolob, ktore sa redukovali
                 symstack_pop(&syms_Stack);
@@ -270,7 +270,7 @@ void evaluation(TDLList* psa_list, TDLList* global_tokens) {
             }
 
             // Ak nebolo uplatnene ziadne pravidlo -- Error
-            if (rule == R_NOTDEFINED) {
+            if (reduction_succ  == false) {
                 symstack_free(&syms_Stack);
                 //fprintf(stderr, "PSA - Syntax error\n");
                 error_call(ERR_SYN, *(&global_tokens));
