@@ -389,14 +389,17 @@
                        }
                    }
                    break;
-                
+               
+               //Osetrenie Package main
                case t_PACKAGE_CONTROLL:
                    if (current_char == 'm')
                    {
+                       //Ked pride znak 'm' za stringom "package " ideme do medzistavu, aby sme skontrolovali ci nasledujuci bude 'a'
                        state = t_PACKAGE_CONTROLL1;
                    }
                    else
                    {
+                       //V pripade, že nepride znak 'm', tak unloadneme prichadzajuci znak a vratime token t_PACKAGE a riesime dalej prichadzajuci znak
                        unload_c(text);
                        ungetc(' ',text);
                        current_token_position--;
@@ -409,11 +412,13 @@
                case t_PACKAGE_CONTROLL1:
                    if (current_char == 'a')
                    {
+                       //Ked pride znak 'a' za stringom "package " ideme do medzistavu, aby sme skontrolovali ci nasledujuci bude 'i'
                        current_char2 = current_char;
                        state = t_PACKAGE_CONTROLL2;
                    }
                    else
                    {
+                       //V pripade, že nepride znak 'a', tak unloadneme prichadzajuce znaky a vratime token t_PACKAGE a riesime dalej prichadzajuce znaky
                        unload_c(text);
                        ungetc('m',text);
                        current_token_position--;
@@ -429,11 +434,13 @@
                case t_PACKAGE_CONTROLL2:
                    if (current_char == 'i')
                    {
+                       //Ked pride znak 'i' za stringom "package " ideme do medzistavu, aby sme skontrolovali ci nasledujuci bude 'n'
                        current_char3 = current_char;
                        state = t_PACKAGE_CONTROLL3;
                    }
                    else
                    {
+                       //V pripade, že nepride znak 'i', tak unloadneme prichadzajuce znaky a vratime token t_PACKAGE a riesime dalej prichadzajuce znaky
                        unload_c(text);
                        ungetc('a',text);
                        current_token_position--;
@@ -452,6 +459,7 @@
                case t_PACKAGE_CONTROLL3:
                    if (current_char == 'n')
                    {
+                       //Ked pride znak 'n' za stringom "package " ideme do medzistavu, aby sme skontrolovali ci nasledujuci nahodou nebude cislo pismeno alebo '_'
                        current_char4 = current_char;
                        state = t_PACKAGE_CONTROLL4;
                        //end_token(t_PACKAGE_MAIN, &token);
@@ -459,6 +467,7 @@
                    }
                    else
                    {
+                       //V pripade, že nepride znak 'n', tak unloadneme prichadzajuce znaky a vratime token t_PACKAGE a riesime dalej prichadzajuce znaky
                        unload_c(text);
                        ungetc('i',text);
                        current_token_position--;
@@ -480,6 +489,7 @@
                case t_PACKAGE_CONTROLL4:
                    if (isalpha(current_char) || isdigit(current_char) || current_char == '_')
                    {
+                       //V pripade ak je nasledujuci znak pismeno/cislica alebo '_', tak unloadneme znaky a vratime token t_PACKAGE a riesime unloadnute znaky
                        unload_c(text);
                        ungetc('n',text);
                        current_token_position--;
@@ -501,8 +511,7 @@
                    }
                    else
                    {
-                       //current_char5 = current_char;
-                       //state = t_PACKAGE_CONTROLL4;
+                       //V pripade ak nepride cislica/pismeno ani '_', tak vraciame token t_PACKAGE_MAIN, pretoze sme dosiahli, ze nam prislo "package main"
                        unload_c(text);
                        end_token(t_PACKAGE_MAIN, &token);
                        return token;
