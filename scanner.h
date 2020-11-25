@@ -76,7 +76,8 @@
 #define t_PACKAGE_CONTROLL1 62
 #define t_PACKAGE_CONTROLL2 63
 #define t_PACKAGE_CONTROLL3 64
-#define t_PACKAGE 65
+#define t_PACKAGE_CONTROLL4 65
+#define t_PACKAGE 66
 #define t_DOLLAR 100
 
 

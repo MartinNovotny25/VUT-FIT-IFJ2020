@@ -14,6 +14,7 @@
    char current_char2;
    char current_char3;
    char current_char4;
+   char current_char5;
    /* Vymazavanie current_tokenu (napr. chodia medzery-vtedy ich vyhodime a
    pokracujeme dalej)*/
    
@@ -452,8 +453,9 @@
                    if (current_char == 'n')
                    {
                        current_char4 = current_char;
-                       end_token(t_PACKAGE_MAIN, &token);
-                       return token;
+                       state = t_PACKAGE_CONTROLL4;
+                       //end_token(t_PACKAGE_MAIN, &token);
+                       //return token;
                    }
                    else
                    {
@@ -471,6 +473,38 @@
                        current_token_position--;
                        current_token[current_token_position] = 0x00;
                        end_token(t_PACKAGE, &token);
+                       return token;
+                   }
+                   break;
+                   
+               case t_PACKAGE_CONTROLL4:
+                   if (isalpha(current_char) || isdigit(current_char) || current_char == '_')
+                   {
+                       unload_c(text);
+                       ungetc('n',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc('i',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc('a',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc('m',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       ungetc(' ',text);
+                       current_token_position--;
+                       current_token[current_token_position] = 0x00;
+                       end_token(t_PACKAGE, &token);
+                       return token;
+                   }
+                   else
+                   {
+                       //current_char5 = current_char;
+                       //state = t_PACKAGE_CONTROLL4;
+                       unload_c(text);
+                       end_token(t_PACKAGE_MAIN, &token);
                        return token;
                    }
                    break;
