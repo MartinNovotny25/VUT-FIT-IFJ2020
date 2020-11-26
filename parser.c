@@ -1057,9 +1057,35 @@ void rule_return() {
             // Ak je prítomnost RETURN nutná -- definicia obsahuje návratové typy
             if (is_return == true) {
                 //pokial za returnom nenasledujú návratové hodnoty -- ERROR -- kontrolovat ci sú správne robí GENERATOR
-                if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
+                /*if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
                     token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
-                else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
+                else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }*/
+
+                TDLLInitList(&psa_list);
+
+                if (token.type == t_EOL) {error_call(ERR_SYN, &tokens);}
+                else {
+
+                    while (token.type != t_COMMA && token.type != t_EOL) {
+                        if ((token.type == t_PLUS)
+                            || (token.type == t_MINUS)
+                            || (token.type == t_DIVIDE)
+                            || (token.type == t_MULTIPLY)
+                            || (token.type == t_RIGHT_BRACKET)
+                            || (token.type == t_LEFT_BRACKET)
+                            || (token.type == t_IDENTIFIER)
+                            || (token.type == t_FLOAT)
+                            || (token.type == t_INT_NON_ZERO)
+                            || (token.type == t_INT_ZERO)) {
+
+                            TDLLInsertLast(&psa_list, token);
+                            token = get_next_token(stdin);
+                            TDLLInsertLast(&tokens, token);
+
+                        } else { error_call(ERR_SYN, &tokens); }
+                    }
+                }
+
 
                 // Ak za returnom nasledujú dalsie return výrazy
                 rule_exp_n();
