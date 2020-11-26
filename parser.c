@@ -668,8 +668,8 @@ void rule_func_assign() {
 
             // ciarka - dalsi vyraz
         else if (token.type == t_COMMA) {
-            token = get_next_token(stdin);
-            TDLLInsertLast(&tokens, token);
+            /*token = get_next_token(stdin);
+            TDLLInsertLast(&tokens, token);*/
             // Ci za jednym vyrazom pokracuje dalsi -- exp_NEXT
             rule_exp_n();
 
@@ -1139,7 +1139,7 @@ void rule_return_type_n() {
 
 //predtym pride ciarka a zavola sa rule_exp_n a nacita sa token
 void rule_exp_n() {
-   // printf("EXP_N s tokenom %d\n",token.type);
+    //printf("EXP_N s tokenom %d\n",token.type);
 
     //token = get_next_token(stdin);
     //TDLLInsertLast(&tokens, token);
