@@ -93,7 +93,7 @@ void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {
 ** Deletes entire binary tree and correctly frees allocated memory.
 **/	
 
-    printf("Symtable: Disposing all nodes...\n");
+    //printf("Symtable: Disposing all nodes...\n");
 	if (*RootPtr != NULL)					
 	{
 		BSTDisposeGlobal(&(*RootPtr)->LPtr);
@@ -120,37 +120,42 @@ void BSTInitLocal (tBSTNodePtrLocal *RootPtr) {
 
 }	
 
-bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, char *Type, char *Data)	{
+bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data)    {
 
 
-
-	if (RootPtr != NULL && RootPtr->Name!= NULL)
-	{
-		if ((strcmp(name, RootPtr->Name) < 0))
-		{
-			return BSTSearchLocal(RootPtr->LPtr,name);
-				
-		}
-		else if (strcmp(name, RootPtr->Name) > 0)
-		{
-			return BSTSearchLocal(RootPtr->RPtr,name);
-		}
-		else
-		{
+    //printf("SOM V SEARCHLOCAL\n");
+    if (RootPtr != NULL && RootPtr->Name!= NULL)
+    {
+        if ((strcmp(name, RootPtr->Name) < 0))
+        {
+            //printf("SOM V 1st if\n");
+            return BSTSearchLocal(RootPtr->LPtr,name, Type, Data);
+                
+        }
+        else if (strcmp(name, RootPtr->Name) > 0)
+        {
+            //printf("SOM V 2nd if\n");
+            return BSTSearchLocal(RootPtr->RPtr,name, Type, Data);
+        }
+        else
+        {
+            //printf("SOM V ELSE - TU CHCEM BYT\n");
             *Type = RootPtr->Type;
-            *Data = RootPtr->Data;
-			return true;								
-		}
-	}
-	else 
-	{
-		return false;
-	}
-} 
+            //printf("SOM V ELSE - 1\n");
+            //*Data = *RootPtr->Data;
+            //printf("SOM V ELSE - 2\n");
+            return true;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
  
 
 
-void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, char *Type, char *Data)	{	
+void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data)	{
 
 				
 
@@ -160,8 +165,9 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, char *Type, char *D
 		(*RootPtr)->Name = Name;
 		(*RootPtr)->LPtr = NULL;
 		(*RootPtr)->RPtr = NULL;	
-		(*RootPtr)->Type = Type;
+		(*RootPtr)->Type = *Type;
 		(*RootPtr)->Data = Data;
+        
 	}
 
 	else if (strcmp(Name, (*RootPtr)->Name) == 0)

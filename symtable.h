@@ -36,7 +36,7 @@ typedef struct global{
 // Note : We dont need to know if local variable is defined because it has to be defined before it is used.
 typedef struct tBSTNodeLocal {
     char* Name;                    /* key */  /* data */
-    char *Type;
+    int Type;
     char *Data;
 	struct tBSTNodeLocal* LPtr;    /* left subtree*/
 	struct tBSTNodeLocal* RPtr;    /* right subtree */
@@ -80,17 +80,11 @@ void BSTDisposeGlobal (tBSTNodePtrGlobal *);
 //void BSTFunctionDataInit (functionData *);
 
 
-
-
-
-
-
-
 void BSTInitLocal   (tBSTNodePtrLocal *);
 // Find out if the func/var is already in tree + get data
-bool BSTSearchLocal  (tBSTNodePtrLocal RootPtr, char *Name);
+bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data);
 // Insert func/var into tree + data
-void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, char *Type, char *Data);
+void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data);
 // Delete entire tree
 void BSTDisposeLocal(tBSTNodePtrLocal *);
 #endif
