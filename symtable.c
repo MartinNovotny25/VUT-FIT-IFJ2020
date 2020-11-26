@@ -120,7 +120,7 @@ void BSTInitLocal (tBSTNodePtrLocal *RootPtr) {
 
 }	
 
-bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name)	{
+bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, char *Type, char *Data)	{
 
 
 
@@ -137,6 +137,8 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name)	{
 		}
 		else
 		{
+            *Type = RootPtr->Type;
+            *Data = RootPtr->Data;
 			return true;								
 		}
 	}
