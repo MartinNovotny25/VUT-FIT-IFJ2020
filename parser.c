@@ -149,7 +149,7 @@ void def_func() {
     //printf("is_return je %d, was_return je %d\n", is_return, was_return);
 
     // Ak funckia mala mat return, ale v kode sa nenachadza -- ERROR
-    if (was_return == false && is_return == true) {error_call(ERR_SYN, &tokens);}
+    if (was_return == false && is_return == true) {error_call(ERR_SEM_RETURN, &tokens);}
 
     // nastavime flagy na povodnu hodnotu pre dalsie mozne def_func
     was_return = false;
@@ -329,7 +329,9 @@ void rule_stat() {
 
                     TDLLInsertLast(&psa_list, token);
                     token = get_next_token(stdin);
+                    TDLLInsertLast(&tokens, token);
 
+                    
                 } else {error_call(ERR_SYN, &tokens);}
 
 
