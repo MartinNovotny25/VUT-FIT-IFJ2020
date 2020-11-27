@@ -325,7 +325,8 @@ void rule_stat() {
                     || (token.type == t_IDENTIFIER)
                     || (token.type == t_FLOAT)
                     || (token.type == t_INT_NON_ZERO)
-                    || (token.type == t_INT_ZERO)) {
+                    || (token.type == t_INT_ZERO)
+                    || (token.type == t_STRING)) {
 
                     TDLLInsertLast(&psa_list, token);
                     token = get_next_token(stdin);
@@ -493,7 +494,8 @@ void rule_stat() {
                     || (token.type == t_IDENTIFIER)
                     || (token.type == t_FLOAT)
                     || (token.type == t_INT_NON_ZERO)
-                    || (token.type == t_INT_ZERO)) {
+                    || (token.type == t_INT_ZERO)
+                    || (token.type == t_STRING)) {
 
                     TDLLInsertLast(&psa_list, token);
                     token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
@@ -704,7 +706,8 @@ void rule_func_assign() {
                     || (token.type == t_IDENTIFIER)
                     || (token.type == t_FLOAT)
                     || (token.type == t_INT_NON_ZERO)
-                    || (token.type == t_INT_ZERO)) {
+                    || (token.type == t_INT_ZERO)
+                    || (token.type == t_STRING)) {
 
                     TDLLInsertLast(&psa_list, token);
                     token = get_next_token(stdin);
@@ -749,7 +752,8 @@ void rule_func_assign() {
                 || (token.type == t_IDENTIFIER)
                 || (token.type == t_FLOAT)
                 || (token.type == t_INT_NON_ZERO)
-                || (token.type == t_INT_ZERO)) {
+                || (token.type == t_INT_ZERO)
+                || (token.type == t_STRING)) {
 
                 TDLLInsertLast(&psa_list, token);
                 token = get_next_token(stdin);
@@ -917,7 +921,8 @@ void rule_for_def() {
                     || (token.type == t_IDENTIFIER)
                     || (token.type == t_FLOAT)
                     || (token.type == t_INT_NON_ZERO)
-                    || (token.type == t_INT_ZERO)) {
+                    || (token.type == t_INT_ZERO)
+                    || (token.type == t_STRING)) {
 
                     TDLLInsertLast(&psa_list, token);
                     token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
@@ -967,7 +972,8 @@ void rule_for_assign() {
                     || (token.type == t_IDENTIFIER)
                     || (token.type == t_FLOAT)
                     || (token.type == t_INT_NON_ZERO)
-                    || (token.type == t_INT_ZERO)) {
+                    || (token.type == t_INT_ZERO)
+                    || (token.type == t_STRING)) {
 
                     TDLLInsertLast(&psa_list, token);
                     token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
@@ -1076,7 +1082,8 @@ void rule_return() {
                             || (token.type == t_IDENTIFIER)
                             || (token.type == t_FLOAT)
                             || (token.type == t_INT_NON_ZERO)
-                            || (token.type == t_INT_ZERO)) {
+                            || (token.type == t_INT_ZERO)
+                            || (token.type == t_STRING)) {
 
                             TDLLInsertLast(&psa_list, token);
                             token = get_next_token(stdin);
@@ -1196,7 +1203,8 @@ void rule_exp_n() {
                     || (token.type == t_IDENTIFIER)
                     || (token.type == t_FLOAT)
                     || (token.type == t_INT_NON_ZERO)
-                    || (token.type == t_INT_ZERO)) {
+                    || (token.type == t_INT_ZERO)
+                    || (token.type == t_STRING)) {
 
                     TDLLInsertLast(&psa_list, token);
                     token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
