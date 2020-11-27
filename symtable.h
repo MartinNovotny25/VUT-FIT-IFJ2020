@@ -55,15 +55,7 @@ typedef struct tBSTNodeGlobal {
 typedef struct	{                          
     int top;
     tBSTNodePtrLocal a[MAXSTACK];
-    tBSTNodePtrGlobal b[MAXSTACK];
 }MainStack;
-
-// Pomocny zasobnik. Uklada ukazatel na osobite ramce(stromy) 
-typedef struct {
-    tBSTNodePtrLocal *a[MAXSTACK];
-    tBSTNodePtrGlobal *b[MAXSTACK];
-    int top;
-}HelpStack;
 
 
 /* function prototypes */
@@ -79,7 +71,6 @@ void BSTDisposeGlobal (tBSTNodePtrGlobal *);
 // Inicializacia functionData
 //void BSTFunctionDataInit (functionData *);
 
-
 void BSTInitLocal   (tBSTNodePtrLocal *);
 // Find out if the func/var is already in tree + get data
 bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data);
@@ -87,4 +78,12 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
 void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data);
 // Delete entire tree
 void BSTDisposeLocal(tBSTNodePtrLocal *);
+
+void InitMainStack (MainStack *S);
+void PushTreeMain (MainStack *S, tBSTNodePtrLocal ptrLocal);
+tBSTNodePtrLocal PopTreeMain (MainStack *S);
+bool EmptyMainStack (MainStack *S);
+
 #endif
+
+
