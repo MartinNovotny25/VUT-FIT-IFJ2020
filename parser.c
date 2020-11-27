@@ -926,7 +926,7 @@ void rule_for_def() {
 
                     TDLLInsertLast(&psa_list, token);
                     token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
-                    TDLLInsertLast(&tokens, token);
+                    //TDLLInsertLast(&tokens, token);
                     
 
                 } else { error_call(ERR_SYN, &tokens); }
