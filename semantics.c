@@ -659,33 +659,42 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
             int typson1 = t_INT_ID;
             if(L->Act->rptr->rptr->tdata.type == t_INT_NON_ZERO || L->Act->rptr->rptr->tdata.type == t_INT_ZERO){
                 int typson2 = t_INT_ID;
-                if(!(typson1 == typson2)){
+                if(typson1 != typson2){
                     error_call(ERR_SEM_EXCOMPAT, L);
                    BSTDisposeLocal(node);
                 }
 
+            }else{
+                error_call(ERR_SEM_EXCOMPAT, L);
+                BSTDisposeLocal(node);
             }
         // Ak ide o floaty maju rovnake typy?
         }else if(L->Act->tdata.type == t_FLOAT64 || L->Act->tdata.type == t_FLOAT){
             int typson1 = t_FLOAT64;
             if(L->Act->rptr->rptr->tdata.type == t_FLOAT64 || L->Act->rptr->rptr->tdata.type == t_FLOAT){
                 int typson2 = t_FLOAT64;
-                if(!(typson1 == typson2)){
+                if(typson1 != typson2){
                     error_call(ERR_SEM_EXCOMPAT, L);
                     BSTDisposeLocal(node);
                 }
 
+            }else{
+                error_call(ERR_SEM_EXCOMPAT, L);
+                BSTDisposeLocal(node);
             }
         // Ak ide o stringy maju rovnake typy?
         }if(L->Act->tdata.type == t_STRING){
             int typson1 = t_STRING_ID;
             if(L->Act->rptr->rptr->tdata.type == t_STRING){
                 int typson2 = t_STRING_ID;
-                if(!(typson1 == typson2)){
+                if(typson1 != typson2){
                     error_call(ERR_SEM_EXCOMPAT, L);
                     BSTDisposeLocal(node);
                 }
 
+            }else{
+                error_call(ERR_SEM_EXCOMPAT, L);
+                BSTDisposeLocal(node);
             }
         }
     }
