@@ -937,7 +937,7 @@ void rule_for_def() {
             //TDLLPrintAllTokens(&psa_list);
             TDLLDisposeList(&psa_list);
             token = get_next_token(stdin);
-
+            TDLLInsertLast(&tokens, token);
             break;
             // Definicia je vynechaná
         case T_SEMICOLON:
