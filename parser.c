@@ -305,6 +305,9 @@ void rule_stat() {
             token = get_next_token(stdin);
             TDLLInsertLast(&tokens, token);
 
+            // If bez vyrazu
+            if (token.type == t_BRACES_L) {error_call(ERR_SYN, &tokens);}
+
             //Nacitavanie tokenov vyrazu do listu -- PSA
             TDLLInitList(&psa_list);
 
