@@ -1,3 +1,6 @@
+/* AUTHOR - Martin Novotný Mlinárcsik xnovot1r */
+/* Part of IFJ 2020 project */
+
 #include "scanner.h"
 #include "psa_lib.h"
 #include "precanalysis_stack.h"
@@ -13,6 +16,10 @@ tsym_stack syms_Stack; // Zásobník tokenov (symbolov)
 int count; //pocet symbolov v REDUKCII
 bool red_found; // symbol redukcie bol najdeny
 bool reduction_succ; // Ci bola redukcia vykonana uspesne alebo neuspesne
+
+bool psa_rule_application(int pocet, tsym_stack_symbol* sym1, tsym_stack_symbol* sym2, tsym_stack_symbol* sym3);
+psa_symbols psa_tokenToSymbol(TOKEN* token);
+
 
 
 // Precedencna tabulka, rozhoduje o výbere operácie podla tokenu na vstupe a tokenu na zásobníku
@@ -34,6 +41,49 @@ int psa_prec_table[PTABLE_ROWS][PTABLE_COLUMNS] = {
         /* 12 i  */{  2 , 2 , 2 , 2 , 4 , 2 , 2 ,  2 ,  2 ,  2 ,  2 , 2 , 4 , 2  },
         /* 13 $  */{  1 , 1 , 1 , 1 , 1 , 4 , 1 ,  1 ,  1 ,  1 ,  1 , 1 , 1 , 4  }
 };
+
+
+void pop3_push(){
+
+    //3 symboly potrebne pre redukciu
+    tsym_stack_symbol* red1;
+    tsym_stack_symbol* red2;
+    tsym_stack_symbol* red3;
+
+    red3 = syms_Stack.top;
+    red2 = red3->next;
+    red1 = red3->next->next;
+
+    // Apliakcia pravidla
+    reduction_succ  = psa_rule_application(count, red1, red2, red3);
+
+    //Popnutie 3 symbolob, ktore sa redukovali
+    symstack_pop(&syms_Stack);
+    symstack_pop(&syms_Stack);
+    symstack_pop(&syms_Stack);
+    symstack_pop(&syms_Stack); //popuje sa RED symbol
+
+    // push nonterm
+    symstack_push(&syms_Stack, T_NON_TERM);
+
+}
+void pop1_push(){
+    //1 symbol potrebny pre redukciu
+    tsym_stack_symbol* red1;
+    red1 = syms_Stack.top;
+
+    //Aplikacia pravidla
+    reduction_succ  = psa_rule_application(count, red1, NULL, NULL);
+
+    // popnutie vrchneho symbolu
+    symstack_pop(&syms_Stack);
+    symstack_pop(&syms_Stack); //popuje sa RED symbol
+
+
+    //Pushnutie nontermu -> E
+    symstack_push(&syms_Stack, T_NON_TERM);
+
+}
 
 // Prevedie tokeny na symboly, s ktorym pracuje precedencna
 psa_symbols psa_tokenToSymbol(TOKEN* token) {
@@ -229,25 +279,14 @@ void evaluation(TDLList* psa_list, TDLList* global_tokens) {
             // Jeden znak
             if (count == 1 && red_found) {
 
-                //1 symbol potrebny pre redukciu
-                tsym_stack_symbol* red1;
-                red1 = syms_Stack.top;
-
-                //Aplikacia pravidla
-                reduction_succ  = psa_rule_application(count, red1, NULL, NULL);
-
-                // popnutie vrchneho symbolu
-                symstack_pop(&syms_Stack);
-                symstack_pop(&syms_Stack); //popuje sa RED symbol
-
-
-                //Pushnutie nontermu -> E
-                symstack_push(&syms_Stack, T_NON_TERM);
+                pop1_push();
 
             }   else if (count == 3 && red_found) {
 
+                pop3_push();
+
                 //3 symboly potrebne pre redukciu
-                tsym_stack_symbol* red1;
+               /* tsym_stack_symbol* red1;
                 tsym_stack_symbol* red2;
                 tsym_stack_symbol* red3;
 
@@ -265,7 +304,7 @@ void evaluation(TDLList* psa_list, TDLList* global_tokens) {
                 symstack_pop(&syms_Stack); //popuje sa RED symbol
 
                 // push nonterm
-                symstack_push(&syms_Stack, T_NON_TERM);
+                symstack_push(&syms_Stack, T_NON_TERM);*/
 
             }
 
