@@ -480,6 +480,9 @@ void rule_stat() {
 
             TDLLInitList(&psa_list);
 
+            //for bez výrazu
+            if (token.type == T_SEMICOLON) {error_call(ERR_SYN, &tokens);}
+
             while (token.type != T_SEMICOLON)
             {
                 if ((token.type == t_PLUS)
@@ -490,8 +493,7 @@ void rule_stat() {
                     || (token.type == t_LEFT_BRACKET)
                     || (token.type == t_LESS)
                     || (token.type == t_LESSOREQUAL)
-                    || (token.type == t_GREATER)
-                    || (token.type == t_GREATEROREQUAL)
+                    || (token.type == t_GREATER)|| (token.type == t_GREATEROREQUAL)
                     || (token.type == t_EQUAL)
                     || (token.type == t_NOT_EQUAL)
                     || (token.type == t_IDENTIFIER)
@@ -965,6 +967,8 @@ void rule_for_assign() {
             else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
             TDLLInitList(&psa_list);
+
+            if (token.type == t_BRACES_L) {error_call(ERR_SYN, &tokens);}
 
             while (token.type != t_BRACES_L)
             {
