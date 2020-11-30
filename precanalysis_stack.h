@@ -28,17 +28,10 @@ typedef struct
 
 
 void symstack_init(tsym_stack* stack);
-
-bool symstack_push(tsym_stack* stack, psa_symbols symbol);
-
+void symstack_push(tsym_stack* stack, psa_symbols symbol);
 bool symstack_pop(tsym_stack* stack);
-
 tsym_stack_symbol* symstack_top_t(tsym_stack* stack);
-
 void symstack_push_red(tsym_stack* stack, psa_symbols symbol);
-
-//tsym_stack_symbol* symstack_top(tsym_stack* stack);
-
 void symstack_free(tsym_stack* stack);
 
 #endif

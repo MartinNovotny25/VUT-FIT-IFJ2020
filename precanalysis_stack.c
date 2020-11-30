@@ -6,18 +6,18 @@ void symstack_init(tsym_stack* sym_stack){
     sym_stack->top = NULL;
 }
 
-bool symstack_push(tsym_stack* sym_stack, psa_symbols symbol){
+void symstack_push(tsym_stack* sym_stack, psa_symbols symbol){
     tsym_stack_symbol* pushed_sym = (tsym_stack_symbol*)malloc(sizeof(tsym_stack_symbol));
 
     if (pushed_sym == NULL) {
-        return false;
+        return;
     }
     pushed_sym->next = sym_stack->top;
     pushed_sym->symbol = symbol;
 
     sym_stack->top = pushed_sym;
 
-    return true;
+    return;
 }
 
 bool symstack_pop(tsym_stack* sym_stack) {

@@ -36,7 +36,7 @@ typedef struct global{
 // Note : We dont need to know if local variable is defined because it has to be defined before it is used.
 typedef struct tBSTNodeLocal {
     char* Name;                    /* key */  /* data */
-    char *Type;
+    int Type;
     char *Data;
 	struct tBSTNodeLocal* LPtr;    /* left subtree*/
 	struct tBSTNodeLocal* RPtr;    /* right subtree */
@@ -55,15 +55,7 @@ typedef struct tBSTNodeGlobal {
 typedef struct	{                          
     int top;
     tBSTNodePtrLocal a[MAXSTACK];
-    tBSTNodePtrGlobal b[MAXSTACK];
 }MainStack;
-
-// Pomocny zasobnik. Uklada ukazatel na osobite ramce(stromy) 
-typedef struct {
-    tBSTNodePtrLocal *a[MAXSTACK];
-    tBSTNodePtrGlobal *b[MAXSTACK];
-    int top;
-}HelpStack;
 
 
 /* function prototypes */
@@ -76,19 +68,22 @@ bool BSTSearchGlobal  (tBSTNodePtrGlobal, char *, functionData *);
 void BSTInsertGlobal (tBSTNodePtrGlobal *, char *, functionData);
 // Delete entire tree
 void BSTDisposeGlobal (tBSTNodePtrGlobal *);
-
-
-
-
-
-
-
+// Inicializacia functionData
+//void BSTFunctionDataInit (functionData *);
 
 void BSTInitLocal   (tBSTNodePtrLocal *);
 // Find out if the func/var is already in tree + get data
-bool BSTSearchLocal  (tBSTNodePtrLocal RootPtr, char *Name);
+bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data);
 // Insert func/var into tree + data
-void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, char *Type, char *Data);
+void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data);
 // Delete entire tree
 void BSTDisposeLocal(tBSTNodePtrLocal *);
+
+void InitMainStack (MainStack *S);
+void PushTreeMain (MainStack *S, tBSTNodePtrLocal ptrLocal);
+tBSTNodePtrLocal PopTreeMain (MainStack *S);
+bool EmptyMainStack (MainStack *S);
+
 #endif
+
+
