@@ -782,33 +782,6 @@ TOKEN get_next_token(FILE* text)
                     current_char3 = current_char;
                     state = PLUS_MINUS_EXPONENT;
                 }
-                /*
-                else
-                {
-                    //V pripade nepovoleneho znaku vypiseme token FLOAT a znak e/E berieme ako identifikator a nepovoleny znak skenujeme dalej
-                    unload_c(text);
-                    ungetc(current_char2,text);
-                    current_token_position--;
-                    current_token[current_token_position] = 0x00;
-                    if(floating_point)
-                    {
-                        floating_point = false;
-                        end_token(t_FLOAT, &token);
-                        return token;
-                    }
-                    else if(zero_int)
-                    {
-                        zero_int = false;
-                        end_token(t_INT_ZERO, &token);
-                        return token;
-                    }
-                    else{
-                        non_zero_int = false;
-                        end_token(t_INT_NON_ZERO, &token);
-                        return token;
-                    }
-                }
-                */
                 else
                 {
                     unload_c(text);
@@ -831,36 +804,6 @@ TOKEN get_next_token(FILE* text)
                     fprintf(stderr , "Lexical error.\n");
                     exit(1);
                 }
-                /*
-                else
-                {
-                    //Koncime tokenom FLOAT a skenujeme dalej nepovoleny znak
-                    unload_c(text);
-                    ungetc(current_char3,text);
-                    current_token_position--;
-                    current_token[current_token_position] = 0x00;
-                    ungetc(current_char2,text);
-                    current_token_position--;
-                    current_token[current_token_position] = 0x00;
-                    if(floating_point)
-                    {
-                        floating_point = false;
-                        end_token(t_FLOAT, &token);
-                        return token;
-                    }
-                    else if(zero_int)
-                    {
-                        zero_int = false;
-                        end_token(t_INT_ZERO, &token);
-                        return token;
-                    }
-                    else{
-                        non_zero_int = false;
-                        end_token(t_INT_NON_ZERO, &token);
-                        return token;
-                    }
-                }
-                */
                 break;
              
             //pokracovanie exponenta so znamienkom
@@ -870,44 +813,6 @@ TOKEN get_next_token(FILE* text)
                     //Ostavame v stave exponent2, pretoze za znakom +/- moze byt viac cifier
                     state = EXPONENT2;
                 }
-                /*
-                else if (current_char == '.')
-                {
-                    //presuvame sa do medzistavu desatinnej bodky, pretoze za nou musi nasledovat cislo
-                    state = DOT;
-                }
-                */
-                /*
-                else
-                {
-                    //V pripade nepovoleneho znaku, koncime tokenom FLOAT a skenujeme dalej nepovoleny znak
-                    //Koncime tokenom FLOAT a skenujeme dalej nepovoleny znak
-                    unload_c(text);
-                    ungetc(current_char3,text);
-                    current_token_position--;
-                    current_token[current_token_position] = 0x00;
-                    ungetc(current_char2,text);
-                    current_token_position--;
-                    current_token[current_token_position] = 0x00;
-                    if(floating_point)
-                    {
-                        floating_point = false;
-                        end_token(t_FLOAT, &token);
-                        return token;
-                    }
-                    else if(zero_int)
-                    {
-                        zero_int = false;
-                        end_token(t_INT_ZERO, &token);
-                        return token;
-                    }
-                    else{
-                        non_zero_int = false;
-                        end_token(t_INT_NON_ZERO, &token);
-                        return token;
-                    }
-                }
-                */
                 else
                 {
                     unload_c(text);
@@ -930,82 +835,6 @@ TOKEN get_next_token(FILE* text)
                     }
                 }
                 break;
-             
-            //Exponent zacinajuci nulou
-            /*
-            case ZERO_EXPONENT:
-                if (current_char == '0')
-                {
-                    remove_();
-                    
-                }
-                else if (isdigit(current_char))
-                {
-                    state = EXPONENT2;
-                }
-                
-                else if (current_char == '.')
-                {
-                    //presuvame sa do medzistavu desatinnej bodky, pretoze za nou musi nasledovat cislo
-                    state = DOT;
-                }
-                
-                
-                else
-                {
-                    //V pripade nepovoleneho znaku, koncime tokenom FLOAT a skenujeme dalej nepovoleny znak
-                    //Koncime tokenom FLOAT a skenujeme dalej nepovoleny znak
-                    unload_c(text);
-                    ungetc(current_char3,text);
-                    current_token_position--;
-                    current_token[current_token_position] = 0x00;
-                    ungetc(current_char2,text);
-                    current_token_position--;
-                    current_token[current_token_position] = 0x00;
-                    if(floating_point)
-                    {
-                        floating_point = false;
-                        end_token(t_FLOAT, &token);
-                        return token;
-                    }
-                    else if(zero_int)
-                    {
-                        zero_int = false;
-                        end_token(t_INT_ZERO, &token);
-                        return token;
-                    }
-                    else{
-                        non_zero_int = false;
-                        end_token(t_INT_NON_ZERO, &token);
-                        return token;
-                    }
-                }
-            
-                else
-                {
-                    if(floating_point)
-                    {
-                        unload_c(text);
-                        floating_point = false;
-                        end_token(t_FLOAT, &token);
-                        return token;
-                    }
-                    else if(zero_int)
-                    {
-                        unload_c(text);
-                        zero_int = false;
-                        end_token(t_INT_ZERO, &token);
-                        return token;
-                    }
-                    else{
-                        unload_c(text);
-                        non_zero_int = false;
-                        end_token(t_INT_NON_ZERO, &token);
-                        return token;
-                    }
-                }
-                break;
-            */
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///BASE ROZSIRENIE
