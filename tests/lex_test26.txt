@@ -1,0 +1,2 @@
+//nespravy string
+a="sadasd\x1"

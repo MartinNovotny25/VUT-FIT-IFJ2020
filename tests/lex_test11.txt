@@ -1,0 +1,2 @@
+//nespravny tvar exponentu
+a:1eE

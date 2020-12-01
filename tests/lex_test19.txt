@@ -1,0 +1,2 @@
+//nedokonceny blokovy komentar +EOL
+/*asdasd

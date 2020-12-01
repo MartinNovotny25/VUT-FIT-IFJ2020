@@ -1,0 +1,2 @@
+//prebytocny pocet nul
+a:09.4

@@ -1,0 +1,3 @@
+//nespravy string
+a="sadasd
+dasda

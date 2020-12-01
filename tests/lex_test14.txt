@@ -1,0 +1,2 @@
+//nespravny tvar desatinneho cisla
+a:2..
