@@ -5,16 +5,44 @@
 //  Created by Andrej Hyros on 23/11/2020.
 //
 
-#ifndef semantics_h
-#define semantics_h
+#ifndef semantika_h
+#define semantika_h
 
 #include <stdio.h>
 #include "tokenList.h"
+#include "symtable.h"
 
-void enterFunctionBody(TDLList *L, char *id);
+
+
+
+
+/*
+void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node);
+void dec_var_control(TDLList *L, tBSTNodePtrLocal *node);
+void for_control(TDLList *L, tBSTNodePtrLocal *node);
+void if_control(TDLList *L, tBSTNodePtrLocal *node);
+
+
+*/
+void for_control(TDLList *L, tBSTNodePtrLocal *node, functionData params);
+void enter_for_body(TDLList *L, tBSTNodePtrLocal *fornode, functionData params);
+void enter_else_body(TDLList *L, tBSTNodePtrLocal *elsenode, functionData params);
+void enter_if_body(TDLList *L, tBSTNodePtrLocal *funcnode, functionData params);
+void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params);
+void dec_var_control(TDLList *L, tBSTNodePtrLocal *node, functionData params);
+void printFunction(char *id, functionData data);
+
+
+void checkReturnStatement(TDLList *L, char *id, tBSTNodePtrLocal *node);
+void checkCallFunction(TDLList *L, char *id, tBSTNodePtrLocal *node);
+void secondRun(TDLList *L);
+void insertBuiltInFunction();
+void paramsRedefinitionCheck(functionData data, TDLList *L);
+void enterFunctionBody(TDLList *L, char *id, MainStack mainstack);
 void checkFunctionParams(TDLList *L, char *id);
 void checkFunction(TDLList *L);
 void goThroughList(TDLList *L);
+#endif
 
 /*
  #define ERR_LEX 1
@@ -91,7 +119,4 @@ void goThroughList(TDLList *L);
  #define BINARY 58
  #define OCTAL 59
  #define HEXADECIMAL 60
-
  */
-
-#endif /* semantics_h */

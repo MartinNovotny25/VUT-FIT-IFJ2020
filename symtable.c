@@ -93,7 +93,7 @@ void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {
 ** Deletes entire binary tree and correctly frees allocated memory.
 **/	
 
-
+    //printf("Symtable: Disposing all nodes...\n");
 	if (*RootPtr != NULL)					
 	{
 		BSTDisposeGlobal(&(*RootPtr)->LPtr);
@@ -123,29 +123,35 @@ void BSTInitLocal (tBSTNodePtrLocal *RootPtr) {
 
 bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data)    {
 
+
+    //printf("SOM V SEARCHLOCAL\n");
+	//printf("Hladam uzol s nazvom: %s\n", name);
     if (RootPtr != NULL && RootPtr->Name!= NULL)
     {
         if ((strcmp(name, RootPtr->Name) < 0))
         {
+            //printf("SOM V 1st if\n");
             return BSTSearchLocal(RootPtr->LPtr,name, Type, Data);
+                
         }
         else if (strcmp(name, RootPtr->Name) > 0)
         {
+            //printf("SOM V 2nd if\n");
             return BSTSearchLocal(RootPtr->RPtr,name, Type, Data);
         }
         else
         {
-           
+            //printf("SOM V ELSE - TU CHCEM BYT\n");
             *Type = RootPtr->Type;
-           
+            //printf("SOM V ELSE - 1\n");
             //*Data = *RootPtr->Data;
-            
+           // printf("SOM V ELSE - 2\n");
             return true;
         }
     }
     else
     {
-		
+		//printf("Nenasiel som hodnotu\n");
         return false;
     }
 }
@@ -154,7 +160,7 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
 
 void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data)	{
 
-	printf("NAZOV: %s,TYP: %d, HODNOTA: %s\n", Name, *Type, Data);
+	//printf("NAZOV: %s,TYP: %d, HODNOTA: %s\n", Name, *Type, Data);
 
 	if (*RootPtr == NULL){
 		*RootPtr = malloc(sizeof (struct tBSTNodeLocal));	
@@ -163,21 +169,21 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Da
 		(*RootPtr)->RPtr = NULL;	
 		(*RootPtr)->Type = *Type;
 		(*RootPtr)->Data = Data;
-		printf("Vlozil som prvy uzol\n");
+	//	printf("Vlozil som prvy uzol\n");
 	}else if (strcmp(Name, (*RootPtr)->Name) == 0)
 	{		
 		// this state should never be called since parser should check if local var is in tree
 		// before trying to insert it again.
 		// TODO :  when parser is done this should be deleted becase it is a dead code !!!								
-		printf("THIS CODE SHOULD NEVER BE REACHED!\n"); 
+	//	printf("THIS CODE SHOULD NEVER BE REACHED!\n"); 
 		
 	}else if (strcmp(Name, (*RootPtr)->Name) < 0)     	
 	{
-		printf("Vlkadam dolava\n");
+	//	printf("Vlkadam dolava\n");
 		BSTInsertLocal(&(*RootPtr)->LPtr,Name, Type, Data);
 	}else if (strcmp(Name, (*RootPtr)->Name) > 0)
 	{
-		printf("Vkladam doprava\n");
+	//	printf("Vkladam doprava\n");
 		BSTInsertLocal(&(*RootPtr)->RPtr,Name, Type, Data);
 	}
 	
@@ -189,7 +195,7 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Da
 void BSTDisposeLocal (tBSTNodePtrLocal *RootPtr) {	
 
 
-	printf("Dispose Local\n");
+	//printf("Dispose Local\n");
 	if (*RootPtr != NULL)					
 	{
 		BSTDisposeLocal(&(*RootPtr)->LPtr);
@@ -208,25 +214,24 @@ void InitMainStack (MainStack *S)
 }
 
 // Vlozi Globalny strom s info alebo lokalny strom s info(infosky su ulozene v strome)
-void PushTreeMain (MainStack *S, tBSTNodePtrLocal ptrLocal)
+void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal)
 {
                  /* Při implementaci v poli může dojít k přetečení zásobníku. */
   if (S->top==MAXSTACK)
-    printf("Chyba: Došlo k přetečení zásobníku s ukazateli!\n");
+   printf("Chyba: Došlo k přetečení zásobníku s ukazateli!\n");
   else {
 		S->top++;
 		S->a[S->top]=ptrLocal;
+		printf("top %d\n", S->top);
 	}
 }
 
 // Vyhodi vrchny strom
 // Asi bude treba upravit
 tBSTNodePtrLocal PopTreeMain (MainStack *S)
-/*         --------
-** Odstraní prvek z vrcholu zásobníku a současně vrátí jeho hodnotu.
-**/
 {
-	return (S->a[S->top--]);
+	 
+	return *(S->a[S->top]);
 }
 
 // Vycisti cely hlavny zasobnik
@@ -235,38 +240,4 @@ bool EmptyMainStack (MainStack *S)
   return(S->top==0);
 }
 ////////////////////////////////////////////////////////////////////////////////////////
-/*
-// Inicializuje pomocny zasobnik
-void InitHelpStack (HelpStack *S)
-{
-	S->top = 0;
-}
-
-// Uklada ukazatel na strom(ramec)
-// Aby sme vedeli kde konci aj ked je to nepotrebne 1 strom je 1 ramec
-void PushPtrTreeHelp (HelpStack *S, tBSTNodePtrLocal *ptrLocal)
-{
-//Při implementaci v poli může dojít k přetečení zásobníku.
-  if (S->top==MAXSTACK)
-    printf("Chyba: Došlo k přetečení zásobníku s ukazateli!\n");
-  else {
-		S->top++;
-		S->a[S->top]=ptrLocal;
-	}
-}
-
-// Po praci so stromom(ramcom) bude treba uvolnit dany strom
-void PopPtrTreeHelp (HelpStack *S)
-{
-	(S->a[S->top--]);
-}
-
-// Zavola sa na konci semantiky
-bool EmptyHelpStack (HelpStack *S)
-{
-  return(S->top==0);
-}
-*/
-
-
 

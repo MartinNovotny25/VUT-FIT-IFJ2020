@@ -54,7 +54,7 @@ typedef struct tBSTNodeGlobal {
 // Hlavny zasobnik. Uklada Stromy obsahujuce info
 typedef struct	{                          
     int top;
-    tBSTNodePtrLocal a[MAXSTACK];
+    tBSTNodePtrLocal *a[MAXSTACK];
 }MainStack;
 
 
@@ -80,7 +80,7 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Da
 void BSTDisposeLocal(tBSTNodePtrLocal *);
 
 void InitMainStack (MainStack *S);
-void PushTreeMain (MainStack *S, tBSTNodePtrLocal ptrLocal);
+void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal);
 tBSTNodePtrLocal PopTreeMain (MainStack *S);
 bool EmptyMainStack (MainStack *S);
 
