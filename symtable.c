@@ -93,7 +93,7 @@ void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {
 ** Deletes entire binary tree and correctly frees allocated memory.
 **/	
 
-    //printf("Symtable: Disposing all nodes...\n");
+    printf("Symtable: Disposing all nodes...\n");
 	if (*RootPtr != NULL)					
 	{
 		BSTDisposeGlobal(&(*RootPtr)->LPtr);
@@ -125,23 +125,23 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
 
 
     //printf("SOM V SEARCHLOCAL\n");
-	//printf("Hladam uzol s nazvom: %s\n", name);
-    if (RootPtr != NULL && RootPtr->Name!= NULL)
+	printf("Hladam uzol s nazvom: %s\n", name);
+    if (RootPtr != NULL && RootPtr->Name != NULL)
     {
         if ((strcmp(name, RootPtr->Name) < 0))
         {
-            //printf("SOM V 1st if\n");
+            printf("SOM V 1st if\n");
             return BSTSearchLocal(RootPtr->LPtr,name, Type, Data);
                 
         }
         else if (strcmp(name, RootPtr->Name) > 0)
         {
-            //printf("SOM V 2nd if\n");
+            printf("SOM V 2nd if\n");
             return BSTSearchLocal(RootPtr->RPtr,name, Type, Data);
         }
         else
         {
-            //printf("SOM V ELSE - TU CHCEM BYT\n");
+            printf("SOM V ELSE - TU CHCEM BYT\n");
             *Type = RootPtr->Type;
             //printf("SOM V ELSE - 1\n");
             //*Data = *RootPtr->Data;
@@ -151,7 +151,7 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
     }
     else
     {
-		//printf("Nenasiel som hodnotu\n");
+		printf("Nenasiel som hodnotu\n");
         return false;
     }
 }
@@ -160,7 +160,7 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
 
 void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data)	{
 
-	//printf("NAZOV: %s,TYP: %d, HODNOTA: %s\n", Name, *Type, Data);
+	printf("NAZOV: %s,TYP: %d, HODNOTA: %s\n", Name, *Type, Data);
 
 	if (*RootPtr == NULL){
 		*RootPtr = malloc(sizeof (struct tBSTNodeLocal));	
@@ -186,23 +186,92 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Da
 	//	printf("Vkladam doprava\n");
 		BSTInsertLocal(&(*RootPtr)->RPtr,Name, Type, Data);
 	}
-	
-	
-	
 }
 
+void ReplaceByRightmost (tBSTNodePtrLocal PtrReplaced, tBSTNodePtrLocal *RootPtr) {
+/*   ------------------
+** Pomocná funkce pro vyhledání, přesun a uvolnění nejpravějšího uzlu.
+**
+** Ukazatel PtrReplaced ukazuje na uzel, do kterého bude přesunuta hodnota
+** nejpravějšího uzlu v podstromu, který je určen ukazatelem RootPtr.
+** Předpokládá se, že hodnota ukazatele RootPtr nebude NULL (zajistěte to
+** testováním před volání této funkce). Tuto funkci implementujte rekurzivně.
+**
+** Tato pomocná funkce bude použita dále. Než ji začnete implementovat,
+** přečtěte si komentář k funkci BSTDelete().
+**/
+	
+
+	if(*RootPtr != NULL && PtrReplaced != NULL){
+		if((*RootPtr)->RPtr != NULL){ 
+			// najde najpravejsi uzol
+			ReplaceByRightmost(PtrReplaced, &(*RootPtr)->RPtr);
+		}else{
+			PtrReplaced->Name = (*RootPtr)->Name;
+			PtrReplaced->Type = (*RootPtr)->Type;
+			PtrReplaced->Data = (*RootPtr)->Data;
+			BSTDelete(RootPtr, (*RootPtr)->Name);
+		}
+	}else return;
+}
+
+void BSTDelete (tBSTNodePtrLocal *RootPtr, char *K) {
+/*   ---------
+** Zruší uzel stromu, který obsahuje klíč K.
+**
+** Pokud uzel se zadaným klíčem neexistuje, nedělá funkce nic.
+** Pokud má rušený uzel jen jeden podstrom, pak jej zdědí otec rušeného uzlu.
+** Pokud má rušený uzel oba podstromy, pak je rušený uzel nahrazen nejpravějším
+** uzlem levého podstromu. Pozor! Nejpravější uzel nemusí být listem.
+**
+** Tuto funkci implementujte rekurzivně s využitím dříve deklarované
+** pomocné funkce ReplaceByRightmost.
+**/
+
+	if(*RootPtr != NULL){ // nemame prazdny uzol
+		if((*RootPtr)->Name > K){ // kluc je vlavo 
+			BSTDelete(&(*RootPtr)->LPtr, K);
+		}else if((*RootPtr)->Name < K){ // kluc je vpravo
+			BSTDelete(&(*RootPtr)->RPtr, K); 
+		}else if((*RootPtr)->Name == K){ // ak sme nasli uzol
+
+			if((*RootPtr)->LPtr != NULL && (*RootPtr)->RPtr != NULL){ // 2 podstromy
+					ReplaceByRightmost(*RootPtr, &(*RootPtr)->LPtr);
+			}else if((*RootPtr)->LPtr != NULL && (*RootPtr)->RPtr == NULL){ // lavy 
+				tBSTNodePtrLocal temp_node;//funguje
+				temp_node = (*RootPtr)->LPtr; // ulozime odstranovany uzol
+				free(*RootPtr);
+				*RootPtr = temp_node;
+
+			}else if((*RootPtr)->RPtr != NULL && (*RootPtr)->LPtr == NULL){ // pravy
+				tBSTNodePtrLocal temp_node; // funguje
+				temp_node = (*RootPtr)->RPtr;
+				free(*RootPtr);
+				*RootPtr = temp_node;
+
+			}else{ // ziadny podstrom funguje
+				free(*RootPtr);
+				*RootPtr = NULL;
+			}
+		}
+	}else{
+		return;
+	}
+}
 
 void BSTDisposeLocal (tBSTNodePtrLocal *RootPtr) {	
 
 
-	//printf("Dispose Local\n");
+	printf("Dispose Local\n");
 	if (*RootPtr != NULL)					
 	{
+        printf("rootprt != NULL\n");
 		BSTDisposeLocal(&(*RootPtr)->LPtr);
 		BSTDisposeLocal(&(*RootPtr)->RPtr);
 		free(*RootPtr);
 		*RootPtr = NULL;
 	}
+    printf("RootPtr == NULL, koniec tejto rekurzie\n");
 	
 
 
@@ -230,8 +299,11 @@ void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal)
 // Asi bude treba upravit
 tBSTNodePtrLocal PopTreeMain (MainStack *S)
 {
-	 
-	return *(S->a[S->top]);
+	tBSTNodePtrLocal temp;
+	temp = *(S->a[S->top]);
+	S->top--;
+	printf("top %d\n", S->top);
+	return temp;
 }
 
 // Vycisti cely hlavny zasobnik

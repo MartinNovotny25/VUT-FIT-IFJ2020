@@ -76,6 +76,9 @@ void BSTInitLocal   (tBSTNodePtrLocal *);
 bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data);
 // Insert func/var into tree + data
 void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data);
+void ReplaceByRightmost (tBSTNodePtrLocal PtrReplaced, tBSTNodePtrLocal *RootPtr);
+// delete node in tree
+void BSTDelete (tBSTNodePtrLocal *RootPtr, char *K);
 // Delete entire tree
 void BSTDisposeLocal(tBSTNodePtrLocal *);
 
@@ -85,5 +88,3 @@ tBSTNodePtrLocal PopTreeMain (MainStack *S);
 bool EmptyMainStack (MainStack *S);
 
 #endif
-
-
