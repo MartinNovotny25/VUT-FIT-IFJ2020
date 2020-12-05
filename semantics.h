@@ -25,9 +25,9 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node);
 
 */
 void for_control(TDLList *L, tBSTNodePtrLocal *node, functionData params);
-void enter_for_body(TDLList *L, tBSTNodePtrLocal *fornode, functionData params);
-void enter_else_body(TDLList *L, tBSTNodePtrLocal *elsenode, functionData params);
-void enter_if_body(TDLList *L, tBSTNodePtrLocal *funcnode, functionData params);
+void enter_for_body(TDLList *L, tBSTNodePtrLocal *fornode, functionData params, char *id);
+void enter_else_body(TDLList *L, tBSTNodePtrLocal *elsenode, functionData params, char *id);
+void enter_if_body(TDLList *L, tBSTNodePtrLocal *funcnode, functionData params, char *id);
 void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params);
 void dec_var_control(TDLList *L, tBSTNodePtrLocal *node, functionData params);
 void printFunction(char *id, functionData data);
