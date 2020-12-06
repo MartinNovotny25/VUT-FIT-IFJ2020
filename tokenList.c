@@ -1,8 +1,9 @@
 /*
-**    Part of IFJ Project 2020/2021
-**    Author: Andrej Hyros xhyros00
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Obojsmerny zoznam tokenov pre projekt IFJ2020
+*  Vytvoril: Andrej Hyros - xhyros00
+*  Datum: 10/2020
 */
-
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -35,7 +36,7 @@
  */
 
 /*
-int main()                          //tmp main - iba na testiky
+int main()                          //tmp main pre potreby testovania
 {
     printf("entered main\n");
     int ascii = 65;

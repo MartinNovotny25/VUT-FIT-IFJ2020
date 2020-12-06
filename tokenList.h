@@ -1,9 +1,9 @@
-//  Predmet : Formalne jazyky a prekladace (IFJ)
-//  tokenList.h - hlavickovy subor pre tokenList.c
-//  
-//
-//  Created by Andrej Hyros on 11/2020.
-//
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Obojsmerny zoznam tokenov pre projekt IFJ2020 (hlavickovy subor)
+*  Vytvoril: Andrej Hyros - xhyros00
+*  Datum: 10/2020
+*/
 
 #ifndef tokenList_h
 #define tokenList_h
