@@ -916,7 +916,8 @@ void rule_for_def() {
             token = get_next_token(stdin);
             TDLLInsertLast(&tokens, token);
             //kontrola, ci pride inicializacia alebo definicia -- Neviem ci je IBA priradenie hodnoty možné, ak áno, iteračná premenná musí byť definovaná dopredu
-            rule_init_def();
+            if (token.type != t_DEFINITION_2) {error_call(ERR_SYN, &tokens);}
+            else {token = get_next_token(stdin);}
 
             TDLLInitList(&psa_list);
 
