@@ -1,10 +1,10 @@
-//
-//  semantics.h
-//  
-//
-//  Created by Andrej Hyros on 23/11/2020.
-//
-
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Hlavickovy subor semantickej analyzy pre projekt IFJ2020
+*  Vytvoril: Peter Cellar - xcella00
+*            Andrej Hyros - xhyros00
+*  Datum: 10/2020
+*/
 #ifndef semantika_h
 #define semantika_h
 
