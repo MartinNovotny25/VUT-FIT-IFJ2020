@@ -172,6 +172,7 @@ void def_func() {
     //Nepovinne eoly medzi blokmi
     if (token.type == t_EOL)
     {
+        printf("Medzi blokmi\n");
         between_def = true;
         rule_eol();
         between_def = false;
@@ -1197,6 +1198,7 @@ void rule_exp_n() {
 
     if (token.type == t_EOL)
     {
+        printf("VON\n");
         return;
 
     } else if (token.type == t_BRACES_L) {
@@ -1257,7 +1259,7 @@ void rule_eol() {
 
         default:
             if (between_def == true) {
-                if (token.type != t_FUNC) {
+                if (token.type != t_FUNC && token.type != t_EOF) {
                     error_call(ERR_SYN, &tokens);
                 }
             }
