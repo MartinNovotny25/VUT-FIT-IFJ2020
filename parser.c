@@ -20,6 +20,7 @@ bool no_id_in_params_flag = false; //pri id, id nemoze byt return type pri def_f
                                     // Ak je flag == true, tak ak príde identifikator medzi návratovými typmi, ERROR
 bool is_return = false; // flag pre vynutenie return statementu
 bool was_return = false; // flag pre zaznacenie ci funkcia obsahovala return
+bool between_def = false; //premenna, ktora udava ci sa nachadzame medzi blokmi kodu
 
 // toto mozte ignorovat, nic to asi nerobi
 int global_brace_count = 0; //pocitadlo mnozinovych zatvoriek
@@ -101,15 +102,6 @@ int main() {
         def_func();
     }
 
-    //Nemusime vynucovat eol na tomto mieste
-    /*if (token.type == t_EOL) {
-        printf("som v poslednom rule eol\n");
-        rule_eol();
-    }*/
-
-    //printf("%d\n", global_brace_count);
-    //if (global_brace_count != 0) { error_call(ERR_SYN, &tokens); }
-
     printf("Parser: USPESNY KONIEC\n");
 
     printf("Parser: Printujem cely zoznam tokenov\n");
@@ -171,7 +163,9 @@ void def_func() {
     //Nepovinne eoly medzi blokmi
     if (token.type == t_EOL)
     {
+        between_def = true;
         rule_eol();
+        between_def = false;
     }
 
     printf("Parser: som von\n");
@@ -1247,6 +1241,11 @@ void rule_eol() {
             break;
 
         default:
+            if (between_def == true) {
+                if (token.type != t_FUNC) {
+                    error_call(ERR_SYN, &tokens);
+                }
+            }
             break;
     }
 }
