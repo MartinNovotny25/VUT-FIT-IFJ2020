@@ -607,10 +607,12 @@ TOKEN get_next_token(FILE* text)
             case MULTILINE_2:
                 if (current_char == '/')
                 {
+                    //remove_();
                     //Koncime tokenom Multiline Comment /* */
                     end_token(t_EOL, &token);
                     First_token = true;
                     return token;
+                    
                 }
                 else
                 {
@@ -816,6 +818,9 @@ TOKEN get_next_token(FILE* text)
                 else
                 {
                     unload_c(text);
+                    end_token(t_FLOAT, &token);
+                    return token;
+                    /*
                     if(floating_point)
                     {
                         floating_point = false;
@@ -833,6 +838,7 @@ TOKEN get_next_token(FILE* text)
                         end_token(t_INT_NON_ZERO, &token);
                         return token;
                     }
+                    */
                 }
                 break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
