@@ -1,9 +1,10 @@
 /*
-`*    Part of IFJ project 2019/2020
-`*    Author: Martin Novotny Mlinarcsik xnovot1r
- *
- *
- */
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Hlavickovy subor zasobniku precedencnej syntaktickej analyzy pre projekt IFJ2020
+*  Vytvoril: Martin Novotny - xnovot
+*
+*  Datum: 10/2020
+*/
 
 #ifndef SYMSTACK_H
 #define SYMSTACK_H

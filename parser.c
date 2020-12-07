@@ -1,3 +1,12 @@
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Zdrojovy subor syntaktickej analyzy pre projekt IFJ2020
+*  Vytvoril: Martin Novotny - xnovot
+*
+*  Datum: 10/2020
+*/
+
+
 #include <stdio.h>
 //#include <stdio.h>
 
@@ -956,6 +965,8 @@ void rule_for_assign() {
             token = get_next_token(stdin);
             TDLLInsertLast(&tokens, token);
 
+            rule_id_n();
+
             //môže príst iba token assign =
             if (token.type != t_ASSIGN) { error_call(ERR_SYN, &tokens); }
             else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
@@ -964,7 +975,7 @@ void rule_for_assign() {
 
             if (token.type == t_BRACES_L) {error_call(ERR_SYN, &tokens);}
 
-            while (token.type != t_BRACES_L)
+            while (token.type != t_BRACES_L && token.type != t_COMMA)
             {
                 if ((token.type == t_PLUS)
                     || (token.type == t_MINUS)
@@ -989,6 +1000,8 @@ void rule_for_assign() {
             evaluation(&psa_list, &tokens);
             TDLLDisposeList(&psa_list);
             //token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
+
+            rule_exp_n();
 
             //sem pride psa
             /*if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
@@ -1177,7 +1190,7 @@ void rule_return_type_n() {
 
 //predtym pride ciarka a zavola sa rule_exp_n a nacita sa token
 void rule_exp_n() {
-    //printf("EXP_N s tokenom %d\n",token.type);
+    printf("EXP_N s tokenom %d\n",token.type);
 
     //token = get_next_token(stdin);
     //TDLLInsertLast(&tokens, token);
@@ -1186,6 +1199,8 @@ void rule_exp_n() {
     {
         return;
 
+    } else if (token.type == t_BRACES_L) {
+        return;
     } else if (token.type != t_COMMA) {error_call(ERR_SYN, &tokens);}
     else {
         token = get_next_token(stdin);
@@ -1196,7 +1211,7 @@ void rule_exp_n() {
         if (token.type == t_EOL) {error_call(ERR_SYN, &tokens);}
         else {
 
-            while (token.type != t_COMMA && token.type != t_EOL) {
+            while (token.type != t_COMMA && token.type != t_EOL && token.type != t_BRACES_L) {
                 if ((token.type == t_PLUS)
                     || (token.type == t_MINUS)
                     || (token.type == t_DIVIDE)

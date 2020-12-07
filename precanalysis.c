@@ -1,5 +1,10 @@
-/* AUTHOR - Martin Novotný Mlinárcsik xnovot1r */
-/* Part of IFJ 2020 project */
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Zdrojovy subor precedencnej syntaktickej analyzy pre projekt IFJ2020
+*  Vytvoril: Martin Novotny Mlinarcsik - xnovot
+*
+*  Datum: 10/2020
+*/
 
 #include "scanner.h"
 #include "psa_lib.h"

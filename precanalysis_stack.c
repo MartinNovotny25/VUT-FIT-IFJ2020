@@ -1,6 +1,12 @@
-#include "precanalysis_stack.h"
-//xd
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Zdrojovy subor zasobniku precedencnej syntaktickej analyzy pre projekt IFJ2020
+*  Vytvoril: Martin Novotny - xnovot
+*
+*  Datum: 10/2020
+*/
 
+#include "precanalysis_stack.h"
 
 void symstack_init(tsym_stack* sym_stack){
     sym_stack->top = NULL;
