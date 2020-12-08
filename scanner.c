@@ -862,6 +862,18 @@ TOKEN get_next_token(FILE* text)
                     //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
                     remove_();
                 }
+                else if ((isdigit(current_char)) && (current_char != '0') && (current_char != '1'))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
+                }
+                else if (isalpha(current_char))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
+                }
                 else
                 {
                     //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
@@ -884,6 +896,18 @@ TOKEN get_next_token(FILE* text)
                 {
                     zero_int = false;
                     state = BINARY;
+                }
+                else if ((isdigit(current_char)) && (current_char != '0') && (current_char != '1'))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
+                }
+                else if (isalpha(current_char))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
                 }
                 else if (current_char == '_')
                 {
@@ -919,6 +943,12 @@ TOKEN get_next_token(FILE* text)
                 {
                     state = OCTAL_ZERO;
                 }
+                else if (isalpha(current_char))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
+                }
                 else if (current_char == '_')
                 {
                     //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
@@ -944,6 +974,12 @@ TOKEN get_next_token(FILE* text)
                 {
                     zero_int = false;
                     state = OCTAL;
+                }
+                else if (isalpha(current_char))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
                 }
                 else if (current_char == '_')
                 {
@@ -979,6 +1015,12 @@ TOKEN get_next_token(FILE* text)
                 {
                     state = HEXA_ZERO;
                 }
+                else if ((current_char >='g' && current_char <= 'z') || (current_char >= 'G' && current_char <= 'Z'))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
+                }
                 else if (current_char == '_')
                 {
                     //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
@@ -1005,6 +1047,12 @@ TOKEN get_next_token(FILE* text)
                     //Ostavame v stave HEXADECIMAL, pretoze moze byt viac ciferne sestnastkove cislo
                     zero_int = false;
                     state = HEXADECIMAL;
+                }
+                else if ((current_char >='g' && current_char <= 'z') || (current_char >= 'G' && current_char <= 'Z'))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
                 }
                 else if (current_char == '_')
                 {
