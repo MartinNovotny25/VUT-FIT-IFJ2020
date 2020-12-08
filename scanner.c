@@ -846,9 +846,15 @@ TOKEN get_next_token(FILE* text)
 ///BASE ROZSIRENIE
                 
             case BINARY:
-                if ((current_char == '0') || (current_char == '1'))
+                if (current_char == '0')
                 {
                     //Ostavame v stave BINARY, pretoze moze byt viac ciferne binarne cislo
+                    //zero_int = true;
+                    state = BINARY_ZERO;
+                }
+                else if (current_char == '1')
+                {
+                    zero_int = false;
                     state = BINARY;
                 }
                 else if (current_char == '_')
@@ -859,16 +865,84 @@ TOKEN get_next_token(FILE* text)
                 else
                 {
                     //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
-                    unload_c(text);
-                    end_token(t_INT_NON_ZERO, &token);
-                    return token;
+                    if(zero_int==false)
+                    {
+                        unload_c(text);
+                        end_token(t_INT_NON_ZERO, &token);
+                        return token;
+                    }
+                }
+                break;
+                
+            case BINARY_ZERO:
+                if (current_char == '0')
+                {
+                    //zero_int = true;
+                    state = BINARY_ZERO;
+                }
+                else if (current_char == '1')
+                {
+                    zero_int = false;
+                    state = BINARY;
+                }
+                else if (current_char == '_')
+                {
+                    //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
+                    remove_();
+                }
+                else
+                {
+                    if(zero_int)
+                    {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
+                        unload_c(text);
+                        end_token(t_INT_ZERO, &token);
+                        return token;
+                    }
+                    else if (zero_int == false)
+                    {
+                        unload_c(text);
+                        end_token(t_INT_NON_ZERO, &token);
+                        return token;
+                    }
                 }
                 break;
                 
             case OCTAL:
-                if (isdigit(current_char))
+                if ((isdigit(current_char)) && (current_char!='0'))
                 {
                     //Ostavame v stave OCTAL, pretoze moze byt viac ciferne osmickove cislo
+                    zero_int = false;
+                    state = OCTAL;
+                }
+                else if (current_char == '0')
+                {
+                    state = OCTAL_ZERO;
+                }
+                else if (current_char == '_')
+                {
+                    //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
+                    remove_();
+                }
+                else
+                {
+                    if(zero_int==false)
+                    {
+                        unload_c(text);
+                        end_token(t_INT_NON_ZERO, &token);
+                        return token;
+                    }
+                }
+                break;
+                
+            case OCTAL_ZERO:
+                if (current_char == '0')
+                {
+                    state = OCTAL_ZERO;
+                }
+                else if ((isdigit(current_char)) && (current_char!='0'))
+                {
+                    zero_int = false;
                     state = OCTAL;
                 }
                 else if (current_char == '_')
@@ -878,17 +952,58 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
-                    //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
-                    unload_c(text);
-                    end_token(t_INT_NON_ZERO, &token);
-                    return token;
+                    if(zero_int)
+                    {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
+                        unload_c(text);
+                        end_token(t_INT_ZERO, &token);
+                        return token;
+                    }
+                    else if (zero_int == false)
+                    {
+                        unload_c(text);
+                        end_token(t_INT_NON_ZERO, &token);
+                        return token;
+                    }
                 }
                 break;
                 
             case HEXADECIMAL:
-                if ((isdigit(current_char)) || (current_char == 'A') || (current_char == 'a') || (current_char == 'B') || (current_char == 'b') || (current_char == 'C') || (current_char == 'c') || (current_char == 'D') || (current_char == 'd') || (current_char == 'E') || (current_char == 'e') || (current_char == 'F') || (current_char == 'f'))
+                if (((isdigit(current_char)) || (current_char == 'A') || (current_char == 'a') || (current_char == 'B') || (current_char == 'b') || (current_char == 'C') || (current_char == 'c') || (current_char == 'D') || (current_char == 'd') || (current_char == 'E') || (current_char == 'e') || (current_char == 'F') || (current_char == 'f')) && (current_char!='0'))
                 {
                     //Ostavame v stave HEXADECIMAL, pretoze moze byt viac ciferne sestnastkove cislo
+                    zero_int = false;
+                    state = HEXADECIMAL;
+                }
+                else if (current_char == '0')
+                {
+                    state = HEXA_ZERO;
+                }
+                else if (current_char == '_')
+                {
+                    //odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
+                    remove_();
+                }
+                else
+                {
+                    if(zero_int==false)
+                    {
+                        unload_c(text);
+                        end_token(t_INT_NON_ZERO, &token);
+                        return token;
+                    }
+                }
+                break;
+             
+            case HEXA_ZERO:
+                if (current_char == '0')
+                {
+                    state = HEXA_ZERO;
+                }
+                else if (((isdigit(current_char)) || (current_char == 'A') || (current_char == 'a') || (current_char == 'B') || (current_char == 'b') || (current_char == 'C') || (current_char == 'c') || (current_char == 'D') || (current_char == 'd') || (current_char == 'E') || (current_char == 'e') || (current_char == 'F') || (current_char == 'f')) && (current_char!='0'))
+                {
+                    //Ostavame v stave HEXADECIMAL, pretoze moze byt viac ciferne sestnastkove cislo
+                    zero_int = false;
                     state = HEXADECIMAL;
                 }
                 else if (current_char == '_')
@@ -898,13 +1013,24 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
-                    //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
-                    unload_c(text);
-                    end_token(t_INT_NON_ZERO, &token);
-                    return token;
+                    if(zero_int)
+                    {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
+                        unload_c(text);
+                        end_token(t_INT_ZERO, &token);
+                        return token;
+                    }
+                    else if (zero_int == false)
+                    {
+                        unload_c(text);
+                        end_token(t_INT_NON_ZERO, &token);
+                        return token;
+                    }
                 }
                 break;
-             
+                    
+                    
+                    
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 
