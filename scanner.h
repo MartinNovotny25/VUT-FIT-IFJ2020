@@ -78,6 +78,10 @@
 #define t_PACKAGE_CONTROLL3 64
 #define t_PACKAGE_CONTROLL4 65
 #define t_PACKAGE 66
+#define MULTILINE_HELP 67
+#define BINARY_ZERO 68
+#define OCTAL_ZERO 69
+#define HEXA_ZERO 70
 #define t_DOLLAR 100
 
 
