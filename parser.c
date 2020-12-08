@@ -1122,11 +1122,17 @@ void rule_return() {
                             || (token.type == t_MULTIPLY)
                             || (token.type == t_RIGHT_BRACKET)
                             || (token.type == t_LEFT_BRACKET)
+                            || (token.type == t_LESS)
+                            || (token.type == t_LESSOREQUAL)
+                            || (token.type == t_GREATER)
+                            || (token.type == t_GREATEROREQUAL)
+                            || (token.type == t_EQUAL)
+                            || (token.type == t_NOT_EQUAL)
                             || (token.type == t_IDENTIFIER)
                             || (token.type == t_FLOAT)
                             || (token.type == t_INT_NON_ZERO)
                             || (token.type == t_INT_ZERO)
-                            || (token.type == t_STRING)) {
+                            || (token.type == t_STRING)){
 
                             TDLLInsertLast(&psa_list, token);
                             token = get_next_token(stdin);
@@ -1134,6 +1140,10 @@ void rule_return() {
 
                         } else { error_call(ERR_SYN, &tokens); }
                     }
+
+                    evaluation(&psa_list, &tokens);
+                    TDLLDisposeList(&psa_list);
+
                 }
 
 
@@ -1217,14 +1227,12 @@ void rule_return_type_n() {
 
 //predtym pride ciarka a zavola sa rule_exp_n a nacita sa token
 void rule_exp_n() {
-    printf("EXP_N s tokenom %d\n",token.type);
 
     //token = get_next_token(stdin);
     //TDLLInsertLast(&tokens, token);
 
     if (token.type == t_EOL)
     {
-        printf("VON\n");
         return;
 
     } else if (token.type == t_BRACES_L) {
