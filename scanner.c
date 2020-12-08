@@ -18,7 +18,7 @@ char current_char5;
 /* Vymazavanie current_tokenu (napr. chodia medzery-vtedy ich vyhodime a
 pokracujeme dalej)*/
 
-
+/*
 int main()
 {
     TOKEN a;
@@ -35,7 +35,7 @@ int main()
     }
     return 0;
 }
-
+*/
 
 //Funkcia na odstranovanie znaku '_'
 void remove_(void)
