@@ -232,6 +232,16 @@ bool isExpression(TDLList *L, int *type, tBSTNodePtrLocal *node) {
                 BSTDisposeLocal(node);
             }
         }
+        //najdeme relacny operator
+        if (L->Act->tdata.type == t_LESS ||
+            L->Act->tdata.type == t_GREATER ||
+            L->Act->tdata.type == t_LESSOREQUAL ||
+            L->Act->tdata.type == t_GREATEROREQUAL ||
+            L->Act->tdata.type == t_EQUAL) {
+            error_call(ERR_SEM_EXCOMPAT, L);
+            BSTDisposeGlobal(&functions);
+            BSTDisposeLocal(node);
+        }
         //nasli sme id
         if (L->Act->tdata.type == t_IDENTIFIER) {
             //nchadza sa v tabulke, do typ sa ulozi jeho typ
@@ -337,7 +347,6 @@ void checkReturnStatement(TDLList *L, char *id, tBSTNodePtrLocal *node) {
             BSTDisposeLocal(node);
         }
     }
-    
     
     
     //ziadne navratove typy
