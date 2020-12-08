@@ -1120,7 +1120,7 @@ void rule_return() {
 
                 TDLLInitList(&psa_list);
 
-                if (token.type == t_EOL) {error_call(ERR_SYN, &tokens);}
+                if (token.type == t_EOL) {error_call(ERR_SEM_RETURN, &tokens);}
                 else {
 
                     while (token.type != t_COMMA && token.type != t_EOL) {
