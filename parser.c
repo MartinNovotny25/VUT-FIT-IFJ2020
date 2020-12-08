@@ -48,6 +48,8 @@ void rule_func_body();
 
 void rule_type();
 
+void rule_return_type();
+
 //PRAVIDLO RETURN_TYPE nie je implementované, bol by to zbytočný medzikrok -- asi by som to mal upraviť v gramatike
 void rule_return_type_n();
 
@@ -227,13 +229,8 @@ void rule_func_retlist_body() {
 
     }
 }
-// Funkcia pre neterminál rule_func_body
-// case t_RIGHT_BRACKET -- Príde ukončovacia zátvorka, zoznam návratových typov je prázdny, return sa nevynucuje
-// zvyšné cases -- špecifikácie návratových typov, return sa vynucuje
-// v tomto prípade pokracuje neterminál RETURN_TYPE_N pre dalsie možné návratové typy
 
-
-void rule_func_body() {
+void rule_return_type() {
     switch (token.type) {
         case t_RIGHT_BRACKET:
             //token = get_next_token(stdin);
@@ -260,6 +257,21 @@ void rule_func_body() {
             break;
 
     }
+
+}
+
+
+
+
+// Funkcia pre neterminál rule_func_body
+// case t_RIGHT_BRACKET -- Príde ukončovacia zátvorka, zoznam návratových typov je prázdny, return sa nevynucuje
+// zvyšné cases -- špecifikácie návratových typov, return sa vynucuje
+// v tomto prípade pokracuje neterminál RETURN_TYPE_N pre dalsie možné návratové typy
+
+
+void rule_func_body() {
+    //pravidlo return_type
+    rule_return_type();
 
     //V prípade, že nám nepríde ukončovacia zátvorka zoznamu návratových typov, ERROR.
 
@@ -1029,11 +1041,7 @@ void rule_for_assign() {
             //token = get_next_token(stdin); TDLLInsertLast(&tokens, token);
 
             rule_exp_n();
-
-            //sem pride psa
-            /*if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
-                token.type != t_INT_NON_ZERO && token.type != t_INT_ZERO) { error_call(ERR_SYN, &tokens); }
-            else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }*/
+            
 
             break;
 
