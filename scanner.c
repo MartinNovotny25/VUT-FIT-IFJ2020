@@ -21,9 +21,10 @@ pokracujeme dalej)*/
 
 int main()
 {
+    TOKEN a;
     while (1)
     {
-        TOKEN a;
+        //TOKEN a;
         a = get_next_token(stdin);
         //printf("%d\n", a.type );
         if (a.type == t_EOF)
@@ -555,7 +556,9 @@ TOKEN get_next_token(FILE* text)
                     //V pripade nepovoleneho znaku, koncime tokenom /
                     unload_c(text);
                     end_token(t_DIVIDE, &token);
-                    return token;
+                    //return token;
+                    state = START;
+                    break;
                 }
                 break;
                 
@@ -566,7 +569,9 @@ TOKEN get_next_token(FILE* text)
                     //end_token(t_EOL, &token);
                     First_token = true;
                     delete_string();
-                    return token;
+                    //return token;
+                    state = START;
+                    break;
                 }
                 else if (current_char == EOF)
                 {
@@ -574,7 +579,9 @@ TOKEN get_next_token(FILE* text)
                     unload_c(text);
                     //end_token(t_EOL, &token);
                     delete_string();
-                    return token;
+                    //return token;
+                    state = START;
+                    break;
                 }
                 if (current_char == '\r')
                 {
@@ -582,7 +589,9 @@ TOKEN get_next_token(FILE* text)
                     //end_token(t_EOL, &token);
                     First_token = true;
                     delete_string();
-                    return token;
+                    //return token;
+                    state = START;
+                    break;
                 }
                 else
                 {
@@ -614,8 +623,9 @@ TOKEN get_next_token(FILE* text)
                     //end_token(t_EOL, &token);
                     First_token = true;
                     delete_string();
-                    return token;
-                    
+                    //return token;
+                    state = START;
+                    break;
                 }
                 else
                 {
