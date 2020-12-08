@@ -1111,7 +1111,7 @@ void rule_return() {
             token = get_next_token(stdin);
             TDLLInsertLast(&tokens, token);
 
-            // Ak je prítomnost RETURN nutná -- definicia obsahuje návratové typy
+            // Ak je prítomnost RETURN nutná -- definicia obsahuje návratové typy // PRAVIDLO REQUIRED RETURN
             if (is_return == true) {
                 //pokial za returnom nenasledujú návratové hodnoty -- ERROR -- kontrolovat ci sú správne robí GENERATOR
                 /*if (token.type != t_IDENTIFIER && token.type != t_FLOAT && token.type != t_STRING &&
@@ -1170,10 +1170,10 @@ void rule_return() {
                 else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }*/
 
 
-                // Ak je prítomnosť RETURN nepovinná
+                // Ak je prítomnosť RETURN nepovinná // PRAVIDLO OPTIONAL RETURN
             } else if (is_return == false) {
                 // Nic nevraciame, cize za RETURNOM musí ísť eol
-                if (token.type != t_EOL) { error_call(ERR_SYN, &tokens); }
+                if (token.type != t_EOL) { error_call(ERR_SEM_RETURN, &tokens); }
                 else { token = get_next_token(stdin); TDLLInsertLast(&tokens, token); }
 
                 // Možné eoly na konci
