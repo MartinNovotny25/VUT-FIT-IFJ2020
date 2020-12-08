@@ -563,22 +563,25 @@ TOKEN get_next_token(FILE* text)
                 if (current_char == '\n')
                 {
                     //Koncime tokenom EOL (ONE LINE COMMENT)
-                    end_token(t_EOL, &token);
+                    //end_token(t_EOL, &token);
                     First_token = true;
+                    delete_string();
                     return token;
                 }
                 else if (current_char == EOF)
                 {
                     //Koncime tokenom EOL
                     unload_c(text);
-                    end_token(t_EOL, &token);
+                    //end_token(t_EOL, &token);
+                    delete_string();
                     return token;
                 }
                 if (current_char == '\r')
                 {
                     //Koncime tokenom EOL (ONE LINE COMMENT)
-                    end_token(t_EOL, &token);
+                    //end_token(t_EOL, &token);
                     First_token = true;
+                    delete_string();
                     return token;
                 }
                 else
@@ -607,10 +610,10 @@ TOKEN get_next_token(FILE* text)
             case MULTILINE_2:
                 if (current_char == '/')
                 {
-                    //remove_();
                     //Koncime tokenom Multiline Comment /* */
-                    end_token(t_EOL, &token);
+                    //end_token(t_EOL, &token);
                     First_token = true;
+                    delete_string();
                     return token;
                     
                 }
