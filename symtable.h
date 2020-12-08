@@ -1,9 +1,17 @@
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Hlavickovy subor tabulky symbolov(sucast semantickej analyzy) pre projekt IFJ2020
+*  Vytvoril: Peter Cellar - xcella01
+*
+*  Datum: 10/2020
+*/
+
 #ifndef symtable_h
 #define symtable_h
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdarg.h>
-#include<string.h>  // for strcmp()
+#include<string.h>
 #include<stdbool.h>
 
 #define MAXSTACK 1000
@@ -17,70 +25,58 @@
  
 // Datova struktura pre ukladanie informacii o funkcii (glob. premenne nie su sucastou ifj20)
 typedef struct global{
-    //bool defined;
-    //bool is_function;
-    int numOfParams;
-    int numOfReturns;
-    //pole parametrov
-    char *params[MAXPARAMS];
-    //pole typov parametrov
-    int paramsType[MAXPARAMS];
-    //pole navratovych typov
-    int returns[MAXPARAMS];
-    //struct tBSTNodeLocal * LocalVarTree;   // pointer to the tree of local variables of the function, if is_funtion == False then LocalVarTree is NULL;
+    int numOfParams;                    //pocet parametrov
+    int numOfReturns;                   //pocetnavratovych hodnot
+    char *params[MAXPARAMS];            //pole ukladajuce mena parametrov
+    int paramsType[MAXPARAMS];          //pole typov parametrov
+    int returns[MAXPARAMS];             //pole navratovych typov
 }functionData ;
 
 
 
 // Lokalny strom. resp. pre premenne,konstanty,... vo funkcii,if-else,for
-// Note : We dont need to know if local variable is defined because it has to be defined before it is used.
 typedef struct tBSTNodeLocal {
-    char* Name;                    /* key */  /* data */
-    int Type;
-    char *Data;
-	struct tBSTNodeLocal* LPtr;    /* left subtree*/
-	struct tBSTNodeLocal* RPtr;    /* right subtree */
+    char* Name;                         //kluc
+    int Type;                           //typ premennej
+    char *Data;                         //momentalne nevyuzite
+	struct tBSTNodeLocal* LPtr;         //lavy podstrom
+	struct tBSTNodeLocal* RPtr;         //pravy podstrom
 } *tBSTNodePtrLocal;
 
 
 // Strom pre funkcie resp. Globalny strom
 typedef struct tBSTNodeGlobal {
-    char * Name;                    /* key */
-    functionData content;               /* data */
-	struct tBSTNodeGlobal * LPtr;         /* left subtree */
-	struct tBSTNodeGlobal * RPtr;         /* right subtree */
+    char * Name;                        //kluc
+    functionData content;               //informacie o funkcii
+	struct tBSTNodeGlobal * LPtr;       //lavy podstrom
+	struct tBSTNodeGlobal * RPtr;       //pravy podstrom
 } *tBSTNodePtrGlobal;
 
-// Hlavny zasobnik. Uklada Stromy obsahujuce info
+// Hlavny zasobnik. Uklada ukazatele na stromy
 typedef struct	{                          
-    int top;
-    tBSTNodePtrLocal *a[MAXSTACK];
+    int top;                            //vrchol zasobnika(pocet aktualne ulozenych ukazatelov)
+    tBSTNodePtrLocal *a[MAXSTACK];      //pole ukazatelov
 }MainStack;
 
 
-/* function prototypes */
+/* prototypy funkcii */
 
-// Initialize tree for global variables or func
+
 void BSTInitGlobal   (tBSTNodePtrGlobal *);
-// Find out if the func/var is already in tree + get data
 bool BSTSearchGlobal  (tBSTNodePtrGlobal, char *, functionData *);
-// Insert func/var into tree + data
 void BSTInsertGlobal (tBSTNodePtrGlobal *, char *, functionData);
-// Delete entire tree
 void BSTDisposeGlobal (tBSTNodePtrGlobal *);
-// Inicializacia functionData
-//void BSTFunctionDataInit (functionData *);
+
+
 
 void BSTInitLocal   (tBSTNodePtrLocal *);
-// Find out if the func/var is already in tree + get data
 bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data);
-// Insert func/var into tree + data
 void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data);
 void ReplaceByRightmost (tBSTNodePtrLocal PtrReplaced, tBSTNodePtrLocal *RootPtr);
-// delete node in tree
 void BSTDelete (tBSTNodePtrLocal *RootPtr, char *K);
-// Delete entire tree
 void BSTDisposeLocal(tBSTNodePtrLocal *);
+
+
 
 void InitMainStack (MainStack *S);
 void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal);

@@ -1,12 +1,14 @@
-/* 
-**	Part of IFJ Project 2019/2020
-**	Author: Samuel Stuchly xstuch06
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Zdrojovy subor tabulky symbolov(sucast semantickej analyzy) pre projekt IFJ2020
+*  Vytvoril: Peter Cellar - xcella01
+*
+*  Datum: 10/2020
 */
-
 #include "symtable.h"
 
 
-// TODO : fix documentation
+
 
 tBSTNodePtrGlobal GlobalBody ;
 tBSTNodePtrLocal LocalVariables;
@@ -14,24 +16,28 @@ tBSTNodePtrLocal  GFDefinedVarsTree;
 tBSTNodePtrLocal  LFDefinedVarsTree;
 
 
+
+// ========================================= GLOBALNY STROM ============================================== //
+
+/*
+ - tato funkcia inicializuje globalny strom
+ @param RootPtr ukazatel na uzol globalneho stromu
+ */
 void BSTInitGlobal (tBSTNodePtrGlobal *RootPtr) {
-/*   -------
-** Function inicializes tree before its first use.
-**/
+
 	*(RootPtr) = NULL;
 
 }	
 
+/*
+ - tato funkcia prehladava globalny strom a hlada zadany kluc == name
+ - ak je uzol s takym klucom najdeny, vracia sa TRUE a vracia obsah uzlu v premennej Content
+ - ak uzol s danym klucom nie je najdeny, vracia FALSE a obsah premennej Content neni definovany
+ @param RootPtr ukazatel na uzol globalneho stromu
+ @param name hladany kluc(retazec)
+ @param Content vracia data v pripade najdenia kluca
+ */
 bool BSTSearchGlobal (tBSTNodePtrGlobal RootPtr, char* name,functionData *Content)	{
-/*  ---------
-** Function searches for a node with key == name.
-**
-** Pokud je takový nalezen, vrací funkce hodnotu TRUE a v proměnné Content se
-** vrací obsah příslušného uzlu.´Pokud příslušný uzel není nalezen, vrací funkce
-** hodnotu FALSE a obsah proměnné Content není definován (nic do ní proto
-** nepřiřazujte).
-**/
-
 
 	if (RootPtr != NULL)
 	{
@@ -57,10 +63,15 @@ bool BSTSearchGlobal (tBSTNodePtrGlobal RootPtr, char* name,functionData *Conten
 	}
 } 
 
-
+/*
+ - tato funkcia vlozi uzol s danym klucom a datamy do globalneho stromu
+ @param RootPtr ukazatel na uzol globalneho stromu
+ @param name kluc vkladaneho uzla
+ @param Content data uzla
+ */
 void BSTInsertGlobal (tBSTNodePtrGlobal* RootPtr, char* name, functionData Content)	{
 
-    //printf("Symtable: Inserting function\n");
+    
 	if (*RootPtr == NULL)
 	{
 		*RootPtr = malloc(sizeof (struct tBSTNodeGlobal));	
@@ -72,7 +83,7 @@ void BSTInsertGlobal (tBSTNodePtrGlobal* RootPtr, char* name, functionData Conte
 
 	else if (strcmp(name, (*RootPtr)->Name) == 0)
 	{														
-		(*RootPtr)->content = Content;					//if found , only data changes 
+		(*RootPtr)->content = Content;
 
 	}
 	else if (strcmp(name, (*RootPtr)->Name) < 0)     	
@@ -83,17 +94,14 @@ void BSTInsertGlobal (tBSTNodePtrGlobal* RootPtr, char* name, functionData Conte
 	{
 		BSTInsertGlobal(&(*RootPtr)->RPtr,name,Content);
 	}
-	
-	//printf("Symtable: Function inserted succesfully\n");
 }
 
+/*
+ - tato funkcia rekurzivne vymaze cely globalny strom a korektne uvolni pamat
+ @param RootPtr ukazatel na uzol globalneho stromu
+*/
+void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {
 
-void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {	
-/*   
-** Deletes entire binary tree and correctly frees allocated memory.
-**/	
-
-    printf("Symtable: Disposing all nodes...\n");
 	if (*RootPtr != NULL)					
 	{
 		BSTDisposeGlobal(&(*RootPtr)->LPtr);
@@ -103,17 +111,12 @@ void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {
 	}
 }
 
+// ========================================= LOKALNY STROM ============================================== //
 
-/*void BSTFunctionDataInit(functionData *data) {
-    data->numOfParams = 0;
-    data->numOfReturns = 0;
-    data->params[MAXPARAMS] = {NULL};
-    data->returns[MAXPARAMS] = {0};
-    data->paramsType[MAXPARAMS] = {0};
-}*/
-
-// ========================================= LOCAL TREE ==================================================== //
-
+/*
+- tato funkcia inicializuje lokalny strom
+@param RootPtr ukazatel na uzol lokalneho stromu
+*/
 void BSTInitLocal (tBSTNodePtrLocal *RootPtr) {
 	
 	printf("Inicializoval som lokalny strom\n");
@@ -121,6 +124,15 @@ void BSTInitLocal (tBSTNodePtrLocal *RootPtr) {
 
 }	
 
+/*
+- tato funkcia prehladava lokalny strom a hlada zadany kluc == name
+- ak je uzol s takym klucom najdeny, vracia sa TRUE a vracia data v premennych Content a Type
+- ak uzol s danym klucom nie je najdeny, vracia FALSE a obsah premennej Content a Type neni definovany
+@param RootPtr ukazatel na uzol lokalneho stromu
+@param name hladany kluc(retazec)
+@param Type vracani typ ulozeneho identifikatora
+@param Content vracane data v pripade najdenia kluca
+*/
 bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data)    {
 
 
@@ -130,22 +142,17 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
     {
         if ((strcmp(name, RootPtr->Name) < 0))
         {
-            printf("SOM V 1st if\n");
             return BSTSearchLocal(RootPtr->LPtr,name, Type, Data);
                 
         }
         else if (strcmp(name, RootPtr->Name) > 0)
         {
-            printf("SOM V 2nd if\n");
             return BSTSearchLocal(RootPtr->RPtr,name, Type, Data);
         }
         else
         {
-            printf("SOM V ELSE - TU CHCEM BYT\n");
             *Type = RootPtr->Type;
-            //printf("SOM V ELSE - 1\n");
             //*Data = *RootPtr->Data;
-           // printf("SOM V ELSE - 2\n");
             return true;
         }
     }
@@ -157,7 +164,13 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
 }
  
 
-
+/*
+- tato funkcia vlozi uzol s danym klucom a datamy do lokalneho stromu
+@param RootPtr ukazatel na uzol lokalneho stromu
+@param name kluc vkladaneho uzla
+@param Type typ ukladaneho identifikatora
+@param Content data uzla
+*/
 void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data)	{
 
 	printf("NAZOV: %s,TYP: %d, HODNOTA: %s\n", Name, *Type, Data);
@@ -169,14 +182,9 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Da
 		(*RootPtr)->RPtr = NULL;	
 		(*RootPtr)->Type = *Type;
 		(*RootPtr)->Data = Data;
-	//	printf("Vlozil som prvy uzol\n");
+	
 	}else if (strcmp(Name, (*RootPtr)->Name) == 0)
-	{		
-		// this state should never be called since parser should check if local var is in tree
-		// before trying to insert it again.
-		// TODO :  when parser is done this should be deleted becase it is a dead code !!!								
-	//	printf("THIS CODE SHOULD NEVER BE REACHED!\n"); 
-		
+	{
 	}else if (strcmp(Name, (*RootPtr)->Name) < 0)     	
 	{
 	//	printf("Vlkadam dolava\n");
@@ -188,19 +196,13 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Da
 	}
 }
 
+
+/*
+ - pomocna funkcia na vyhladanie, presun a uvolnenie najpravejsieho uzlu
+ @param PtrReplaced ukazatel na uzol, do ktoreho bude presunuta hodnota najpravejsieho uzlu v postrome
+ @param RootPtr ukazatel na podstrom(uzol), kde bude hladany najpravejsi uzol
+ */
 void ReplaceByRightmost (tBSTNodePtrLocal PtrReplaced, tBSTNodePtrLocal *RootPtr) {
-/*   ------------------
-** Pomocná funkce pro vyhledání, přesun a uvolnění nejpravějšího uzlu.
-**
-** Ukazatel PtrReplaced ukazuje na uzel, do kterého bude přesunuta hodnota
-** nejpravějšího uzlu v podstromu, který je určen ukazatelem RootPtr.
-** Předpokládá se, že hodnota ukazatele RootPtr nebude NULL (zajistěte to
-** testováním před volání této funkce). Tuto funkci implementujte rekurzivně.
-**
-** Tato pomocná funkce bude použita dále. Než ji začnete implementovat,
-** přečtěte si komentář k funkci BSTDelete().
-**/
-	
 
 	if(*RootPtr != NULL && PtrReplaced != NULL){
 		if((*RootPtr)->RPtr != NULL){ 
@@ -214,19 +216,12 @@ void ReplaceByRightmost (tBSTNodePtrLocal PtrReplaced, tBSTNodePtrLocal *RootPtr
 		}
 	}else return;
 }
-
+/*
+ - tato funkcia zrusi uzol stromu, ktory obsahuje kluc K
+ @param RootPtr ukazatel na uzol lokalneho stromu
+ @param K hladany kluc(retazec)
+ */
 void BSTDelete (tBSTNodePtrLocal *RootPtr, char *K) {
-/*   ---------
-** Zruší uzel stromu, který obsahuje klíč K.
-**
-** Pokud uzel se zadaným klíčem neexistuje, nedělá funkce nic.
-** Pokud má rušený uzel jen jeden podstrom, pak jej zdědí otec rušeného uzlu.
-** Pokud má rušený uzel oba podstromy, pak je rušený uzel nahrazen nejpravějším
-** uzlem levého podstromu. Pozor! Nejpravější uzel nemusí být listem.
-**
-** Tuto funkci implementujte rekurzivně s využitím dříve deklarované
-** pomocné funkce ReplaceByRightmost.
-**/
 
 	if(*RootPtr != NULL){ // nemame prazdny uzol
 		if((*RootPtr)->Name > K){ // kluc je vlavo 
@@ -259,6 +254,10 @@ void BSTDelete (tBSTNodePtrLocal *RootPtr, char *K) {
 	}
 }
 
+/*
+- tato funkcia rekurzivne vymaze cely lokalny strom a korektne uvolni pamat
+@param RootPtr ukazatel na uzol lokalneho stromu
+*/
 void BSTDisposeLocal (tBSTNodePtrLocal *RootPtr) {	
 
 
@@ -277,15 +276,27 @@ void BSTDisposeLocal (tBSTNodePtrLocal *RootPtr) {
 
 }
 
+// ========================================= ZASOBNIK STROMOV ============================================== //
+
+
+/*
+ - tato funkcia inicializuje zasobnik ukazatelov na lokalne stromy
+ */
 void InitMainStack (MainStack *S)
 {
 	S->top = 0;
 }
 
-// Vlozi Globalny strom s info alebo lokalny strom s info(infosky su ulozene v strome)
+
+/*
+ - tato funkcia vlozi ukazatel na lokalny strom do zasobnika
+ @param S zasobnik ukazatelov na lokalne stromy
+ @param ptrLocal vkladany ukazatel
+ */
 void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal)
 {
-                 /* Při implementaci v poli může dojít k přetečení zásobníku. */
+
+    
   if (S->top==MAXSTACK)
    printf("Chyba: Došlo k přetečení zásobníku s ukazateli!\n");
   else {
@@ -295,8 +306,10 @@ void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal)
 	}
 }
 
-// Vyhodi vrchny strom
-// Asi bude treba upravit
+/*
+ - tato funkcia odstrani vrchny ukazatel zo zasobnika
+ @param S zasobnik ukazatelov na lokalne stromy
+ */
 tBSTNodePtrLocal PopTreeMain (MainStack *S)
 {
 	tBSTNodePtrLocal temp;
@@ -306,7 +319,10 @@ tBSTNodePtrLocal PopTreeMain (MainStack *S)
 	return temp;
 }
 
-// Vycisti cely hlavny zasobnik
+/*
+ - tato funkcia odstrani cely obsah zasobnika
+ @param S zasobnik ukazatelov na lokalne stromy
+ */
 bool EmptyMainStack (MainStack *S)
 {
   return(S->top==0);

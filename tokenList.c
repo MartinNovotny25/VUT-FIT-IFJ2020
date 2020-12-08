@@ -13,68 +13,12 @@
 #include "tokenList.h"
 #include "scanner.h"
 
-/*
- void TDLLInitList (TDLList *);          //inicializacia zoznamu
- void TDLLDisposeList (TDLList *);       //zrusenie vsetkych prvkov
- void TDLLInsertFirst (TDLList *, int);  //vlozenie prvku na zaciatok zoznmu
- void TDLLInsertLast(TDLList *, int);    //vlozenie prvku na koniec zoznamu
- void TDLLFirst (TDLList *);             //nastavenie aktivity na prvy prvok
- void TDLLLast (TDLList *);              //nastavenie aktivity na posedny prvok
- void TDLLCopyFirst (TDLList *, int *);  //vracia hodnotu prveho prvku
- void TDLLCopyLast (TDLList *, int *);   //vracia hodnotu posledneho prvku
- void TDLLDeleteFirst (TDLList *);       //odstranenie prveho prvku
- void TDLLDeleteLast (TDLList *);        //odstranenie posledneho prvku
- void TDLLPostDelete (TDLList *);        //odstranenie prvku za aktivnym prvkom
- void TDLLPreDelete (TDLList *);         //odstranenie prvku pred aktivnym prvkom
- void TDLLPostInsert (TDLList *, int);   //vlozenie prvku za aktivny prok
- void TDLLPreInsert (TDLList *, int);    //vlozenie prvku pred aktivny prvok
- void TDLLCopy (TDLList *, int *);       //vracia hodnotu aktivneho prvku
- void TDLLActualize (TDLList *, int);    //prepisanie dat aktivneho prvku
- void TDLLSucc (TDLList *);              //posun aktivity doprava
- void TDLLPred (TDLList *);              //posun aktivity dolava
- int TDLLActive (TDLList *);             //zistuje aktivitu zoznamu
- */
 
-/*
-int main()                          //tmp main pre potreby testovania
-{
-    printf("entered main\n");
-    int ascii = 65;
-    
-    TDLList tmpL;
-    TDLLInitList(&tmpL);
-    
-    TOKEN tmpTOKEN[5];
-    
-    for (int i = 0; i < 5; i++) {
-        printf("entered for\n");
-        tmpTOKEN[i].lex = "ascii";
-        tmpTOKEN[i].type = i;
-        printf("%d  %s\n", tmpTOKEN[i].type,  tmpTOKEN[i].lex);
-        ascii++;
-        TDLLInsertLast(&tmpL, tmpTOKEN[i]);
-        TDLLFirst(&tmpL);
-    }
-    printf("for ^\n     Print all tokens \\/\n");
-    //while (tmpL.Act != NULL) {
-    //    printf("entered while\n");
-     //   printf("%d  %s\n", tmpL.Act->tdata.type,  tmpL.Act->tdata.lex);
-      //  TDLLSucc(&tmpL);
-    }
-    TDLLPrintAllTokens(&tmpL);
-    TDLLDisposeList(&tmpL);
-    printf("return iminent\n");
-    return 0;
-}
-*/
 
 void DLError() {
 //nema prakticke vyuzite v projekte
 //TODO overit ci vymazanie nic nerozbije a vymazat
-/*
-** Vytiskne upozornění na to, že došlo k chybě.
-** Tato funkce bude volána z některých dále implementovaných operací.
-**/
+
     printf ("tokenList: *ERROR* The program has performed an illegal operation.\n");
     //errflg = TRUE;             /* globální proměnná -- příznak ošetření chyby */
     return;
@@ -82,7 +26,10 @@ void DLError() {
 
 
 
-
+/*
+- tato funckia vytlaci cely obsah zoznamu
+@param L ukazatel na zoznam
+*/
 void TDLLPrintAllTokens(TDLList *L) {
     printf("tokenList: Printing all tokens from DL list...\n\n");
     TDLLFirst(L);
@@ -100,29 +47,27 @@ void TDLLPrintAllTokens(TDLList *L) {
     TDLLFirst(L);                                      //aktivita sa vrati na zaciatok
 }
 
-void TDLLInitList (TDLList *L) {
 /*
-** Provede inicializaci seznamu L před jeho prvním použitím (tzn. žádná
-** z následujících funkcí nebude volána nad neinicializovaným seznamem).
-** Tato inicializace se nikdy nebude provádět nad již inicializovaným
-** seznamem, a proto tuto možnost neošetřujte. Vždy předpokládejte,
-** že neinicializované proměnné mají nedefinovanou hodnotu.
-**/
-    //printf("som v InitList\n");
+- inicializuje zoznam L pred prvym pouzitim
+@param L ukazatel na zoznam
+*/
+void TDLLInitList (TDLList *L) {
+
     L->First = NULL;        //vsetky ukazetele zoznamu nastavi na NULL
     L->Last = NULL;
     L->Act = NULL;
-    //printf("koncim InitList\n");
 }
 
-void TDLLDisposeList (TDLList *L) {
+
 /*
-** Zruší všechny prvky seznamu L a uvede seznam do stavu, v jakém
-** se nacházel po inicializaci. Rušené prvky seznamu budou korektně
-** uvolněny voláním operace free.
-**/
+- odstrani vsetky prvky zoznamu a korektne uvolni pamat
+- zanecha zoznam v stave, v akom sa nachadzal po inicializacii
+@param L ukazatel na zoznam
+*/
+void TDLLDisposeList (TDLList *L) {
+
     printf("tokenList: Disposing all Elements...\n");
-    TDLLElemPtr tmp = L->First;              //tmp ukazuje na prvy prvok
+    TDLLElemPtr tmp = L->First;             //tmp ukazuje na prvy prvok
     while (L->First != NULL) {              //zoznam nie je prazdny
         L->First = L->First->rptr;          //cyklus posuva ukazatel First do prava a uvolnuje pamat prvku pred nim
         free(tmp);
@@ -133,12 +78,13 @@ void TDLLDisposeList (TDLList *L) {
     L->Act = NULL;
 }
 
-void TDLLInsertFirst (TDLList *L, TOKEN token) {
 /*
-** Vloží nový prvek na začátek seznamu L.
-** V případě, že není dostatek paměti pro nový prvek při operaci malloc,
-** volá funkci DLError().
-**/
+ - vlozi novy prvok na zaciatok zoznamu
+ @param L ukazatel na zoznam
+ @param token token ktory bude ulozeny do zoznamu
+ */
+void TDLLInsertFirst (TDLList *L, TOKEN token) {
+
     TDLLElemPtr tmp = (TDLLElemPtr) malloc(sizeof(struct TDLLElem));       //alokacia pamate
     if (tmp == NULL) {                                 //overenie uspesnosti alokacie
         DLError();
@@ -156,20 +102,19 @@ void TDLLInsertFirst (TDLList *L, TOKEN token) {
     L->First = tmp;                                     //prvy prvok bude tmp
 }
 
-void TDLLInsertLast(TDLList *L, TOKEN token) {
+
 /*
-** Vloží nový prvek na konec seznamu L (symetrická operace k DLInsertFirst).
-** V případě, že není dostatek paměti pro nový prvek při operaci malloc,
-** volá funkci DLError().
-**/
-    
-    //printf("som v InsertLast a idem alokovat\n");
+- vlozi novy prvok na koniec zoznamu
+@param L ukazatel na zoznam
+@param token token ktory bude ulozeny do zoznamu
+*/
+void TDLLInsertLast(TDLList *L, TOKEN token) {
+
     TDLLElemPtr tmp = (TDLLElemPtr) malloc(sizeof(struct TDLLElem));       //alokacia pamate
     if (tmp == NULL) {
         DLError();
         return;
     }
-    //printf("som v InsertLast a po alokovani\n\n");
     tmp->tdata = token;                                    //nakopirovanie dat
     tmp->rptr = NULL;                                   //pravy ukazatel noveho prvku musi byt NULL
     tmp->lptr = L->Last;                                //lavy ukazatl noveho ukazuje na Last
@@ -182,29 +127,32 @@ void TDLLInsertLast(TDLList *L, TOKEN token) {
     L->Last = tmp;
 }
 
-void TDLLFirst (TDLList *L) {
 /*
-** Nastaví aktivitu na první prvek seznamu L.
-** Funkci implementujte jako jediný příkaz (nepočítáme-li return),
-** aniž byste testovali, zda je seznam L prázdný.
-**/
+ - nastavi aktivitu na prvy prvok zoznamu
+ @param L ukazatel na zoznam
+ */
+void TDLLFirst (TDLList *L) {
+
     L->Act = L->First;                  //nastavenie aktivity na prvy prvok
 }
 
-void TDLLLast (TDLList *L) {
+
 /*
-** Nastaví aktivitu na poslední prvek seznamu L.
-** Funkci implementujte jako jediný příkaz (nepočítáme-li return),
-** aniž byste testovali, zda je seznam L prázdný.
-**/
+- nastavi aktivitu na posledny prvok zoznamu
+@param L ukazatel na zoznam
+*/
+void TDLLLast (TDLList *L) {
+
     L->Act = L->Last;                  //nastavenie aktivity na posledny prvok
 }
 
-void TDLLCopyFirst (TDLList *L, TOKEN *token) {
 /*
-** Prostřednictvím parametru token vrátí hodnotu prvního prvku seznamu L.
-** Pokud je seznam L prázdný, volá funkci DLError().
-**/
+ - vracia obsah prveho prvku premennou token
+ @param L ukazatel na zoznam
+ @param token v tejto premennej sa vrati obsah prvku
+ */
+void TDLLCopyFirst (TDLList *L, TOKEN *token) {
+
     if (L->First == NULL) {             //zoznam je prazdny
         DLError();
         return;
@@ -212,11 +160,13 @@ void TDLLCopyFirst (TDLList *L, TOKEN *token) {
     *token = L->First->tdata;              //kopirovanie dat prveho prvku
 }
 
-void TDLLCopyLast (TDLList *L, TOKEN *token) {
 /*
-** Prostřednictvím parametru token vrátí hodnotu posledního prvku seznamu L.
-** Pokud je seznam L prázdný, volá funkci DLError().
-**/
+- vracia obsah posledneho prvku premennou token
+@param L ukazatel na zoznam
+@param token v tejto premennej sa vrati obsah prvku
+*/
+void TDLLCopyLast (TDLList *L, TOKEN *token) {
+
     if (L->First == NULL) {             //zoznam je prazdny
            DLError();
            return;
@@ -224,6 +174,10 @@ void TDLLCopyLast (TDLList *L, TOKEN *token) {
        *token = L->Last->tdata;            //kopirovanie dat z posledneho prvku
 }
 
+/*
+ - zrusi prvy prvok zoznamu L
+ @param L ukazatel na zoznam
+ */
 void TDLLDeleteFirst (TDLList *L) {
 /*
 ** Zruší první prvek seznamu L. Pokud byl první prvek aktivní, aktivita
@@ -248,12 +202,12 @@ void TDLLDeleteFirst (TDLList *L) {
     }
 }
 
-void TDLLDeleteLast (TDLList *L) {
 /*
-** Zruší poslední prvek seznamu L.
-** Pokud byl poslední prvek aktivní, aktivita seznamu se ztrácí.
-** Pokud byl seznam L prázdný, nic se neděje.
-**/
+- zrusi posledny prvok zoznamu L
+@param L ukazatel na zoznam
+*/
+void TDLLDeleteLast (TDLList *L) {
+
     if (L->First != NULL) {                      //zoznam nie je prazdny
         TDLLElemPtr tmp = L->First;
         if (L->First == L->Act) {
@@ -273,12 +227,12 @@ void TDLLDeleteLast (TDLList *L) {
     }
 }
 
-void TDLLPostDelete (TDLList *L) {
 /*
-** Zruší prvek seznamu L za aktivním prvkem.
-** Pokud je seznam L neaktivní nebo pokud je aktivní prvek
-** posledním prvkem seznamu, nic se neděje.
-**/
+- zrusi prvok zoznamu L za aktivnym prvkom
+@param L ukazatel na zoznam
+*/
+void TDLLPostDelete (TDLList *L) {
+
     if (L->Act && L->Act != L->Last) {              //zoznam musi byt aktivny inde ako na posledom prvku
         TDLLElemPtr tmp = L->Act->rptr;              //tmp bude ukazovat na odstranovany prvok
         if (tmp == L->Last) {                       //mazany prvok je posledny
@@ -293,12 +247,13 @@ void TDLLPostDelete (TDLList *L) {
     }
 }
 
-void TDLLPreDelete (TDLList *L) {
+
 /*
-** Zruší prvek před aktivním prvkem seznamu L .
-** Pokud je seznam L neaktivní nebo pokud je aktivní prvek
-** prvním prvkem seznamu, nic se neděje.
-**/
+- zrusi prvok zoznamu L pred aktivnym prvkom
+@param L ukazatel na zoznam
+*/
+void TDLLPreDelete (TDLList *L) {
+
     if (L->Act && L->Act != L->First) {             //zoznam musi byt aktivny inde ako na prvom prvku
         TDLLElemPtr tmp = L->Act->lptr;              //tmp bude ukazovat na odstranovany prvok
         if (tmp == L->First) {                      //odstranovan prvok je prvy
@@ -313,6 +268,11 @@ void TDLLPreDelete (TDLList *L) {
     }
 }
 
+/*
+- vlozi prvok do zoznamu L za aktivny prvok
+@param L ukazatel na zoznam
+@token vkladane data
+*/
 void TDLLPostInsert (TDLList *L, TOKEN token) {
 /*
 ** Vloží prvek za aktivní prvek seznamu L.
@@ -338,13 +298,14 @@ void TDLLPostInsert (TDLList *L, TOKEN token) {
     }
 }
 
-void TDLLPreInsert (TDLList *L, TOKEN token) {
+
 /*
-** Vloží prvek před aktivní prvek seznamu L.
-** Pokud nebyl seznam L aktivní, nic se neděje.
-** V případě, že není dostatek paměti pro nový prvek při operaci malloc,
-** volá funkci DLError().
-**/
+- vlozi prvok do zoznamu L pred aktivny prvok
+@param L ukazatel na zoznam
+@token vkladane data
+*/
+void TDLLPreInsert (TDLList *L, TOKEN token) {
+
     if (L->Act) {                                   //zoznam je aktivny
         TDLLElemPtr tmp = (TDLLElemPtr) malloc(sizeof(struct TDLLElem));   //alokacia pamati
         tmp->tdata = token;                            //kopirovanie dat
@@ -363,11 +324,13 @@ void TDLLPreInsert (TDLList *L, TOKEN token) {
     }
 }
 
-void TDLLCopy (TDLList *L, TOKEN *token) {
 /*
-** Prostřednictvím parametru token vrátí hodnotu aktivního prvku seznamu L.
-** Pokud seznam L není aktivní, volá funkci DLError ().
-**/
+ - vracia obsah aktivneho prvku prostrednictvom premennej token
+ @param L ukazatel na zoznam
+ @token sem sa ulozi obsah aktivneho prvku
+ */
+void TDLLCopy (TDLList *L, TOKEN *token) {
+
      if (L->Act == NULL) {                              //zoznam nie je aktivny
          DLError();
          return;
@@ -375,6 +338,12 @@ void TDLLCopy (TDLList *L, TOKEN *token) {
     *token = L->Act->tdata;                         //kopirovanie dat aktivneho prvku
 }
 
+
+/*
+ - prepise obsah aktivneho prvku
+ @param L ukazatel na zoznam
+ @token novy obsah
+ */
 void TDLLActualize (TDLList *L, TOKEN token) {
 /*
 ** Přepíše obsah aktivního prvku seznamu L.
@@ -385,34 +354,34 @@ void TDLLActualize (TDLList *L, TOKEN token) {
     }
 }
 
-void TDLLSucc (TDLList *L) {
 /*
-** Posune aktivitu na následující prvek seznamu L.
-** Není-li seznam aktivní, nedělá nic.
-** Všimněte si, že při aktivitě na posledním prvku se seznam stane neaktivním.
-**/
+ - posunie aktivny prvok doprava
+ @param L ukazatel na zoznam
+ */
+void TDLLSucc (TDLList *L) {
+
     if (L->Act) {
         L->Act = L->Act->rptr;                               //posunutie aktivity do prava
     }
 }
 
-
-void TDLLPred (TDLList *L) {
 /*
-** Posune aktivitu na předchozí prvek seznamu L.
-** Není-li seznam aktivní, nedělá nic.
-** Všimněte si, že při aktivitě na prvním prvku se seznam stane neaktivním.
-**/
+- posunie aktivny prvok do lava
+@param L ukazatel na zoznam
+*/
+void TDLLPred (TDLList *L) {
+
     if (L->Act) {
         L->Act = L->Act->lptr;                               //posunutie aktivity do lava
     }
 }
 
-int TDLLActive (TDLList *L) {
 /*
-** Je-li seznam L aktivní, vrací nenulovou hodnotu, jinak vrací 0.
-** Funkci je vhodné implementovat jedním příkazem return.
-**/
+ - vracia nenulovu hodnotu, ak je zoznam aktivny
+ @param L ukazatel na zoznam
+ */
+int TDLLActive (TDLList *L) {
+
     return L->Act != NULL;
 }
 
