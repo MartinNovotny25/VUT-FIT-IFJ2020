@@ -1,7 +1,7 @@
 /*
 *  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
 *  Hlavickovy subor precedencnej syntaktickej analyzy pre projekt IFJ2020
-*  Vytvoril: Martin Novotny - xnovot
+*  Vytvoril: Martin Novotny - xnovot1r
 *
 *  Datum: 10/2020
 */

@@ -1,7 +1,10 @@
-//
-// Created by novot on 10/25/2020.
-//
-
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Hlavickovy subor error kniznice pre projekt IFJ2020
+*  Vytvoril: Martin Novotny - xnovot1r
+*
+*  Datum: 10/2020
+*/
 #ifndef IFJ2020_ERROR_H
 #define IFJ2020_ERROR_H
 
