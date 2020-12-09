@@ -173,9 +173,11 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Da
 	{
 	}else if (strcmp(Name, (*RootPtr)->Name) < 0)     	
 	{
+	//	printf("Vlkadam dolava\n");
 		BSTInsertLocal(&(*RootPtr)->LPtr,Name, Type, Data);
 	}else if (strcmp(Name, (*RootPtr)->Name) > 0)
 	{
+	//	printf("Vkladam doprava\n");
 		BSTInsertLocal(&(*RootPtr)->RPtr,Name, Type, Data);
 	}
 }
@@ -283,6 +285,7 @@ void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal)
   else {
 		S->top++;
 		S->a[S->top]=ptrLocal;
+		//printf("top %d\n", S->top);
 	}
 }
 
@@ -295,6 +298,7 @@ tBSTNodePtrLocal PopTreeMain (MainStack *S)
 	tBSTNodePtrLocal temp;
 	temp = *(S->a[S->top]);
 	S->top--;
+	//printf("top %d\n", S->top);
 	return temp;
 }
 

@@ -59,7 +59,6 @@ void TDLLInitList (TDLList *L) {
 */
 void TDLLDisposeList (TDLList *L) {
 
-    printf("tokenList: Disposing all Elements...\n");
     TDLLElemPtr tmp = L->First;             //tmp ukazuje na prvy prvok
     while (L->First != NULL) {              //zoznam nie je prazdny
         L->First = L->First->rptr;          //cyklus posuva ukazatel First do prava a uvolnuje pamat prvku pred nim

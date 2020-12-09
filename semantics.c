@@ -280,7 +280,6 @@ bool isExpression(TDLList *L, int *type, tBSTNodePtrLocal *node) {
     }
     //vsetko v poriadku, vratim true a datovy typ
     *type = typ;
-    //printf("Aktivny prvok po vykonani celeho isExpression: %s %d\n", L->Act->tdata.lex, L->Act->tdata.type);
     return true;
 }   //koniec isExpression
 
@@ -356,7 +355,6 @@ void checkReturnStatement(TDLList *L, char *id, tBSTNodePtrLocal *node) {
                     if (data.returns[i] == typ) {
                         //po kazdom overeni musi aktivny prvok ostat za id/exp/literalom
                         TDLLSucc(L);
-                        //printf("VYPISUJEM ALC->RPTR : %s\n", L->Act->rptr->tdata.lex);
                         continue;
                     }
                     error_call(ERR_SEM_RETURN, L);
@@ -536,7 +534,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         // je prvy v strome?
         if(MainStackSearch(mainstack, L->Act->tdata.lex, &typ1)){
             if(!(strcmp(L->Act->tdata.lex, "_"))){
-                //printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -549,7 +546,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         
         if(MainStackSearch(mainstack, L->Act->rptr->rptr->tdata.lex, &typ2)){
             if(!(strcmp(L->Act->rptr->rptr->tdata.lex, "_"))){
-                //printf("2\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -561,7 +557,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
 
         // Maju rovnake typy?
         if(!(typ1 == typ2)){
-            //printf("3\n");
             error_call(ERR_SEM_EXCOMPAT, L);
             BSTDisposeLocal(node);
         }
@@ -573,7 +568,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         // Je prvy id v strome?
         if(MainStackSearch(mainstack, L->Act->tdata.lex, &typ1)){
             if(!(strcmp(L->Act->tdata.lex, "_"))){
-                //printf("4\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -587,7 +581,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         if(L->Act->rptr->rptr->tdata.type == t_INT_NON_ZERO || L->Act->rptr->rptr->tdata.type == t_INT_ZERO){
             typ2 = t_INT_ID;
             if(!(typ1 == typ2)){
-                //printf("5\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -595,7 +588,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         }else if(L->Act->rptr->rptr->tdata.type == t_FLOAT64 || L->Act->rptr->rptr->tdata.type == t_FLOAT){
             typ2 = t_FLOAT64;
             if(!(typ1 == typ2)){
-                //printf("6\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -603,7 +595,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         }else if(L->Act->rptr->rptr->tdata.type == t_STRING){
             typ2 = t_STRING_ID;
             if(!(typ1 == typ2)){
-                //printf("7\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -616,7 +607,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         // Je v strome?
         if(MainStackSearch(mainstack, L->Act->rptr->rptr->tdata.lex, &typ2)){
             if(!(strcmp(L->Act->rptr->rptr->tdata.lex, "_"))){
-                //printf("8\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 
                 BSTDisposeLocal(node);
@@ -630,7 +620,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         if(L->Act->tdata.type == t_INT_NON_ZERO || L->Act->tdata.type == t_INT_ZERO){
             typ1 = t_INT_ID;
             if(!(typ1 == typ2)){
-                //printf("1\n");
                  error_call(ERR_SEM_EXCOMPAT, L);
                    BSTDisposeLocal(node);
             }
@@ -639,7 +628,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         }else if(L->Act->tdata.type == t_FLOAT64 || L->Act->tdata.type == t_FLOAT){
             typ1 = t_FLOAT64;
             if(!(typ1 == typ2)){
-                //printf("1\n");
                    error_call(ERR_SEM_EXCOMPAT, L);
                    BSTDisposeLocal(node);
             }
@@ -648,7 +636,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         }else if(L->Act->tdata.type == t_STRING){
             typ1 = t_STRING_ID;
             if(!(typ1 == typ2)){
-                //printf("1\n");
                    error_call(ERR_SEM_EXCOMPAT, L);
                    BSTDisposeLocal(node);
             }
@@ -662,13 +649,11 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
             if(L->Act->rptr->rptr->tdata.type == t_INT_NON_ZERO || L->Act->rptr->rptr->tdata.type == t_INT_ZERO){
                 int typson2 = t_INT_ID;
                 if(typson1 != typson2){
-                    //printf("1\n");
                     error_call(ERR_SEM_EXCOMPAT, L);
                    BSTDisposeLocal(node);
                 }
 
             }else{
-                //printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -683,7 +668,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
                 }
 
             }else{
-                //printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -693,13 +677,11 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
             if(L->Act->rptr->rptr->tdata.type == t_STRING){
                 int typson2 = t_STRING_ID;
                 if(typson1 != typson2){
-                    //printf("1\n");
                     error_call(ERR_SEM_EXCOMPAT, L);
                     BSTDisposeLocal(node);
                 }
 
             }else{
-                //printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -729,25 +711,21 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
             real_op++;
         }else {
             if(L->Act->tdata.type == t_PLUS){
-                //printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
              
             if(L->Act->tdata.type == t_MINUS){
-                //printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
                 
             if(L->Act->tdata.type == t_MULTIPLY){
-                //printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
               
             if(L->Act->tdata.type == t_DIVIDE){
-                //printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
                 BSTDisposeLocal(node);
             }
@@ -758,7 +736,6 @@ void if_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
     }
      
     if(real_op != 1){
-        //printf("1\n");
         error_call(ERR_SEM_EXCOMPAT, L);
         BSTDisposeLocal(node);
     }
@@ -1047,27 +1024,21 @@ void dec_var_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
     while(L->Act->tdata.type != t_EOL){
         if(L->Act->tdata.type == t_GREATER){
             BSTDisposeLocal(node);
-            printf("1\n");
             error_call(ERR_SEM_EXCOMPAT, L);
         }else if(L->Act->tdata.type == t_GREATEROREQUAL){
             BSTDisposeLocal(node);
-            printf("1\n");
             error_call(ERR_SEM_EXCOMPAT, L);
         }else if(L->Act->tdata.type == t_LESS){
             BSTDisposeLocal(node);
-            printf("1\n");
             error_call(ERR_SEM_EXCOMPAT, L);
         }else if(L->Act->tdata.type == t_LESSOREQUAL){
             BSTDisposeLocal(node);
-            printf("1\n");
             error_call(ERR_SEM_EXCOMPAT, L);
         }else if(L->Act->tdata.type == t_EQUAL){
             BSTDisposeLocal(node);
-            printf("1\n");
             error_call(ERR_SEM_EXCOMPAT, L);
         }else if(L->Act->tdata.type == t_NOT_EQUAL){
             BSTDisposeLocal(node);
-            printf("1\n");
             error_call(ERR_SEM_EXCOMPAT, L);
         }
 
@@ -1114,7 +1085,6 @@ void dec_var_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
         }else if(L->Act->tdata.type == t_STRING){
             if(L->Act->rptr->tdata.type == t_MINUS || L->Act->rptr->tdata.type == t_DIVIDE || L->Act->rptr->tdata.type == t_MULTIPLY){
                 BSTDisposeLocal(node);
-                printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
             }
             // uloz jeho typ
@@ -1169,7 +1139,6 @@ void dec_var_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
                 error_call(ERR_SEM_OTHER, L);
 
             }else if(!(strcmp(L->Act->tdata.lex, "print"))){
-                printf("1\n");
                 error_call(ERR_SEM_EXCOMPAT, L);
 
             }else if(BSTSearchGlobal(functions, L->Act->tdata.lex, &returned_data)){
@@ -1189,7 +1158,6 @@ void dec_var_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
                 }else if(datovytyp == t_STRING_ID){
                     if(L->Act->rptr->tdata.type == t_MINUS || L->Act->rptr->tdata.type == t_DIVIDE || L->Act->rptr->tdata.type == t_MULTIPLY){
                     BSTDisposeLocal(node);
-                        printf("1\n");
                     error_call(ERR_SEM_EXCOMPAT, L);
                     }
                     string_count++;
@@ -1529,12 +1497,10 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
 
             id[identifier] = L->Act->tdata.lex;
             if(MainStackSearch(mainstack, id[identifier], &types_of_defined_vars[identifier])){
-                //printf("Vo vyssom ramci: nazov: %s, hodnota %d\n\n", id[identifier], types_of_defined_vars[identifier]);
                     // premenna bola najdena v ramci a while bol hned zastaveny
                     // stack sa prehladava zhora dole
                 if(!(strcmp(id[identifier], "_"))){
                     types_of_defined_vars[identifier] = 404;
-                  //  printf("Premenna %s, typ %d, pozicia %d\n\n", id[identifier], types_of_defined_vars[identifier], identifier);
                     underscore_found = 1;
                 }
                 //identifier++;
@@ -1547,16 +1513,10 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
         }
         TDLLSucc(L);
     }
- //printf("\nPRESIEL SOM ZA WHILE LOOP\n");
-   // printf("Pocet premennych nalavo od =: %d\n\n", identifier);
-
-
     // pocet identifikatorov napravo od =
     //int identif_count = 0;
     // pocet ciarok napravo od =
     int comma_count = 0;
-
- //   printf("\n SME NA LEXEME: %s\n", L->Act->tdata.lex);
     // prechadzaj pokym neprejdeme na koniec riadku
     while(L->Act->tdata.type!= t_EOL){
             if(L->Act->tdata.type == t_GREATER){
@@ -1593,13 +1553,11 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
            
 
             if(L->Act->tdata.type == t_INT_NON_ZERO || L->Act->tdata.type == t_INT_ZERO){
-              //  printf("Piradujem integer pozicia %d\n", id_insert);
                 type[id_insert] = t_INT_ID;
                 int_count++;
                 id_insert++;
             // ak ide o float
             }else if(L->Act->tdata.type == t_FLOAT64 || L->Act->tdata.type == t_FLOAT){
-             //   printf("\n\n NASIEL SOM FLOAT\n\n");
                 if(!(strcmp(L->Act->tdata.lex, "0.0"))){
                     if(!(strcmp(L->Act->lptr->tdata.lex, "/"))){
                         BSTDisposeLocal(node);
@@ -1616,7 +1574,6 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                     error_call(ERR_SEM_EXCOMPAT, L);
                 }
                 
-               // printf("Nasiel som string\n\n");
                 type[id_insert] = t_STRING_ID;
                 string_count++;
                 id_insert++;
@@ -1625,17 +1582,14 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                 int datovytyp;
                 char *name = L->Act->tdata.lex;
                 functionData returned_data;
-             //   printf("\nMENO PREMENNEJ NALAVO OD = %s\n\n", name);
                 if(!(strcmp(L->Act->tdata.lex, "_"))){
                     BSTDisposeLocal(node);
                     error_call(ERR_SEM_UNDEF, L);
                 }
            
                 if(!(strcmp(L->Act->tdata.lex, "inputs"))){
-                   // printf("Ide o inputs\n");
                     assign_func_params_control(L, node, "inputs");
                     if(identifier != 2) error_call(ERR_SEM_RETURN, L);
-                   // printf("Kontrolujem typy premennych\n");
                    if(types_of_defined_vars[0] == t_STRING_ID && (types_of_defined_vars[1] == t_INT_ID || types_of_defined_vars[1] == 404)){
                        is_function++;
                    }else{
@@ -1669,7 +1623,6 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                             error_call(ERR_SEM_EXCOMPAT, L);
                         }
                     }
-                  //  printf("kontrola prebehla v poriadku\n");
                     is_function++;
                 }else if(!(strcmp(L->Act->tdata.lex, "float2int"))){
                     assign_func_params_control(L, node, "float2int");
@@ -1684,7 +1637,6 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                 }else if(!(strcmp(L->Act->tdata.lex, "len"))){
                     assign_func_params_control(L, node, "len");
                     if(identifier != 1) error_call(ERR_SEM_RETURN, L);
-                    printf("Typ premennej: %d\n", types_of_defined_vars[0]);
                     if(types_of_defined_vars[0] != t_INT_ID ){
                         if( types_of_defined_vars[1] != 404){
                             BSTDisposeLocal(node);
@@ -1728,16 +1680,13 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                     checkCallFunction(L, L->Act->tdata.lex, node);
                     if(identifier != returned_data.numOfReturns) error_call(ERR_SEM_RETURN, L);
                     else{
-                     //  printf("\n\n NAZOV PREMENNEJ %s\n\n\n", L->Act->tdata.lex);
                         int i = 0;
                         while(returned_data.numOfReturns != i){
                             type[i] = returned_data.returns[i];
-                        //    printf("\n\n typonn : %d\n\n", type[i]);
                             i++;
                         }
 
                         for(int i = 0; i < identifier; i++){
-                         //   printf("\n\npremenna napravo: %d, premena nalavo: %d\n\n", types_of_defined_vars[i], type[i]);
                             if(types_of_defined_vars[i] != type[i]){
                                 if(!(strcmp(id[i], "_"))){
 
@@ -1755,7 +1704,6 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                 }else if(MainStackSearch(mainstack, name, &datovytyp)) {
                      type[id_insert] = datovytyp;
                             if(datovytyp == t_INT_ID){
-                              //  printf("Ide o integer\n");
                                 int_count++;
                                 id_insert++;
                             }else if(datovytyp == t_FLOAT64){
@@ -1788,15 +1736,10 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
               
             // ak sme prisli na ciarku alebo koniec riadku
             if(L->Act->tdata.type == t_COMMA || L->Act->rptr->tdata.type == t_EOL || L->Act->tdata.type == t_BRACES_L){
-
-                //printf("\n\n IDEM PRIRADIT HODNOTU\n\n");
                 // ak vo vyraze boli len stringy
                 if(string_count != 0 && int_count == 0 && float_count == 0){
                     
                     // je premenna do ktorej chceme ulozit hodnotu deklarovana?
-                    //printf("Hlada node zo stringu %s\n\n", id[comma_count]);
-                    
-                    //printf("Datovy typ napravo %d", types_of_defined_vars[comma_count]);
                     if(types_of_defined_vars[comma_count] == t_STRING_ID || types_of_defined_vars[comma_count] == 404){
                         BSTInsertLocal(node, id[comma_count], type, data);
                         id_insert++;
@@ -1804,9 +1747,16 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                         int_count = 0;
                         float_count = 0;
                     }else{
-                        if(types_of_defined_vars[comma_count] == 0){
-                            BSTDisposeLocal(node);
-                            error_call(ERR_SEM_OTHER, L);
+                        if(types_of_defined_vars[comma_count] != t_INT_ID ){
+                            if(types_of_defined_vars[comma_count] != t_STRING_ID){
+                                if(types_of_defined_vars[comma_count] != t_FLOAT64){
+                                    error_call(ERR_SEM_OTHER, L);
+                                }else{
+                                    error_call(ERR_SEM_EXCOMPAT, L);
+                                }
+                            }else{
+                                error_call(ERR_SEM_EXCOMPAT, L);
+                            }
                         }else{
                             error_call(ERR_SEM_EXCOMPAT, L);
                         }
@@ -1815,11 +1765,8 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                     // ak vo vyraze boli len cisla
                 }else if(string_count == 0 && int_count != 0 && float_count == 0){
                     
-                   // printf("Hladam node z integer\n\n");
                     // je premenna do ktorej chceme ulozit hodnotu deklarovana?
                     
-
-                   //printf("POROVNAAVAM %d a %d\n\n", types_of_defined_vars[comma_count], t_INT_ID);
                     if(types_of_defined_vars[comma_count] == t_INT_ID || types_of_defined_vars[comma_count] == 404){
                         //BSTInsertLocal(node, id[comma_count], types_of_defined_vars[comma_count], data);
                         id_insert++;
@@ -1827,11 +1774,20 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                         int_count = 0;
                         float_count = 0;
                     }else{
-                        if(types_of_defined_vars[comma_count] == 0){
-                            error_call(ERR_SEM_OTHER, L);
+                        if(types_of_defined_vars[comma_count] != t_INT_ID ){
+                            if(types_of_defined_vars[comma_count] != t_STRING_ID){
+                                if(types_of_defined_vars[comma_count] != t_FLOAT64){
+                                    error_call(ERR_SEM_OTHER, L);
+                                }else{
+                                    error_call(ERR_SEM_EXCOMPAT, L);
+                                }
+                            }else{
+                                error_call(ERR_SEM_EXCOMPAT, L);
+                            }
                         }else{
                             error_call(ERR_SEM_EXCOMPAT, L);
                         }
+                        
                     }
 
                 // ak vo vyraze boli len floaty
@@ -1846,8 +1802,16 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                         int_count = 0;
                         float_count = 0;
                     }else{
-                        if(types_of_defined_vars[comma_count] == 0){
-                            error_call(ERR_SEM_OTHER, L);
+                        if(types_of_defined_vars[comma_count] != t_INT_ID ){
+                            if(types_of_defined_vars[comma_count] != t_STRING_ID){
+                                if(types_of_defined_vars[comma_count] != t_FLOAT64){
+                                    error_call(ERR_SEM_OTHER, L);
+                                }else{
+                                    error_call(ERR_SEM_EXCOMPAT, L);
+                                }
+                            }else{
+                                error_call(ERR_SEM_EXCOMPAT, L);
+                            }
                         }else{
                             error_call(ERR_SEM_EXCOMPAT, L);
                         }
@@ -1864,10 +1828,8 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                 }
                 comma_count++;
             }
-        //printf("Lexem: %s\n", L->Act->tdata.lex);
         TDLLSucc(L);
     }
-  //  printf("pocet id %d pocet ciarok %d\n\n", identifier, comma_count);
     // Ak je pocet premennych do ktorych sa ma priradovat ako hodnot rozdielny
     if(is_function == 0){
         if(identifier != comma_count){
@@ -1875,8 +1837,6 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
             BSTDisposeLocal(node);
         }
     }
- //   printf("uspesne som presiel za assign\n\n");
-  //  printf("Posledny lexem %s\n\n", L->Act->tdata.lex);
     //TDLLPred(L);
 }   //koniec assign_vals_control
 
@@ -1985,7 +1945,6 @@ void secondRun(TDLList *L) {
     TDLLFirst(L);
     //prehladavaj kym nenajdes funkciu
     while (L->Act->tdata.type != t_EOF) {
-        //printf("som vo while\n");
         if (!strcmp(L->Act->tdata.lex, "func")) {
             // Stack pre pracu s ramcami vo funkcii
             // (Re)Inicializacia stacku
@@ -2094,8 +2053,6 @@ void insertBuiltInFunction() {
  @param L obojstranne viazany zoznam tokenov
  */
 void paramsRedefinitionCheck(functionData data, TDLList *L) {
-    //printf("pocet parametrov ktore kontrolujem: %d\n", data.numOfParams);
-    //printf("sem: som v paramsRedefinitionCheck\n");
     if (data.numOfParams == 0) {
         return;
     }
@@ -2240,7 +2197,6 @@ void goThroughList(TDLList *L) {
     insertBuiltInFunction();
     TDLLFirst(L);
     int i = 0, j = 0;      //pre potreby vypiskov
-    TDLLPrintAllTokens(L);
     while (L->Act->tdata.type != t_EOF) {
         if (!strcmp(L->Act->tdata.lex, "func")) {
             j++;
@@ -2264,9 +2220,9 @@ void goThroughList(TDLList *L) {
     TDLLFirst(L);
     
     secondRun(L);
-    TDLLPrintAllTokens(L);
+    //TDLLPrintAllTokens(L);
     //uvolnime pouzivane struktury
     TDLLDisposeList(L);
     BSTDisposeGlobal(&functions);
-    printf("USPESNY KONIEC SEMANTIKY\n");
+    //printf("USPESNY KONIEC SEMANTIKY\n");
 } // koniec goThroughList
