@@ -1805,6 +1805,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                         float_count = 0;
                     }else{
                         if(types_of_defined_vars[comma_count] == 0){
+                            BSTDisposeLocal(node);
                             error_call(ERR_SEM_OTHER, L);
                         }else{
                             error_call(ERR_SEM_EXCOMPAT, L);
