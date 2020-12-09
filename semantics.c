@@ -1526,12 +1526,12 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
 
             id[identifier] = L->Act->tdata.lex;
             if(MainStackSearch(mainstack, id[identifier], &types_of_defined_vars[identifier])){
-                printf("Vo vyssom ramci: nazov: %s, hodnota %d\n\n", id[identifier], types_of_defined_vars[identifier]);
+                //printf("Vo vyssom ramci: nazov: %s, hodnota %d\n\n", id[identifier], types_of_defined_vars[identifier]);
                     // premenna bola najdena v ramci a while bol hned zastaveny
                     // stack sa prehladava zhora dole
                 if(!(strcmp(id[identifier], "_"))){
                     types_of_defined_vars[identifier] = 404;
-                    printf("Premenna %s, typ %d, pozicia %d\n\n", id[identifier], types_of_defined_vars[identifier], identifier);
+                  //  printf("Premenna %s, typ %d, pozicia %d\n\n", id[identifier], types_of_defined_vars[identifier], identifier);
                     underscore_found = 1;
                 }
                 //identifier++;
@@ -1545,7 +1545,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
         TDLLSucc(L);
     }
  //printf("\nPRESIEL SOM ZA WHILE LOOP\n");
-    printf("Pocet premennych nalavo od =: %d\n\n", identifier);
+   // printf("Pocet premennych nalavo od =: %d\n\n", identifier);
 
 
     // pocet identifikatorov napravo od =
@@ -1590,7 +1590,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
            
 
             if(L->Act->tdata.type == t_INT_NON_ZERO || L->Act->tdata.type == t_INT_ZERO){
-                printf("Piradujem integer pozicia %d\n", id_insert);
+              //  printf("Piradujem integer pozicia %d\n", id_insert);
                 type[id_insert] = t_INT_ID;
                 int_count++;
                 id_insert++;
@@ -1629,7 +1629,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                 }
            
                 if(!(strcmp(L->Act->tdata.lex, "inputs"))){
-                    printf("Ide o inputs\n");
+                   // printf("Ide o inputs\n");
                     assign_func_params_control(L, node, "inputs");
                     if(identifier != 2) error_call(ERR_SEM_RETURN, L);
                    // printf("Kontrolujem typy premennych\n");
@@ -1724,7 +1724,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                     checkCallFunction(L, L->Act->tdata.lex, node);
                     if(identifier != returned_data.numOfReturns) error_call(ERR_SEM_RETURN, L);
                     else{
-                       printf("\n\n NAZOV PREMENNEJ %s\n\n\n", L->Act->tdata.lex);
+                     //  printf("\n\n NAZOV PREMENNEJ %s\n\n\n", L->Act->tdata.lex);
                         int i = 0;
                         while(returned_data.numOfReturns != i){
                             type[i] = returned_data.returns[i];
@@ -1750,7 +1750,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                 }else if(MainStackSearch(mainstack, name, &datovytyp)) {
                      type[id_insert] = datovytyp;
                             if(datovytyp == t_INT_ID){
-                                printf("Ide o integer\n");
+                              //  printf("Ide o integer\n");
                                 int_count++;
                                 id_insert++;
                             }else if(datovytyp == t_FLOAT64){
@@ -1806,7 +1806,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                     // ak vo vyraze boli len cisla
                 }else if(string_count == 0 && int_count != 0 && float_count == 0){
                     
-                    printf("Hladam node z integer\n\n");
+                   // printf("Hladam node z integer\n\n");
                     // je premenna do ktorej chceme ulozit hodnotu deklarovana?
                     
 
@@ -1851,16 +1851,16 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
         //printf("Lexem: %s\n", L->Act->tdata.lex);
         TDLLSucc(L);
     }
-    printf("pocet id %d pocet ciarok %d\n\n", identifier, comma_count);
+  //  printf("pocet id %d pocet ciarok %d\n\n", identifier, comma_count);
     // Ak je pocet premennych do ktorych sa ma priradovat ako hodnot rozdielny
     if(is_function == 0){
         if(identifier != comma_count){
-            error_call(ERR_SEM_DATATYPE, L);
+            error_call(ERR_SEM_OTHER, L);
             BSTDisposeLocal(node);
         }
     }
-    printf("uspesne som presiel za assign\n\n");
-    printf("Posledny lexem %s\n\n", L->Act->tdata.lex);
+ //   printf("uspesne som presiel za assign\n\n");
+  //  printf("Posledny lexem %s\n\n", L->Act->tdata.lex);
     //TDLLPred(L);
 }   //koniec assign_vals_control
 
