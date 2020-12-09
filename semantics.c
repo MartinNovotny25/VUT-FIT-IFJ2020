@@ -1173,11 +1173,14 @@ void dec_var_control(TDLList *L, tBSTNodePtrLocal *node, functionData params){
                 error_call(ERR_SEM_EXCOMPAT, L);
 
             }else if(BSTSearchGlobal(functions, L->Act->tdata.lex, &returned_data)){
-                 checkCallFunction(L, L->Act->tdata.lex, node);
-                if(returned_data.numOfReturns != 1) error_call(ERR_SEM_RETURN, L);
-                else{
-                    type = returned_data.returns[0];
-                    BSTInsertLocal(node, id,&type, data);
+                if(L->Act->rptr->tdata.type == t_LEFT_BRACKET){
+                    checkCallFunction(L, L->Act->tdata.lex, node);
+                
+                    if(returned_data.numOfReturns != 1) error_call(ERR_SEM_RETURN, L);
+                    else{
+                        type = returned_data.returns[0];
+                        BSTInsertLocal(node, id,&type, data);
+                    }
                 }
             }else if (MainStackSearch(mainstack, name, &datovytyp)) {
                     type = datovytyp;
@@ -1721,6 +1724,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                     error_call(ERR_SEM_EXCOMPAT, L);
 
                 }else if(BSTSearchGlobal(functions, L->Act->tdata.lex, &returned_data)){
+                    if(L->Act->rptr->tdata.type == t_LEFT_BRACKET){
                     checkCallFunction(L, L->Act->tdata.lex, node);
                     if(identifier != returned_data.numOfReturns) error_call(ERR_SEM_RETURN, L);
                     else{
@@ -1746,6 +1750,7 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                                 break;
                             }
                         }
+                    }
                     }
                 }else if(MainStackSearch(mainstack, name, &datovytyp)) {
                      type[id_insert] = datovytyp;
