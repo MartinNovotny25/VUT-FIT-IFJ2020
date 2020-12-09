@@ -8,15 +8,6 @@
 #include "symtable.h"
 
 
-
-
-tBSTNodePtrGlobal GlobalBody ;
-tBSTNodePtrLocal LocalVariables;
-tBSTNodePtrLocal  GFDefinedVarsTree;
-tBSTNodePtrLocal  LFDefinedVarsTree;
-
-
-
 // ========================================= GLOBALNY STROM ============================================== //
 
 /*
@@ -119,7 +110,6 @@ void BSTDisposeGlobal (tBSTNodePtrGlobal *RootPtr) {
 */
 void BSTInitLocal (tBSTNodePtrLocal *RootPtr) {
 	
-	printf("Inicializoval som lokalny strom\n");
 	*(RootPtr) = NULL;
 
 }	
@@ -136,8 +126,6 @@ void BSTInitLocal (tBSTNodePtrLocal *RootPtr) {
 bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data)    {
 
 
-    //printf("SOM V SEARCHLOCAL\n");
-	printf("Hladam uzol s nazvom: %s\n", name);
     if (RootPtr != NULL && RootPtr->Name != NULL)
     {
         if ((strcmp(name, RootPtr->Name) < 0))
@@ -158,7 +146,6 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
     }
     else
     {
-		printf("Nenasiel som hodnotu\n");
         return false;
     }
 }
@@ -173,7 +160,6 @@ bool BSTSearchLocal (tBSTNodePtrLocal RootPtr, char* name, int *Type, char *Data
 */
 void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Data)	{
 
-	printf("NAZOV: %s,TYP: %d, HODNOTA: %s\n", Name, *Type, Data);
 
 	if (*RootPtr == NULL){
 		*RootPtr = malloc(sizeof (struct tBSTNodeLocal));	
@@ -261,16 +247,13 @@ void BSTDelete (tBSTNodePtrLocal *RootPtr, char *K) {
 void BSTDisposeLocal (tBSTNodePtrLocal *RootPtr) {	
 
 
-	printf("Dispose Local\n");
 	if (*RootPtr != NULL)					
 	{
-        printf("rootprt != NULL\n");
 		BSTDisposeLocal(&(*RootPtr)->LPtr);
 		BSTDisposeLocal(&(*RootPtr)->RPtr);
 		free(*RootPtr);
 		*RootPtr = NULL;
 	}
-    printf("RootPtr == NULL, koniec tejto rekurzie\n");
 	
 
 
@@ -327,5 +310,32 @@ bool EmptyMainStack (MainStack *S)
 {
   return(S->top==0);
 }
+
+/* ==========================================================================================
+ - tato funkcia prehlada zasobnik stromov, vracia true ak najde zhodu a v premennej type vracia typ
+ @param stack zasobnik, ktory sa prehlada
+ @param id identifikator hladanej premennej
+ @param type tymto ukazatelom sa vracia datovy typ
+ */
+bool MainStackSearch(MainStack stack, char* id, int *type) {
+    
+    //pocet stromov v zasobniku
+    int i = stack.top;
+    //na ulozenie typu
+    int typ = 0;
+    char* unneeded = NULL;
+    
+    while (i != 0) {
+        if (BSTSearchLocal((*stack.a[i]), id, &typ, unneeded)) {
+            *type = typ;
+            return true;
+        }
+        i--;
+    }
+    return false;
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////
 

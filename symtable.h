@@ -82,5 +82,6 @@ void InitMainStack (MainStack *S);
 void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal);
 tBSTNodePtrLocal PopTreeMain (MainStack *S);
 bool EmptyMainStack (MainStack *S);
+bool MainStackSearch(MainStack stack, char* id, int *type);
 
 #endif
