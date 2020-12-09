@@ -85,6 +85,7 @@
 #define BINARY_ZERO 68
 #define OCTAL_ZERO 69
 #define HEXA_ZERO 70
+#define UNDERSCORE 71
 #define t_DOLLAR 100
 
 

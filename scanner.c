@@ -661,8 +661,8 @@ TOKEN get_next_token(FILE* text)
                 }
                 else if (current_char == '_')
                 {
-                    //Odstranime znak '_', pretoze pri cifrach sa ignoruje
-                    remove_();
+                    //Presunieme sa do pomocneho stavu, v ktorom zistime ci je v podtrzitko povolene
+                    state = UNDERSCORE;
                 }
                 else
                 {
@@ -705,8 +705,8 @@ TOKEN get_next_token(FILE* text)
                 }
                 else if (current_char == '_')
                 {
-                    //Odstranime znak '_', pretoze pri cislach znak podtrzitka ignorujeme
-                    remove_();
+                    //Presunieme sa do pomocneho stavu, v ktorom zistime ci je v podtrzitko povolene
+                    state = UNDERSCORE;
                 }
                 else if (current_char == '0')
                 {
@@ -730,6 +730,32 @@ TOKEN get_next_token(FILE* text)
                 }
                 break;
                 
+            case UNDERSCORE:
+                if (isdigit(current_char))
+                {
+                    //V pripade, ze pride cislo tak unloadneme
+                    unload_c(text);
+                    //odstranime podtrzitko
+                    remove_();
+                    //Ked je hodnota nastavena na true, vraciame sa do nuloveho stavu
+                    if (zero_int)
+                    {
+                        state = t_INT_ZERO;
+                    }
+                    //Inak sa presuvame do nenuloveho stavu
+                    else
+                    {
+                        state = t_INT_NON_ZERO;
+                    }
+                    
+                }
+                else
+                {
+                    //V pripade nepovoleneho znaku (cislom), koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
+                }
+                
             case DOT:
                 if (isdigit(current_char))
                 {
@@ -740,8 +766,11 @@ TOKEN get_next_token(FILE* text)
                 }
                 else if (current_char == '_')
                 {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
                     //Odstranime znak '_', pretoze pri cislach znak '_' ignorujeme
-                    remove_();
+                    //remove_();
                 }
                 else if(current_char != EOF)
                 {
@@ -938,7 +967,7 @@ TOKEN get_next_token(FILE* text)
                 break;
                 
             case OCTAL:
-                if ((isdigit(current_char)) && (current_char!='0'))
+                if ((isdigit(current_char)) && (current_char!='0') && (current_char!='8') && (current_char!='9'))
                 {
                     //V pripade ze dostaneme nenulove cislo, nastavime hodnotu false, pretoze vieme ze nebude uz 0
                     zero_int = false;
@@ -949,6 +978,12 @@ TOKEN get_next_token(FILE* text)
                 {
                     //V pripade ze pride 0, sa presuvame do stavu OCTAL_ZERO, pretoze moze byt nulove cislo
                     state = OCTAL_ZERO;
+                }
+                else if ((current_char == '8') || (current_char == '9'))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
                 }
                 else if (isalpha(current_char))
                 {
@@ -980,12 +1015,18 @@ TOKEN get_next_token(FILE* text)
                     //V pripade, ze pride cislica 0, ostavame v stave OCTAL_ZERO, pretoze to stale moze byt 0 cislo
                     state = OCTAL_ZERO;
                 }
-                else if ((isdigit(current_char)) && (current_char!='0'))
+                else if ((isdigit(current_char)) && (current_char!='0') && (current_char!='8') && (current_char!='9'))
                 {
                     //V pripade ze nepride cislica 0, nastavime hodnotu false, pretoze vieme, ze to uz nebude nulove cislo
                     zero_int = false;
                     //Vraciame sa teda do stavu OCTAL
                     state = OCTAL;
+                }
+                else if ((current_char == '8') || (current_char == '9'))
+                {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
+                    fprintf(stderr , "Lexical error.\n");
+                    exit(1);
                 }
                 else if (isalpha(current_char))
                 {
