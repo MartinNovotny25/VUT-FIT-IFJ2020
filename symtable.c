@@ -285,7 +285,6 @@ void PushTreeMain (MainStack *S, tBSTNodePtrLocal *ptrLocal)
   else {
 		S->top++;
 		S->a[S->top]=ptrLocal;
-		printf("top %d\n", S->top);
 	}
 }
 
@@ -298,7 +297,6 @@ tBSTNodePtrLocal PopTreeMain (MainStack *S)
 	tBSTNodePtrLocal temp;
 	temp = *(S->a[S->top]);
 	S->top--;
-	printf("top %d\n", S->top);
 	return temp;
 }
 
