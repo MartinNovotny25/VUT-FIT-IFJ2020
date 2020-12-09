@@ -14,18 +14,6 @@
 #include "scanner.h"
 
 
-
-void DLError() {
-//nema prakticke vyuzite v projekte
-//TODO overit ci vymazanie nic nerozbije a vymazat
-
-    printf ("tokenList: *ERROR* The program has performed an illegal operation.\n");
-    //errflg = TRUE;             /* globální proměnná -- příznak ošetření chyby */
-    return;
-}
-
-
-
 /*
 - tato funckia vytlaci cely obsah zoznamu
 @param L ukazatel na zoznam
@@ -35,12 +23,17 @@ void TDLLPrintAllTokens(TDLList *L) {
     TDLLFirst(L);
     
     while (L->Act != NULL) {                          //while prechadza listom
-        printf("token %d\n", L->Act->tdata.type);
-        if (L->Act->tdata.type == 29) {
+        printf("typ   %d\n", L->Act->tdata.type);
+        if (L->Act->tdata.type == t_EOF) {
             printf("lexem EOF\n\n");
         } else {
-        printf("lexem %s\n\n", L->Act->tdata.lex);
+            if (L->Act->tdata.type == t_EOL) {
+                printf("lexem EOL\n\n");
+            } else {
+                printf("lexem %s\n\n", L->Act->tdata.lex);
+            }
         }
+        
         TDLLSucc(L);                                //presun aktivity na nasledujuci token
     }
     printf("tokenList: Printing Ended Succesfully...\n");
@@ -87,7 +80,6 @@ void TDLLInsertFirst (TDLList *L, TOKEN token) {
 
     TDLLElemPtr tmp = (TDLLElemPtr) malloc(sizeof(struct TDLLElem));       //alokacia pamate
     if (tmp == NULL) {                                 //overenie uspesnosti alokacie
-        DLError();
         return;
     }
     tmp->tdata = token;                                    //nakopirovanie dat
@@ -112,7 +104,6 @@ void TDLLInsertLast(TDLList *L, TOKEN token) {
 
     TDLLElemPtr tmp = (TDLLElemPtr) malloc(sizeof(struct TDLLElem));       //alokacia pamate
     if (tmp == NULL) {
-        DLError();
         return;
     }
     tmp->tdata = token;                                    //nakopirovanie dat
@@ -154,7 +145,6 @@ void TDLLLast (TDLList *L) {
 void TDLLCopyFirst (TDLList *L, TOKEN *token) {
 
     if (L->First == NULL) {             //zoznam je prazdny
-        DLError();
         return;
     }
     *token = L->First->tdata;              //kopirovanie dat prveho prvku
@@ -168,7 +158,6 @@ void TDLLCopyFirst (TDLList *L, TOKEN *token) {
 void TDLLCopyLast (TDLList *L, TOKEN *token) {
 
     if (L->First == NULL) {             //zoznam je prazdny
-           DLError();
            return;
        }
        *token = L->Last->tdata;            //kopirovanie dat z posledneho prvku
@@ -179,10 +168,7 @@ void TDLLCopyLast (TDLList *L, TOKEN *token) {
  @param L ukazatel na zoznam
  */
 void TDLLDeleteFirst (TDLList *L) {
-/*
-** Zruší první prvek seznamu L. Pokud byl první prvek aktivní, aktivita
-** se ztrácí. Pokud byl seznam L prázdný, nic se neděje.
-**/
+
     if (L->First != NULL) {                         //zoznam nie je prazdny
         TDLLElemPtr tmp = L->First;
         if (L->First == L->Act) {
@@ -274,12 +260,7 @@ void TDLLPreDelete (TDLList *L) {
 @token vkladane data
 */
 void TDLLPostInsert (TDLList *L, TOKEN token) {
-/*
-** Vloží prvek za aktivní prvek seznamu L.
-** Pokud nebyl seznam L aktivní, nic se neděje.
-** V případě, že není dostatek paměti pro nový prvek při operaci malloc,
-** volá funkci DLError().
-**/
+
     if (L->Act) {                                   //zoznam je aktivny
         TDLLElemPtr tmp = (TDLLElemPtr) malloc(sizeof(struct TDLLElem));   //alokacia pamati
         tmp->tdata = token;                            //kopirovanie dat
@@ -332,7 +313,6 @@ void TDLLPreInsert (TDLList *L, TOKEN token) {
 void TDLLCopy (TDLList *L, TOKEN *token) {
 
      if (L->Act == NULL) {                              //zoznam nie je aktivny
-         DLError();
          return;
     }
     *token = L->Act->tdata;                         //kopirovanie dat aktivneho prvku
@@ -345,10 +325,6 @@ void TDLLCopy (TDLList *L, TOKEN *token) {
  @token novy obsah
  */
 void TDLLActualize (TDLList *L, TOKEN token) {
-/*
-** Přepíše obsah aktivního prvku seznamu L.
-** Pokud seznam L není aktivní, nedělá nic.
-**/
     if (L->Act) {
         L->Act->tdata = token;                                 //kopirovanie dat z aktivneho prvku
     }
