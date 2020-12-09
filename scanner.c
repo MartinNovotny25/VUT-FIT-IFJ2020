@@ -91,14 +91,11 @@ void end_token(int type, TOKEN* token)
     alloc(current_token_position+1, token);
     strcpy(token->lex, current_token);
     token->type = type;
-    printf("Scanner: token %d lex %s\n",token->type, token->lex);
-    //printf("%d\n",token->type);
     delete_string();
 }
 
 TOKEN get_next_token(FILE* text)
 {
-    //printf("Scanner: Dodavam novy TOKEN\n");
     TOKEN token;
     static int state;
     if(state != IND_DED)
