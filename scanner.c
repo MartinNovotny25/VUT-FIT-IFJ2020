@@ -480,8 +480,6 @@ TOKEN get_next_token(FILE* text)
                     //Ked pride znak 'n' za stringom "package " ideme do medzistavu, aby sme skontrolovali ci nasledujuci nahodou nebude cislo pismeno alebo '_'
                     current_char4 = current_char;
                     state = t_PACKAGE_CONTROLL4;
-                    //end_token(t_PACKAGE_MAIN, &token);
-                    //return token;
                 }
                 else
                 {
@@ -556,9 +554,7 @@ TOKEN get_next_token(FILE* text)
                     //V pripade nepovoleneho znaku, koncime tokenom /
                     unload_c(text);
                     end_token(t_DIVIDE, &token);
-                    //return token;
-                    state = START;
-                    break;
+                    return token;
                 }
                 break;
                 
@@ -566,31 +562,34 @@ TOKEN get_next_token(FILE* text)
                 if (current_char == '\n')
                 {
                     //Koncime tokenom EOL (ONE LINE COMMENT)
-                    //end_token(t_EOL, &token);
                     First_token = true;
+                    //Zmazeme komentar
                     delete_string();
-                    //return token;
+                    //A vraciame sa na pociatocny stav
                     state = START;
+                    //Koncime cyklus
                     break;
                 }
                 else if (current_char == EOF)
                 {
-                    //Koncime tokenom EOL
+                    //Koncime tokenom EOL (ONE LINE COMMENT)
                     unload_c(text);
-                    //end_token(t_EOL, &token);
+                    //Zmazeme komentar
                     delete_string();
-                    //return token;
+                    //A vraciame sa na pociatocny stav
                     state = START;
+                    //Koncime cyklus
                     break;
                 }
                 if (current_char == '\r')
                 {
                     //Koncime tokenom EOL (ONE LINE COMMENT)
-                    //end_token(t_EOL, &token);
                     First_token = true;
+                    //Zmazeme komentar
                     delete_string();
-                    //return token;
+                    //A vraciame sa na pociatocny stav
                     state = START;
+                    //Koncime cyklus
                     break;
                 }
                 else
@@ -620,11 +619,12 @@ TOKEN get_next_token(FILE* text)
                 if (current_char == '/')
                 {
                     //Koncime tokenom Multiline Comment /* */
-                    //end_token(t_EOL, &token);
                     First_token = true;
+                    //Zmazeme komentar
                     delete_string();
-                    //return token;
+                    //A vraciame sa na pociatocny stav
                     state = START;
+                    //Koncime cyklus
                     break;
                 }
                 else
@@ -742,6 +742,7 @@ TOKEN get_next_token(FILE* text)
                 }
                 else if(current_char != EOF)
                 {
+                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
                     fprintf(stderr , "Lexical error.\n");
                     exit(1);
                 }
@@ -830,28 +831,10 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
+                    //V pripade nepovoleneho znaku koncime tokenom FLOAT a skenujeme nepovoleny znak
                     unload_c(text);
                     end_token(t_FLOAT, &token);
                     return token;
-                    /*
-                    if(floating_point)
-                    {
-                        floating_point = false;
-                        end_token(t_FLOAT, &token);
-                        return token;
-                    }
-                    else if(zero_int)
-                    {
-                        zero_int = false;
-                        end_token(t_INT_ZERO, &token);
-                        return token;
-                    }
-                    else{
-                        non_zero_int = false;
-                        end_token(t_INT_NON_ZERO, &token);
-                        return token;
-                    }
-                    */
                 }
                 break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -861,12 +844,12 @@ TOKEN get_next_token(FILE* text)
             case BINARY:
                 if (current_char == '0')
                 {
-                    //Ostavame v stave BINARY, pretoze moze byt viac ciferne binarne cislo
-                    //zero_int = true;
+                    //Presuvame sa do medzistavu, v ktorom zistime ci binarne cislo nie je 0
                     state = BINARY_ZERO;
                 }
                 else if (current_char == '1')
                 {
+                    //Binarne cislo uz nemoze byt 0, preto nastavime hodnotu false a ostavame v stave Binary
                     zero_int = false;
                     state = BINARY;
                 }
@@ -889,9 +872,10 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
-                    //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
+                    //V pripade nepovoleneho znaku zistime ci je zero_int false, ak je tak cislo nie je 0
                     if(zero_int==false)
                     {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_NON_ZERO, &token);
                         return token;
@@ -902,12 +886,14 @@ TOKEN get_next_token(FILE* text)
             case BINARY_ZERO:
                 if (current_char == '0')
                 {
-                    //zero_int = true;
+                    //V pripade ze pride 0, ostavame v stave BINARY_ZERO, pretoze binarne cislo moze byt stale 0
                     state = BINARY_ZERO;
                 }
                 else if (current_char == '1')
                 {
+                    //V pripade ze prisla 1, nastavime hodnotu false, pretoze binarne cislo uz nemoze byt 0, kedze obsahuje 1
                     zero_int = false;
+                    //Vraciame sa do stavu BINARY
                     state = BINARY;
                 }
                 else if ((isdigit(current_char)) && (current_char != '0') && (current_char != '1'))
@@ -929,15 +915,18 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
+                    //V pripade, ze je hodnota true, vieme ze binarne cislo je 0, lebo neobsahuje 1
                     if(zero_int)
                     {
-                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
+                        //V pripade nepovoleneho znaku koncime tokenom INT_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_ZERO, &token);
                         return token;
                     }
+                    //V pripade, ze je hodnota false, vieme ze binarne cislo je nenulove, lebo obsahuje 1
                     else if (zero_int == false)
                     {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_NON_ZERO, &token);
                         return token;
@@ -948,12 +937,14 @@ TOKEN get_next_token(FILE* text)
             case OCTAL:
                 if ((isdigit(current_char)) && (current_char!='0'))
                 {
-                    //Ostavame v stave OCTAL, pretoze moze byt viac ciferne osmickove cislo
+                    //V pripade ze dostaneme nenulove cislo, nastavime hodnotu false, pretoze vieme ze nebude uz 0
                     zero_int = false;
+                    //Ostavame v stave OCTAL, pretoze nemusi byt len jeden znak
                     state = OCTAL;
                 }
                 else if (current_char == '0')
                 {
+                    //V pripade ze pride 0, sa presuvame do stavu OCTAL_ZERO, pretoze moze byt nulove cislo
                     state = OCTAL_ZERO;
                 }
                 else if (isalpha(current_char))
@@ -969,8 +960,10 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
+                    //V pripade ze je hodnota false, vieme ze cislo je nenulove, lebo obsahuje iny znak ako 0
                     if(zero_int==false)
                     {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_NON_ZERO, &token);
                         return token;
@@ -981,11 +974,14 @@ TOKEN get_next_token(FILE* text)
             case OCTAL_ZERO:
                 if (current_char == '0')
                 {
+                    //V pripade, ze pride cislica 0, ostavame v stave OCTAL_ZERO, pretoze to stale moze byt 0 cislo
                     state = OCTAL_ZERO;
                 }
                 else if ((isdigit(current_char)) && (current_char!='0'))
                 {
+                    //V pripade ze nepride cislica 0, nastavime hodnotu false, pretoze vieme, ze to uz nebude nulove cislo
                     zero_int = false;
+                    //Vraciame sa teda do stavu OCTAL
                     state = OCTAL;
                 }
                 else if (isalpha(current_char))
@@ -1001,15 +997,18 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
+                    //V pripade, ze je hodnota true, vieme ze cislo je nulove
                     if(zero_int)
                     {
-                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
+                        //V pripade nepovoleneho znaku koncime tokenom INT_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_ZERO, &token);
                         return token;
                     }
+                    //V pripade, ze je hodnota false, vieme ze cislo nie je nulove
                     else if (zero_int == false)
                     {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_NON_ZERO, &token);
                         return token;
@@ -1020,12 +1019,14 @@ TOKEN get_next_token(FILE* text)
             case HEXADECIMAL:
                 if (((isdigit(current_char)) || (current_char == 'A') || (current_char == 'a') || (current_char == 'B') || (current_char == 'b') || (current_char == 'C') || (current_char == 'c') || (current_char == 'D') || (current_char == 'd') || (current_char == 'E') || (current_char == 'e') || (current_char == 'F') || (current_char == 'f')) && (current_char!='0'))
                 {
-                    //Ostavame v stave HEXADECIMAL, pretoze moze byt viac ciferne sestnastkove cislo
+                    //V pripade ak pride povoleny znak a nie je to 0, tak nastavime hodnotu false, lebo vieme ze to uz nebude nulove cislo
                     zero_int = false;
+                    //Ostavame teda v stave HEXADECIMAL
                     state = HEXADECIMAL;
                 }
                 else if (current_char == '0')
                 {
+                    //V pripade, ze pride cislica 0, presuvame sa do stavu HEXA_ZERO, lebo cislo moze byt nulove
                     state = HEXA_ZERO;
                 }
                 else if ((current_char >='g' && current_char <= 'z') || (current_char >= 'G' && current_char <= 'Z'))
@@ -1041,8 +1042,10 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
+                    //V pripade cez je hodnota false, vieme ze cislo je nenulove
                     if(zero_int==false)
                     {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_NON_ZERO, &token);
                         return token;
@@ -1053,12 +1056,14 @@ TOKEN get_next_token(FILE* text)
             case HEXA_ZERO:
                 if (current_char == '0')
                 {
+                    //V pripade ze pride 0, ostavame v stave HEXA_ZERO, lebo cislo moze byt nulove
                     state = HEXA_ZERO;
                 }
                 else if (((isdigit(current_char)) || (current_char == 'A') || (current_char == 'a') || (current_char == 'B') || (current_char == 'b') || (current_char == 'C') || (current_char == 'c') || (current_char == 'D') || (current_char == 'd') || (current_char == 'E') || (current_char == 'e') || (current_char == 'F') || (current_char == 'f')) && (current_char!='0'))
                 {
-                    //Ostavame v stave HEXADECIMAL, pretoze moze byt viac ciferne sestnastkove cislo
+                    //V pripade ze dostaneme znak ktory neni 0, nastavime hodnotu false, lebo vieme ze cislo nebude nulove
                     zero_int = false;
+                    //Presuvame sa do stavu HEXADECIMAL
                     state = HEXADECIMAL;
                 }
                 else if ((current_char >='g' && current_char <= 'z') || (current_char >= 'G' && current_char <= 'Z'))
@@ -1074,23 +1079,24 @@ TOKEN get_next_token(FILE* text)
                 }
                 else
                 {
+                    //V pripade ze je hodnota nastavena na true, vieme ze cislo je nulove
                     if(zero_int)
                     {
-                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
+                        //V pripade nepovoleneho znaku koncime tokenom INT_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_ZERO, &token);
                         return token;
                     }
+                    //V pripade ze je hodnota nastavena na false, vieme ze cislo je nenulove
                     else if (zero_int == false)
                     {
+                        //V pripade nepovoleneho znaku koncime tokenom INT_NON_ZERO a skenujeme nepovoleny znak
                         unload_c(text);
                         end_token(t_INT_NON_ZERO, &token);
                         return token;
                     }
                 }
                 break;
-                    
-                    
                     
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1107,14 +1113,6 @@ TOKEN get_next_token(FILE* text)
                     //Presuvame sa do medzistavu ES_STRING, pretoze mozu nasledovat vyhradene znaky, potrebne na ES
                     state = ES_STRING;
                 }
-                /*
-                else if (current_char == '\n')
-                {
-                    //V pripade nepovoleneho znaku, koncime lexikalnou chybou
-                    fprintf(stderr , "Lexical error.\n");
-                    exit(1);
-                }
-                */
                 else if (current_char == EOF)
                 {
                     //V pripade nepovoleneho znaku, koncime lexikalnou chybou
