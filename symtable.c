@@ -173,11 +173,9 @@ void BSTInsertLocal (tBSTNodePtrLocal* RootPtr, char * Name, int *Type, char *Da
 	{
 	}else if (strcmp(Name, (*RootPtr)->Name) < 0)     	
 	{
-	//	printf("Vlkadam dolava\n");
 		BSTInsertLocal(&(*RootPtr)->LPtr,Name, Type, Data);
 	}else if (strcmp(Name, (*RootPtr)->Name) > 0)
 	{
-	//	printf("Vkladam doprava\n");
 		BSTInsertLocal(&(*RootPtr)->RPtr,Name, Type, Data);
 	}
 }
