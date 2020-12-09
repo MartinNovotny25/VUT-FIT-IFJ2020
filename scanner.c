@@ -1,6 +1,9 @@
 /*
-**    Part of IFJ Project 2020/2021
-**    Author: Simon Fenko xfenko01
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Zdrojovy subor lexikalnej analyzy pre projekt IFJ2020
+*  Vytvoril: Simon Fenko - xfenko01
+*
+*  Datum: 10/2020
 */
 #include "scanner.h"
 
