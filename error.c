@@ -1,6 +1,10 @@
-//
-// Created by novot on 10/25/2020.
-//
+/*
+*  Predmet: Formalne jazyky a prekladace (IFJ) - FIT VUT v Brne
+*  Zdrojovy subor error kniznice pre projekt IFJ2020
+*  Vytvoril: Martin Novotny - xnovot1r
+*
+*  Datum: 10/2020
+*/
 
 #include "error.h"
 #include "parser.h"
