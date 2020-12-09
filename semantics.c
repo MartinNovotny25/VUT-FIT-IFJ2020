@@ -1804,8 +1804,11 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                         int_count = 0;
                         float_count = 0;
                     }else{
-                        //printf("Datove typy sa nerovnaju\n\n");
-                        error_call(ERR_SEM_EXCOMPAT, L);
+                        if(types_of_defined_vars[comma_count] == 0){
+                            error_call(ERR_SEM_OTHER, L);
+                        }else{
+                            error_call(ERR_SEM_EXCOMPAT, L);
+                        }
                     }
                 
                     // ak vo vyraze boli len cisla
@@ -1823,8 +1826,11 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                         int_count = 0;
                         float_count = 0;
                     }else{
-                        //printf("\n\n TYP PREMENNEJ SA NEROVNA S INTEGROM\n");
-                        error_call(ERR_SEM_EXCOMPAT, L);
+                        if(types_of_defined_vars[comma_count] == 0){
+                            error_call(ERR_SEM_OTHER, L);
+                        }else{
+                            error_call(ERR_SEM_EXCOMPAT, L);
+                        }
                     }
 
                 // ak vo vyraze boli len floaty
@@ -1839,7 +1845,11 @@ void assign_vals_control(TDLList *L, tBSTNodePtrLocal *node, functionData params
                         int_count = 0;
                         float_count = 0;
                     }else{
-                        error_call(ERR_SEM_EXCOMPAT, L);
+                        if(types_of_defined_vars[comma_count] == 0){
+                            error_call(ERR_SEM_OTHER, L);
+                        }else{
+                            error_call(ERR_SEM_EXCOMPAT, L);
+                        }
                     }
                 }else if(underscore_found == 1){
                     id_insert++;
