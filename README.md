@@ -8,3 +8,8 @@ Sémantické/běhové chyby (detekce): 100 % (26/26)
 Interpretace přeloženého kódu: 1 % (12/850)
 
 Celkové hodnotenie programovej časti - 7,08/15
+
+Cieľom tohto repozitára je ukázať, že tento projekt sa dá zvládnuť, aj keď je váš tím tvorený pepegami.
+
+Veľa šťastia
+
