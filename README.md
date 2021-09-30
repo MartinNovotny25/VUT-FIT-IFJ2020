@@ -13,3 +13,5 @@ Cieľom tohto repozitára je ukázať, že tento projekt sa dá zvládnuť, aj k
 
 Veľa šťastia
 
+So rise up! Rise up, children of the Empire! Rise up, Stormcloaks! Embrace the word of mighty Talos, he who is both man and Divine!
+
