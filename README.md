@@ -9,9 +9,9 @@ Interpretace přeloženého kódu: 1 % (12/850)
 
 Celkové hodnotenie programovej časti - 7,08/15
 
-Cieľom tohto repozitára je ukázať, že tento projekt sa dá zvládnuť, aj keď je váš tím tvorený pepegami.
+Brother, to partake in our crusade, is to be IMMORTAL.
 
 Veľa šťastia
 
-So rise up! Rise up, children of the Empire! Rise up, Stormcloaks! Embrace the word of mighty Talos, he who is both man and Divine!
+
 
